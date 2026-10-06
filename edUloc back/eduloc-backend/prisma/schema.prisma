@@ -1,0 +1,880 @@
+// ============================================================
+// EduLoc V2 — schema.prisma (Prisma 7)
+// ------------------------------------------------------------
+// Contraintes non exprimables en Prisma (exclusion anti-chevauchement,
+// CHECK, PostGIS, index partiels) : prisma/sql/001_constraints.sql
+// à coller dans la première migration créée avec --create-only.
+// ============================================================
+
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  PENDING_VERIFICATION
+}
+
+enum TutorApplicationStatus {
+  DRAFT
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TutorDocumentType {
+  IDENTITY
+  DIPLOMA
+  CERTIFICATE
+  PROFESSIONAL_PROOF
+  OTHER
+}
+
+enum TutorDocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum RelationshipType {
+  SELF
+  CHILD
+  SPOUSE
+  SIBLING
+  PARENT
+  RELATIVE
+  OTHER
+}
+
+enum ObjectiveType {
+  REMEDIAL
+  ONGOING
+  EXCELLENCE
+}
+
+enum DifficultyType {
+  THEORETICAL
+  PRACTICAL
+  METHODOLOGICAL
+  CONFIDENCE
+  OTHER
+}
+
+enum TeachingFormat {
+  ONLINE
+  IN_PERSON
+  BOTH
+}
+
+enum RhythmType {
+  ONE_TIME
+  OCCASIONAL
+  REGULAR
+  INTENSIVE
+}
+
+enum PlaceType {
+  TUTOR_HOME
+  BENEFICIARY_HOME
+  PUBLIC_PLACE
+  ONLINE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  REFUSED
+  CANCELLED
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum BookingActor {
+  REQUESTER
+  TUTOR
+  SYSTEM
+  ADMIN
+}
+
+enum TeachingMode {
+  ONLINE
+  AT_HOME_BENEFICIARY
+  AT_HOME_TUTOR
+  PUBLIC_PLACE
+}
+
+enum ConversationStatus {
+  OPEN
+  READ_ONLY
+  CLOSED
+}
+
+/// Pas de TEXT : la communication utilisateur est vocale (ADR-04).
+enum MessageType {
+  VOICE
+  DOCUMENT
+  SYSTEM
+  CALL_EVENT
+}
+
+enum AttachmentKind {
+  VOICE
+  DOCUMENT
+}
+
+enum TranscriptStatus {
+  NONE
+  PENDING
+  DONE
+  FAILED
+}
+
+enum CallType {
+  AUDIO
+  VIDEO
+}
+
+enum CallStatus {
+  RINGING
+  ONGOING
+  ENDED
+  MISSED
+  DECLINED
+  CANCELLED
+}
+
+enum DevicePlatform {
+  ANDROID
+  IOS
+  WEB
+}
+
+enum NotificationType {
+  BOOKING_REQUEST
+  BOOKING_CONFIRMED
+  BOOKING_REFUSED
+  BOOKING_CANCELLED
+  SESSION_STARTED
+  SESSION_COMPLETED
+  REVIEW_REQUEST
+  TUTOR_APPLICATION
+  TUTOR_APPLICATION_APPROVED
+  TUTOR_APPLICATION_REJECTED
+  TUTOR_SUSPENDED
+  VOICE_MESSAGE
+  DOCUMENT_MESSAGE
+  INCOMING_CALL
+  MISSED_CALL
+  REMINDER
+  SYSTEM
+}
+
+enum ConflictType {
+  OVERLAPPING_BOOKINGS
+  TUTOR_UNAVAILABLE
+  AVAILABILITY_REMOVED
+  OFFER_INACTIVE
+  TUTOR_SUSPENDED
+}
+
+enum ConflictStatus {
+  OPEN
+  RESOLVED
+  DISMISSED
+}
+
+// ============================================================
+// USER / DEMANDEUR
+// ============================================================
+
+model User {
+  id        String @id @default(uuid())
+  firstName String
+  lastName  String
+  email     String @unique
+  password  String // hash argon2id
+
+  phone    String?
+  avatar   String?
+  language String  @default("fr")
+  timezone String  @default("Indian/Antananarivo")
+
+  status UserStatus @default(PENDING_VERIFICATION)
+
+  emailVerified              Boolean   @default(false)
+  emailVerificationTokenHash String?   @unique
+  emailVerificationExpiresAt DateTime?
+  passwordResetTokenHash     String?   @unique
+  passwordResetExpiresAt     DateTime?
+
+  isAdmin Boolean @default(false)
+
+  lastLoginAt DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  beneficiaries            Beneficiary[]
+  bookings                 Booking[]          @relation("RequesterBookings")
+  tutorProfile             TutorProfile?
+  sentMessages             Message[]          @relation("SentMessages")
+  conversationsAsRequester Conversation[]     @relation("RequesterConversations")
+  reviews                  Review[]           @relation("RequesterReviews")
+  refreshTokens            RefreshToken[]
+  notifications            Notification[]
+  deviceTokens             DeviceToken[]
+  initiatedCalls           CallSession[]      @relation("InitiatedCalls")
+  reviewedApplications     TutorApplication[] @relation("ApplicationReviewer")
+  bookingEvents            BookingEvent[]
+  resolvedConflicts        Conflict[]         @relation("ConflictResolver")
+
+  @@index([status])
+  @@map("users")
+}
+
+// ============================================================
+// AUTHENTICATION
+// ============================================================
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  tokenHash String    @unique // SHA-256 du jeton opaque
+  familyId  String // rotation : réutilisation détectée => révocation de la famille
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userAgent String?
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([userId])
+  @@index([familyId])
+  @@map("refresh_tokens")
+}
+
+model DeviceToken {
+  id         String         @id @default(uuid())
+  userId     String
+  user       User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token      String         @unique
+  platform   DevicePlatform
+  lastSeenAt DateTime       @default(now())
+  createdAt  DateTime       @default(now())
+
+  @@index([userId])
+  @@map("device_tokens")
+}
+
+// ============================================================
+// BENEFICIARY
+// ============================================================
+
+model Beneficiary {
+  id          String @id @default(uuid())
+  requesterId String
+  requester   User   @relation(fields: [requesterId], references: [id], onDelete: Cascade)
+
+  firstName    String
+  lastName     String?
+  birthDate    DateTime?
+  relationship RelationshipType
+
+  educationLevelId String?
+  educationLevel   EducationLevel? @relation(fields: [educationLevelId], references: [id])
+
+  objective       ObjectiveType?
+  difficultyType  DifficultyType?
+  preferredFormat TeachingFormat?
+  preferredRhythm RhythmType?
+  notes           String?         @db.Text
+
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  bookings Booking[]
+
+  @@index([requesterId])
+  @@index([educationLevelId])
+  @@map("beneficiaries")
+}
+
+// ============================================================
+// CATALOG
+// ============================================================
+
+model EducationLevel {
+  id           String   @id @default(uuid())
+  name         String
+  category     String   @default("")
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  beneficiaries Beneficiary[]
+  tutorSubjects TutorSubject[]
+  offers        Offer[]
+
+  @@unique([name, category])
+  @@index([isActive])
+  @@map("education_levels")
+}
+
+model Subject {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?  @db.Text
+  category    String?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tutorSubjects TutorSubject[]
+  offers        Offer[]
+
+  @@index([isActive])
+  @@map("subjects")
+}
+
+// ============================================================
+// TUTOR
+// ============================================================
+
+model TutorProfile {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  displayName         String?
+  bio                 String?   @db.Text
+  birthDate           DateTime?
+  profilePhoto        String?
+  experience          String?   @db.Text
+  educationBackground String?   @db.Text
+
+  /// Maintenu dans la même transaction que l'approbation / la suspension.
+  isVisible   Boolean   @default(false)
+  suspendedAt DateTime?
+
+  rating       Float @default(0)
+  reviewsCount Int   @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  applications   TutorApplication[]
+  subjects       TutorSubject[]
+  offers         Offer[]
+  places         Place[]
+  availabilities Availability[]
+  blockedPeriods BlockedPeriod[]
+  bookings       Booking[]          @relation("TutorBookings")
+  conversations  Conversation[]     @relation("TutorConversations")
+  reviews        Review[]
+
+  @@index([isVisible])
+  @@map("tutor_profiles")
+}
+
+model TutorApplication {
+  id             String       @id @default(uuid())
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  status TutorApplicationStatus @default(DRAFT)
+
+  submittedAt     DateTime?
+  reviewedAt      DateTime?
+  reviewedById    String?
+  reviewedBy      User?     @relation("ApplicationReviewer", fields: [reviewedById], references: [id], onDelete: SetNull)
+  rejectionReason String?   @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  documents TutorDocument[]
+
+  @@index([tutorProfileId])
+  @@index([status])
+  @@map("tutor_applications")
+}
+
+model TutorDocument {
+  id                 String           @id @default(uuid())
+  tutorApplicationId String
+  tutorApplication   TutorApplication @relation(fields: [tutorApplicationId], references: [id], onDelete: Cascade)
+
+  type        TutorDocumentType
+  storagePath String            @unique
+  mimeType    String
+  sizeBytes   Int
+  fileName    String?
+
+  status          TutorDocumentStatus @default(PENDING)
+  rejectionReason String?             @db.Text
+
+  uploadedAt DateTime  @default(now())
+  reviewedAt DateTime?
+
+  @@index([tutorApplicationId])
+  @@index([status])
+  @@map("tutor_documents")
+}
+
+model TutorSubject {
+  id             String       @id @default(uuid())
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  educationLevelId String
+  educationLevel   EducationLevel @relation(fields: [educationLevelId], references: [id])
+
+  competenceDescription String?  @db.Text
+  createdAt             DateTime @default(now())
+
+  @@unique([tutorProfileId, subjectId, educationLevelId])
+  @@index([subjectId])
+  @@index([educationLevelId])
+  @@map("tutor_subjects")
+}
+
+model Offer {
+  id             String       @id @default(uuid())
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  subjectId String
+  subject   Subject @relation(fields: [subjectId], references: [id])
+
+  educationLevelId String?
+  educationLevel   EducationLevel? @relation(fields: [educationLevelId], references: [id])
+
+  title           String
+  description     String         @db.Text
+  format          TeachingFormat @default(BOTH)
+  durationMinutes Int            @default(60)
+  price           Decimal        @db.Decimal(12, 2)
+  currency        String         @default("MGA")
+
+  isActive          Boolean   @default(true)
+  /// Désactivation par un admin (UC-G08) : le tuteur ne peut pas réactiver.
+  disabledByAdminAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  availabilities Availability[]
+  bookings       Booking[]
+
+  @@index([tutorProfileId])
+  @@index([subjectId, educationLevelId])
+  @@index([isActive])
+  @@map("offers")
+}
+
+model Place {
+  id             String       @id @default(uuid())
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  label     String
+  address   String?
+  latitude  Float?
+  longitude Float?
+  /// Rayon de déplacement en mètres (type BENEFICIARY_HOME)
+  radius    Int?
+  type      PlaceType
+
+  /// Colonne générée PostGIS (cf. 001_constraints.sql). Lecture via $queryRaw uniquement.
+  location Unsupported("geography(Point, 4326)")?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  availabilities Availability[]
+  bookings       Booking[]
+
+  @@index([tutorProfileId])
+  @@index([isActive])
+  @@map("places")
+}
+
+/// Règle de disponibilité récurrente (pas un rendez-vous).
+model Availability {
+  id             String       @id @default(uuid())
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  placeId String?
+  place   Place?  @relation(fields: [placeId], references: [id], onDelete: SetNull)
+
+  offerId String?
+  offer   Offer?  @relation(fields: [offerId], references: [id], onDelete: SetNull)
+
+  /// 0 = dimanche ... 6 = samedi
+  dayOfWeek Int
+  /// "HH:mm", heure locale du fuseau `timezone`
+  startTime String
+  endTime   String
+  timezone  String @default("Indian/Antananarivo")
+
+  validFrom  DateTime?
+  validUntil DateTime?
+
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bookings Booking[]
+
+  @@index([tutorProfileId, isActive, dayOfWeek])
+  @@index([placeId])
+  @@index([offerId])
+  @@map("availabilities")
+}
+
+/// Période bloquée ponctuelle (UC-E08 « bloquer une période »).
+model BlockedPeriod {
+  id             String       @id @default(uuid())
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id], onDelete: Cascade)
+  startAt        DateTime
+  endAt          DateTime
+  reason         String?
+  createdAt      DateTime     @default(now())
+
+  @@index([tutorProfileId, startAt, endAt])
+  @@map("blocked_periods")
+}
+
+// ============================================================
+// BOOKING
+// ============================================================
+
+model Booking {
+  id String @id @default(uuid())
+
+  requesterId String
+  requester   User   @relation("RequesterBookings", fields: [requesterId], references: [id])
+
+  beneficiaryId String
+  beneficiary   Beneficiary @relation(fields: [beneficiaryId], references: [id])
+
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation("TutorBookings", fields: [tutorProfileId], references: [id])
+
+  offerId String
+  offer   Offer  @relation(fields: [offerId], references: [id])
+
+  availabilityId String?
+  availability   Availability? @relation(fields: [availabilityId], references: [id], onDelete: SetNull)
+
+  placeId String?
+  place   Place?  @relation(fields: [placeId], references: [id], onDelete: SetNull)
+
+  startAt DateTime
+  endAt   DateTime
+  status  BookingStatus @default(PENDING)
+
+  teachingMode TeachingMode
+
+  // --- Snapshot au moment de la réservation ---
+  price           Decimal @db.Decimal(12, 2)
+  currency        String  @default("MGA")
+  offerTitle      String
+  locationLabel   String?
+  locationAddress String?
+  latitude        Float?
+  longitude       Float?
+
+  // --- Séance ---
+  startOtpCipher String? // AES-256-GCM
+  otpAttempts    Int       @default(0)
+  otpExpiresAt   DateTime?
+  startedAt      DateTime?
+  completedAt    DateTime?
+
+  // --- Annulation / refus ---
+  cancelledBy        BookingActor?
+  cancellationReason String?       @db.Text
+  refusalReason      String?       @db.Text
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  conversations Conversation[]
+  calls         CallSession[]
+  review        Review?
+  events        BookingEvent[]
+  conflicts     Conflict[]
+
+  @@index([requesterId, startAt])
+  @@index([beneficiaryId])
+  @@index([tutorProfileId, status, startAt])
+  @@index([tutorProfileId, startAt, endAt])
+  @@index([offerId])
+  @@index([availabilityId])
+  @@index([status, startAt])
+  @@map("bookings")
+}
+
+/// Journal d'audit des transitions (machine d'états).
+model BookingEvent {
+  id          String         @id @default(uuid())
+  bookingId   String
+  booking     Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  fromStatus  BookingStatus?
+  toStatus    BookingStatus
+  actor       BookingActor
+  actorUserId String?
+  actorUser   User?          @relation(fields: [actorUserId], references: [id], onDelete: SetNull)
+  reason      String?
+  createdAt   DateTime       @default(now())
+
+  @@index([bookingId, createdAt])
+  @@map("booking_events")
+}
+
+// ============================================================
+// COMMUNICATION (vocal, documents, appels LiveKit)
+// ============================================================
+
+/// Une conversation par paire demandeur / tuteur (ADR-12).
+model Conversation {
+  id String @id @default(uuid())
+
+  requesterId String
+  requester   User   @relation("RequesterConversations", fields: [requesterId], references: [id], onDelete: Cascade)
+
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation("TutorConversations", fields: [tutorProfileId], references: [id], onDelete: Cascade)
+
+  /// Réservation de contexte la plus récente
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  status ConversationStatus @default(OPEN)
+
+  lastMessageType     MessageType?
+  lastMessagePreview  String?
+  lastMessageAt       DateTime?
+  requesterLastReadAt DateTime?
+  tutorLastReadAt     DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+  calls    CallSession[]
+
+  @@unique([requesterId, tutorProfileId])
+  @@index([requesterId, lastMessageAt])
+  @@index([tutorProfileId, lastMessageAt])
+  @@map("conversations")
+}
+
+model Message {
+  id String @id @default(uuid())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  /// null pour SYSTEM / CALL_EVENT
+  senderId String?
+  sender   User?   @relation("SentMessages", fields: [senderId], references: [id], onDelete: SetNull)
+
+  type            MessageType
+  clientMessageId String      @default(uuid())
+  systemText      String?     @db.Text
+
+  replyToId String?
+  replyTo   Message?  @relation("Replies", fields: [replyToId], references: [id], onDelete: SetNull)
+  replies   Message[] @relation("Replies")
+
+  callSessionId String?      @unique
+  callSession   CallSession? @relation(fields: [callSessionId], references: [id], onDelete: SetNull)
+
+  listenedAt DateTime?
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+
+  attachment MessageAttachment?
+
+  @@unique([conversationId, clientMessageId])
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+  @@map("messages")
+}
+
+model MessageAttachment {
+  id        String  @id @default(uuid())
+  messageId String  @unique
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  kind        AttachmentKind
+  bucket      String
+  storagePath String         @unique
+  mimeType    String
+  sizeBytes   Int
+  fileName    String?
+
+  // VOICE
+  durationMs Int?
+  waveform   Json?
+
+  // Transcription (décision ouverte n°6)
+  transcriptStatus TranscriptStatus @default(NONE)
+  transcript       String?          @db.Text
+
+  createdAt DateTime @default(now())
+
+  @@map("message_attachments")
+}
+
+model CallSession {
+  id String @id @default(uuid())
+
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  bookingId String?
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+
+  /// Nom de la room LiveKit (unique)
+  roomName String     @unique
+  type     CallType
+  status   CallStatus @default(RINGING)
+
+  initiatedById String
+  initiatedBy   User   @relation("InitiatedCalls", fields: [initiatedById], references: [id])
+
+  ringingUntil DateTime
+  startedAt    DateTime?
+  endedAt      DateTime?
+  durationSec  Int?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  message Message?
+
+  @@index([conversationId, createdAt])
+  @@index([bookingId])
+  @@index([status, ringingUntil])
+  @@map("call_sessions")
+}
+
+// ============================================================
+// REVIEW
+// ============================================================
+
+model Review {
+  id String @id @default(uuid())
+
+  bookingId String  @unique
+  booking   Booking @relation(fields: [bookingId], references: [id])
+
+  tutorProfileId String
+  tutorProfile   TutorProfile @relation(fields: [tutorProfileId], references: [id])
+
+  /// Auteur. Décision ouverte n°5 : ajouter beneficiaryId si le bénéficiaire évalue.
+  requesterId String
+  requester   User   @relation("RequesterReviews", fields: [requesterId], references: [id])
+
+  rating        Int
+  text          String?   @db.Text
+  officialReply String?   @db.Text
+  repliedAt     DateTime?
+  hiddenAt      DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([tutorProfileId, createdAt])
+  @@index([requesterId])
+  @@map("reviews")
+}
+
+// ============================================================
+// NOTIFICATIONS & OUTBOX
+// ============================================================
+
+model Notification {
+  id      String           @id @default(uuid())
+  userId  String
+  user    User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title   String
+  message String           @db.Text
+  type    NotificationType
+  data    Json?
+  isRead  Boolean          @default(false)
+  linkUrl String?
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, isRead, createdAt])
+  @@map("notifications")
+}
+
+/// Transactional outbox : écrite dans la transaction métier, publiée par le relay.
+model OutboxEvent {
+  id            String    @id @default(uuid())
+  aggregateType String
+  aggregateId   String
+  eventType     String
+  recipientIds  String[]
+  payload       Json
+  pushTitle     String?
+  pushBody      String?
+  /// Clés Redis à invalider après publication
+  cacheKeys     String[]
+  attempts      Int       @default(0)
+  lockedUntil   DateTime?
+  processedAt   DateTime?
+  lastError     String?
+  createdAt     DateTime  @default(now())
+
+  @@index([processedAt, createdAt])
+  @@map("outbox_events")
+}
+
+// ============================================================
+// ADMIN — CONFLITS (UC-G10, G11)
+// ============================================================
+
+model Conflict {
+  id        String         @id @default(uuid())
+  type      ConflictType
+  status    ConflictStatus @default(OPEN)
+  bookingId String
+  booking   Booking        @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  details   Json?
+
+  resolvedById String?
+  resolvedBy   User?     @relation("ConflictResolver", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolution   String?   @db.Text
+  resolvedAt   DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([bookingId, type])
+  @@index([status, createdAt])
+  @@map("conflicts")
+}

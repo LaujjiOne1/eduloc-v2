@@ -1,0 +1,63 @@
+import { Body, Controller, Get, Param, ParseUUIDPipe, Post, Query, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { CurrentUser, AuthUser } from '../../common/decorators/current-user.decorator';
+import { IdempotencyInterceptor } from '../../common/interceptors/idempotency.interceptor';
+import { BookingsService } from './bookings.service';
+import { CancelBookingDto, CreateBookingDto, RefuseBookingDto, StartSessionDto } from './dto';
+
+@ApiTags('bookings')
+@ApiBearerAuth()
+@Controller('bookings')
+export class BookingsController {
+  constructor(private readonly service: BookingsService) {}
+
+  @Post()
+  @UseInterceptors(IdempotencyInterceptor)
+  create(@CurrentUser() user: AuthUser, @Body() dto: CreateBookingDto) {
+    return this.service.createBooking(user.userId, dto);
+  }
+
+  @Get()
+  list(
+    @CurrentUser() user: AuthUser,
+    @Query('role') role: 'requester' | 'tutor' = 'requester',
+    @Query('status') status?: string,
+  ) {
+    return this.service.listMine(user.userId, role, status);
+  }
+
+  @Get(':id')
+  get(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    return this.service.getForUser(user.userId, id);
+  }
+
+  @Post(':id/accept')
+  accept(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    return this.service.acceptBooking(user.userId, id);
+  }
+
+  @Post(':id/refuse')
+  refuse(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string, @Body() dto: RefuseBookingDto) {
+    return this.service.refuseBooking(user.userId, id, dto);
+  }
+
+  @Post(':id/cancel')
+  cancel(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string, @Body() dto: CancelBookingDto) {
+    return this.service.cancelBooking(user.userId, id, dto, user.isAdmin);
+  }
+
+  @Get(':id/otp')
+  otp(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    return this.service.getOtp(user.userId, id);
+  }
+
+  @Post(':id/start')
+  start(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string, @Body() dto: StartSessionDto) {
+    return this.service.startSession(user.userId, id, dto.otp);
+  }
+
+  @Post(':id/complete')
+  complete(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    return this.service.completeSession(user.userId, id);
+  }
+}

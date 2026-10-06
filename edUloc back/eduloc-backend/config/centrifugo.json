@@ -1,0 +1,28 @@
+{
+  "client": {
+    "token": { "hmac_secret_key": "${CENTRIFUGO_TOKEN_SECRET}" },
+    "subscription_token": { "hmac_secret_key": "${CENTRIFUGO_SUB_SECRET}" },
+    "allowed_origins": ["https://app.eduloc.mg", "https://eduloc.mg", "http://localhost:3000"]
+  },
+  "http_api": { "key": "${CENTRIFUGO_API_KEY}" },
+  "channel": {
+    "namespaces": [
+      {
+        "name": "personal",
+        "allow_user_limited_channels": true,
+        "history_size": 100,
+        "history_ttl": "72h",
+        "force_recovery": true
+      },
+      {
+        "name": "conv",
+        "allow_publish_for_subscriber": true,
+        "presence": true
+      },
+      {
+        "name": "slots",
+        "allow_subscribe_for_client": true
+      }
+    ]
+  }
+}

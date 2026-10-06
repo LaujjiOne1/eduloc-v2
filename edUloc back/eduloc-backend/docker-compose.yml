@@ -1,0 +1,85 @@
+services:
+  db:
+    image: postgis/postgis:16-3.4-alpine
+    container_name: eduloc-db
+    environment:
+      POSTGRES_USER: eduloc
+      POSTGRES_PASSWORD: eduloc
+      POSTGRES_DB: eduloc
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U eduloc -d eduloc"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: eduloc-redis
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  centrifugo:
+    image: centrifugo/centrifugo:v6
+    container_name: eduloc-centrifugo
+    command: ["centrifugo", "-c", "/etc/centrifugo/config.json"]
+    volumes:
+      - ./config/centrifugo.json:/etc/centrifugo/config.json:ro
+    environment:
+      CENTRIFUGO_TOKEN_SECRET: centrifugo-connection-secret
+      CENTRIFUGO_SUB_SECRET: centrifugo-subscription-secret
+      CENTRIFUGO_API_KEY: centrifugo-api-key
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: eduloc-livekit
+    command: |
+      --dev
+      --bind 0.0.0.0
+      --keys "devkey: secretsecretsecretsecretsecretsecret"
+    ports:
+      - "7880:7880"
+      - "7881:7881"
+      - "7882:7882/udp"
+      - "50000-50100:50000-50100/udp"
+
+  api:
+    build: .
+    container_name: eduloc-api
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://eduloc:eduloc@db:5432/eduloc?schema=public
+      DIRECT_URL: postgresql://eduloc:eduloc@db:5432/eduloc?schema=public
+      REDIS_URL: redis://redis:6379
+      CENTRIFUGO_URL: http://centrifugo:8000
+      LIVEKIT_URL: ws://livekit:7880
+    ports:
+      - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      centrifugo:
+        condition: service_started
+      livekit:
+        condition: service_started
+
+volumes:
+  pgdata:
+  redisdata:
