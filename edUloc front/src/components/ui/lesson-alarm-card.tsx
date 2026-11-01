@@ -43,10 +43,10 @@ export function LessonAlarmCard() {
   };
 
   return (
-    <View className="rounded-lg border border-line bg-surface p-4">
+    <View className="rounded-lg border border-line bg-surface shadow-card p-4">
       <View className="flex-row items-center gap-3">
         <View className="h-9 w-9 items-center justify-center rounded-full bg-warning-tint">
-          <AlarmIcon size={18} color="#BD7E28" />
+          <AlarmIcon size={18} color="#D4890A" />
         </View>
         <View className="flex-1">
           <Text className="text-[14.5px] font-bold text-ink">{t("ui.lessonAlarmCard.lessonAlarm")}</Text>

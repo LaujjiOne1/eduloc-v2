@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="crm_lead_view_form_eduloc" model="ir.ui.view">
+        <field name="name">crm.lead.form.eduloc</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']" position="before">
+                <page string="Demande EduLoc" name="eduloc_request">
+                    <group>
+                        <group string="Besoin éducatif">
+                            <field name="eduloc_request_type"/>
+                            <field name="eduloc_for_whom"/>
+                            <field name="eduloc_level"/>
+                            <field name="eduloc_subject"/>
+                            <field name="eduloc_format"/>
+                            <field name="eduloc_frequency"/>
+                            <field name="eduloc_city"/>
+                        </group>
+                        <group string="Suivi">
+                            <field name="eduloc_preferred_channel"/>
+                            <field name="eduloc_received_at"/>
+                            <field name="eduloc_public_ref"/>
+                            <field name="eduloc_external_ref"/>
+                            <field name="eduloc_reservation_ref"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_lead_view_search_eduloc" model="ir.ui.view">
+        <field name="name">crm.lead.search.eduloc</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.view_crm_case_opportunities_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='name']" position="after">
+                <field name="eduloc_public_ref" string="Référence visiteur"/>
+                <field name="eduloc_external_ref" string="Référence externe"/>
+                <field name="eduloc_reservation_ref" string="Référence de réservation"/>
+            </xpath>
+            <xpath expr="//filter[@name='saleschannel']" position="after">
+                <filter name="group_eduloc_type" string="Type de demande" context="{'group_by': 'eduloc_request_type'}"/>
+                <filter name="group_eduloc_level" string="Niveau" context="{'group_by': 'eduloc_level'}"/>
+                <filter name="group_eduloc_subject" string="Matière" context="{'group_by': 'eduloc_subject'}"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -11,7 +11,19 @@
     "noTutorToShowOn": "Aucun tuteur à afficher sur la carte.",
     "km": "{{label}}, {{distanceKm}} km",
     "tryLoadingTheTutorsAgain": "Réessayer de charger les tuteurs",
-    "searching": "Recherche des tuteurs…"
+    "searching": "Recherche des tuteurs…",
+    "noTutorTitle": "Aucun tuteur trouvé à proximité ?",
+    "noTutorHint": "Changez de niveau ou de matière, ou essayez un cours en ligne.",
+    "changeSearch": "Modifier ma recherche",
+    "newTutor": "Nouveau tuteur",
+    "book": "Réserver",
+    "onlineAndInPerson": "En ligne & présentiel",
+    "viewDetails": "Voir les détails",
+    "fullProfile": "Voir le profil complet",
+    "previous": "Tuteur précédent",
+    "next": "Tuteur suivant",
+    "carouselHint": "Faites glisser pour parcourir les tuteurs",
+    "carouselPosition": "{{current}} sur {{total}}"
   },
   "tutorProfile": {
     "verifiedTutor": "Tuteur validé",

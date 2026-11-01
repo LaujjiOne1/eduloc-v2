@@ -1,0 +1,5 @@
+project_id = "puzzzannbcpqozjvssob"
+
+# Appelée par la tâche planifiée avec un secret Bearer (cron-auth.ts), pas avec un JWT utilisateur.
+[functions.odoo-sync]
+verify_jwt = false

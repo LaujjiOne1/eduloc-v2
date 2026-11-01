@@ -186,13 +186,13 @@ function RoomForm({ room, blocks = [], onCreated, onUpdated, onRefresh, onDelete
     <>
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 28 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View className="mb-1 flex-row items-start justify-between gap-3">
-          <Text className="flex-1 text-[24px] font-bold text-ink">{room ? room.name : t("partnerDashboard.room.newRoom")}</Text>
+          <Text className="flex-1 text-[24px] font-bold font-display text-ink">{room ? room.name : t("partnerDashboard.room.newRoom")}</Text>
           {status ? <ToneBadge label={status.label} tone={status.tone} /> : null}
         </View>
 
         {room ? (
           <FadeIn delay={20}>
-            <View className="mb-4 mt-2 rounded-lg border border-line bg-surface p-4">
+            <View className="mb-4 mt-2 rounded-lg border border-line bg-surface shadow-card p-4">
               <Text className="text-[13px] text-ink-soft">
                 {PUBLICATION_LABELS[room.publication]} · {room.bookable ? t("common.bookable") : t("common.notBookable")}
                 {!room.isActive ? t("partnerDashboard.room.temporarilyClosed") : ""}

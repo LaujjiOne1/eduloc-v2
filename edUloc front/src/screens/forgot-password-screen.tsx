@@ -37,7 +37,7 @@ export function ForgotPasswordScreen() {
         {form.step === "email" ? (
           <>
             <FadeIn delay={40}>
-              <Text className="mb-[6px] text-[25px] font-bold text-ink">{t("common.forgotPassword")}</Text>
+              <Text className="mb-[6px] text-[25px] font-bold font-display text-ink">{t("common.forgotPassword")}</Text>
               <Text className="mb-6 text-[14px] text-ink-soft">
                 {t("screens.forgotPassword.enterYourAccountEmailWe")}</Text>
             </FadeIn>
@@ -72,7 +72,7 @@ export function ForgotPasswordScreen() {
         {form.step === "reset" ? (
           <>
             <FadeIn delay={40}>
-              <Text className="mb-[6px] text-[25px] font-bold text-ink">{t("screens.forgotPassword.newPassword")}</Text>
+              <Text className="mb-[6px] text-[25px] font-bold font-display text-ink">{t("screens.forgotPassword.newPassword")}</Text>
               <Text className="mb-6 text-[14px] text-ink-soft">
                 {t("screens.forgotPassword.ifAccountExistsFor")} <Text className="font-bold text-ink">{form.email.trim()}</Text>{t("screens.forgotPassword.codeJustSent")}
               </Text>
@@ -113,7 +113,7 @@ export function ForgotPasswordScreen() {
 
         {form.step === "done" ? (
           <FadeIn delay={40}>
-            <Text className="mb-[6px] text-[25px] font-bold text-ink">{t("screens.forgotPassword.passwordChanged")}</Text>
+            <Text className="mb-[6px] text-[25px] font-bold font-display text-ink">{t("screens.forgotPassword.passwordChanged")}</Text>
             <Text className="mb-6 text-[14px] text-ink-soft">
               {t("screens.forgotPassword.yourDevicesWereSignedOut")}</Text>
             <Button label={t("common.signIn")} onPress={() => router.replace(LOGIN_ROUTE)} fullWidth />

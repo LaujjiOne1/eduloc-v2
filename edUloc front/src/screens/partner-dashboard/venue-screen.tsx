@@ -147,7 +147,7 @@ function VenueForm({ venue, onChanged, onDone, bottomInset }: { venue: PartnerVe
     <>
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View className="mb-1 flex-row items-start justify-between gap-3">
-          <Text className="flex-1 text-[24px] font-bold text-ink">{venue ? t("partnerDashboard.venue.myOrganisation") : t("partnerDashboard.venue.newOrganisation")}</Text>
+          <Text className="flex-1 text-[24px] font-bold font-display text-ink">{venue ? t("partnerDashboard.venue.myOrganisation") : t("partnerDashboard.venue.newOrganisation")}</Text>
           {status ? <ToneBadge label={status.label} tone={status.tone} /> : null}
         </View>
         <Text className="mb-4 text-[13.5px] leading-[20px] text-ink-soft">
@@ -202,7 +202,7 @@ function VenueForm({ venue, onChanged, onDone, bottomInset }: { venue: PartnerVe
                 <FormError message={fileError} />
               </View>
             ) : null}
-            <View className="rounded-lg border border-line bg-surface px-4">
+            <View className="rounded-lg border border-line bg-surface shadow-card px-4">
               {DOCUMENT_KINDS.map((kind, index) => {
                 const doc = venue.documents.find((d) => d.kind === kind);
                 return (
@@ -246,7 +246,7 @@ function VenueForm({ venue, onChanged, onDone, bottomInset }: { venue: PartnerVe
         {venue?.history.length ? (
           <FadeIn delay={90}>
             <Text className="mb-2 mt-8 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("partnerDashboard.venue.fileTracking")}</Text>
-            <View className="rounded-lg border border-line bg-surface px-4">
+            <View className="rounded-lg border border-line bg-surface shadow-card px-4">
               {venue.history
                 .filter((h) => h.scope === "venue")
                 .slice(0, 6)

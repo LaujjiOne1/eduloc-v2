@@ -1,0 +1,5 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_eduloc_payment_salesman,eduloc.payment salesman (lecture seule),model_eduloc_payment,sales_team.group_sale_salesman,1,0,0,0
+access_eduloc_payment_manager,eduloc.payment manager (lecture seule),model_eduloc_payment,sales_team.group_sale_manager,1,0,0,0
+access_eduloc_payment_event_salesman,eduloc.payment.event salesman (lecture seule),model_eduloc_payment_event,sales_team.group_sale_salesman,1,0,0,0
+access_eduloc_payment_event_manager,eduloc.payment.event manager (lecture seule),model_eduloc_payment_event,sales_team.group_sale_manager,1,0,0,0

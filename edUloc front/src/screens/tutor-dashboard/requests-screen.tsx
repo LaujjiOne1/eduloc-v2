@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { AlertTriangleIcon, CalendarIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -37,7 +38,7 @@ export function RequestsScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-[14px] text-[25px] font-bold text-ink">{t("tutorDashboard.requests.requests")}</Text>
+      <Text className="px-5 pb-[14px] text-[25px] font-bold font-display text-ink">{t("tutorDashboard.requests.requests")}</Text>
 
       <View className="flex-row w-full h-[52px] gap-[14px] px-5 pb-4">
         {TABS.map(({ id, label }) => {
@@ -75,11 +76,10 @@ export function RequestsScreen() {
             </PressableScale>
           </View>
         ) : bookings.length === 0 ? (
-          <View className="items-center py-10">
-            <Text className="text-center text-[14px] text-ink-soft">
-              {tab === "pending" ? t("common.noPendingRequestsAtThe") : t("tutorDashboard.requests.noConfirmedRequestsYet")}
-            </Text>
-          </View>
+          <EmptyState
+            illustration="notebook"
+            title={tab === "pending" ? t("common.noPendingRequestsAtThe") : t("tutorDashboard.requests.noConfirmedRequestsYet")}
+          />
         ) : (
           bookings.map((booking, index) => (
             <FadeIn key={booking.id} delay={40 + index * 50}>
@@ -98,7 +98,7 @@ function RequestCard({ booking, onPress }: { booking: Booking; onPress: () => vo
   const { t } = useTranslation();
   return (
     <PressableScale onPress={onPress} accessibilityLabel={t("common.requestFrom", { firstName: booking.beneficiary.firstName })}>
-      <View className="mb-3 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="flex-row items-start justify-between">
           <View>
             <Text className="text-[15px] font-bold text-ink">{booking.beneficiary.firstName}</Text>
@@ -115,7 +115,7 @@ function RequestCard({ booking, onPress }: { booking: Booking; onPress: () => vo
         </View>
         {booking.competingRequests.length > 0 ? (
           <View className="mt-3 flex-row items-center gap-[6px] rounded-md bg-warning-tint px-3 py-2">
-            <AlertTriangleIcon size={14} color="#BD7E28" />
+            <AlertTriangleIcon size={14} color="#D4890A" />
             <Text className="flex-1 text-[12.5px] font-semibold text-warning">
               {t("tutorDashboard.requests.sameTimeRequested", { value: booking.competingRequests.length === 1 ? t("tutorDashboard.requests.by1OtherPerson") : t("tutorDashboard.requests.byOtherPeople", { length: booking.competingRequests.length }) })}
             </Text>

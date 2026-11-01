@@ -22,7 +22,29 @@
     "whatWouldYouLikeTo": "Inona no tianao atao?",
     "myActivities": "Ny asa ataoko",
     "switchModeLearner": "Hiova fomba: Mpianatra",
-    "beneficiaries": "Mpandray soa"
+    "beneficiaries": "Mpandray soa",
+    "appointmentWith": "Fihaonana miaraka amin'i {{tutorName}}",
+    "recommendedNear": "Mpampianatra atolotra akaikin'i {{place}}",
+    "recommendedNearYou": "Mpampianatra atolotra eo akaikinao",
+    "recommendedOnline": "Mpampianatra atolotra an-tserasera",
+    "aroundMe": "Manodidina ahy",
+    "noRatingYet": "Vaovao",
+    "myTutors": "Ireo mpampianatra ahy",
+    "recommendedBadge": "Atolotra",
+    "activeCount_one": "{{count}} mavitrika",
+    "activeCount_other": "{{count}} mavitrika",
+    "noAppointmentsShort": "Tsy misy",
+    "managePlanning": "Tantano ny drafitra",
+    "beneficiariesCount_one": "{{count}} mpanjifa",
+    "beneficiariesCount_other": "{{count}} mpanjifa",
+    "linkedStudents": "Mpianatra voafehy",
+    "openTutor": "Hijery ny mombamomba an'i {{tutorName}}",
+    "lessonsThisWeek": "Lesona amin'ity herinandro ity",
+    "lessonsCount_one": "Lesona {{count}}",
+    "lessonsCount_other": "Lesona {{count}}",
+    "noLessonsShort": "Tsy misy lesona",
+    "pendingShort_one": "{{count}} miandry",
+    "pendingShort_other": "{{count}} miandry"
   },
   "reviewTutor": {
     "howDidTheSessionGo": "Nahoana ny session?",
@@ -42,5 +64,41 @@
     "thisScreenUpdatesByItself": "Miova ho azy ity efijery ity raha vao manomboka ny session ny mpampianatra.",
     "theSessionCodeIsOnly": "Ny kaody session dia azo ampiasaina amin'ny fihaonana voamafy ihany.",
     "sendTheCodeToThe": "Alefaso any amin'ny mpampianatra ny kaody"
+  },
+  "timetable": {
+    "title": "Fandaharam-potoana",
+    "today": "Anio",
+    "previousDay": "Andro teo aloha",
+    "nextDay": "Andro manaraka",
+    "noLessons": "Tsy misy lesona amin'io andro io",
+    "noLessonsHint": "Hiseho eto ny lesonao raha vao alefa ny fangatahana.",
+    "pending": "Miandry fanamafisana",
+    "pendingHint": "Tsy maintsy manaiky ny fangatahana i {{name}}. Mbola tsy voatokana ity fotoana ity.",
+    "confirmed": "Voamarina",
+    "inProgress": "Mandeha",
+    "completed": "Vita",
+    "startsInMinutes_one": "Afaka {{count}} min",
+    "startsInMinutes_other": "Afaka {{count}} min",
+    "startsInHours": "Afaka {{hours}} ora {{minutes}}",
+    "startsInDays_one": "Afaka {{count}} andro",
+    "startsInDays_other": "Afaka {{count}} andro",
+    "nowLine": "Izao"
+  },
+  "drawer": {
+    "open": "Hanokatra ny vatasarihana",
+    "close": "Hanidy ny vatasarihana"
+  },
+  "greeting": {
+    "hello": "Salama",
+    "learnToday": "Inona no tianao hianarana anio?",
+    "lessonsWeek_one": "Manana lesona {{count}} ianao amin'ity herinandro ity.",
+    "lessonsWeek_other": "Manana lesona {{count}} ianao amin'ity herinandro ity.",
+    "nextLessonToday": "Lesona manaraka anio amin'ny {{time}}.",
+    "nextLessonTomorrow": "Lesona manaraka rahampitso amin'ny {{time}}.",
+    "nextLessonOn": "Lesona manaraka: {{day}} amin'ny {{time}}.",
+    "pending_one": "{{count}} fangatahana miandry ny valin'ny mpampianatra.",
+    "pending_other": "{{count}} fangatahana miandry ny valin'ny mpampianatra.",
+    "unread_one": "{{count}} hafatra tsy vakiana.",
+    "unread_other": "{{count}} hafatra tsy vakiana."
   }
 }

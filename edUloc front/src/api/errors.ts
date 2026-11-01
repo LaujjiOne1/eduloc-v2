@@ -31,6 +31,9 @@ export type AppErrorCode =
   | "application_not_editable"
   | "too_many_requests"
   | "provider_not_configured"
+  /** L'utilisateur a fermé la fenêtre du fournisseur : pas une erreur à afficher. */
+  | "social_cancelled"
+  | "payments_unavailable"
   | "account_disabled"
   | "geocoding_unavailable"
   | "permission_denied"
@@ -119,6 +122,12 @@ const CODE_MAP: Record<string, AppErrorCode> = {
   UNKNOWN_SUBJECT: "validation_error",
   TUTOR_ALREADY_APPROVED: "application_not_editable",
   APPLICATION_ALREADY_PENDING: "application_not_editable",
+  // Paiements
+  PAYMENTS_UNAVAILABLE: "payments_unavailable",
+  PAYMENT_NOT_FOUND: "not_found",
+  PAYMENT_BOOKING_NOT_OWNED: "forbidden",
+  PAYMENT_BOOKING_NOT_PAYABLE: "invalid_state",
+  PAYMENT_ALREADY_SETTLED: "invalid_state",
   // Technique
   GEOCODING_UNAVAILABLE: "geocoding_unavailable",
   NOT_IMPLEMENTED: "provider_not_configured",

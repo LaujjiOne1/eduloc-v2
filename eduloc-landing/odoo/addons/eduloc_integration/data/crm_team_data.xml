@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Cahier §4.2 : une équipe, attribution manuelle au départ (pas de répartition automatique). -->
+    <record id="team_eduloc" model="crm.team">
+        <field name="name">EduLoc — Relation client</field>
+        <field name="use_leads" eval="False"/>
+        <field name="use_opportunities" eval="True"/>
+        <field name="assignment_optout" eval="True"/>
+    </record>
+</odoo>

@@ -20,6 +20,13 @@ datasource db {
 // ENUMS
 // ============================================================
 
+/// Fournisseurs de connexion sociale (via Clerk). Un compte peut en lier plusieurs.
+enum OAuthProvider {
+  GOOGLE
+  APPLE
+  FACEBOOK
+}
+
 enum UserStatus {
   ACTIVE
   SUSPENDED
@@ -304,7 +311,8 @@ model User {
   firstName String
   lastName  String
   email     String @unique
-  password  String // hash argon2id
+  /// Hash argon2id ; NULL pour un compte créé par connexion sociale (aucun mot de passe tant qu'il n'en définit pas un).
+  password  String?
 
   phone    String?
   avatar   String?
@@ -332,6 +340,7 @@ model User {
 
   beneficiaries               Beneficiary[]
   bookings                    Booking[]            @relation("RequesterBookings")
+  payments                    Payment[]            @relation("RequesterPayments")
   tutorProfile                TutorProfile?
   createdSubjects             Subject[]            @relation("SubjectCreator")
   sentMessages                Message[]            @relation("SentMessages")
@@ -355,6 +364,7 @@ model User {
   roomReviewsHidden           RoomReview[]         @relation("RoomReviewHider")
   partnerStatusEvents         PartnerStatusEvent[]
   cvImports                   CvImport[]
+  oauthAccounts               OAuthAccount[]
 
   @@index([status])
   @@map("users")
@@ -363,6 +373,25 @@ model User {
 // ============================================================
 // AUTHENTICATION
 // ============================================================
+
+/// Identités de connexion sociale liées à un compte (relation 1-N) : « provider + providerUserId » identifie le compte
+/// chez le fournisseur ; l'e-mail n'est qu'un indice (Apple peut le masquer, il peut changer).
+model OAuthAccount {
+  id             String        @id @default(uuid())
+  userId         String
+  provider       OAuthProvider
+  /// Identifiant stable donné par le fournisseur (sub Google, id Facebook, sub Apple) — jamais l'e-mail.
+  providerUserId String
+  /// E-mail renvoyé par le fournisseur à la liaison (peut être un relais Apple) ; conservé car Apple ne le renvoie qu'une fois.
+  email          String?
+  createdAt      DateTime      @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("oauth_accounts")
+}
 
 model RefreshToken {
   id        String    @id @default(uuid())
@@ -1189,6 +1218,7 @@ model Booking {
   conflicts     Conflict[]
   hold          BookingHold?
   roomReviews   RoomReview[]
+  payments      Payment[]
 
   @@index([requesterId, startAt])
   @@index([beneficiaryId])
@@ -1663,4 +1693,87 @@ model CvImport {
   @@index([userId, createdAt])
   @@index([userId, fileHash])
   @@map("cv_imports")
+}
+
+// ============================================================
+// PAIEMENTS (service externe eduloc-pay-subscriptions)
+// ============================================================
+
+/// États internes d'un paiement (MM-02). PENDING = en cours OU résultat encore inconnu : jamais assimilé à un échec.
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  EXPIRED
+}
+
+enum PaymentMethod {
+  VISA
+  MOBILE_MONEY
+}
+
+/// Paiement d'une réservation. EduLoc ne voit JAMAIS de donnée de carte ni de PIN : seulement des références techniques
+/// (VISA-02, MM-01). Le statut ne devient SUCCEEDED que sur résultat vérifié côté serveur (VISA-04, MM-03).
+model Payment {
+  id String @id @default(uuid())
+
+  bookingId String
+  booking   Booking @relation(fields: [bookingId], references: [id], onDelete: Restrict)
+
+  requesterId String
+  requester   User   @relation("RequesterPayments", fields: [requesterId], references: [id], onDelete: Restrict)
+
+  /// Figé à l'émission du ticket = Booking.totalAmount (SEC-03) : jamais un montant venu du client.
+  amount   Decimal @db.Decimal(12, 2)
+  currency String  @default("MGA")
+
+  status PaymentStatus @default(PENDING)
+  method PaymentMethod?
+  /// « stripe », « orange-money », « mvola »… tel que renvoyé par le service de paiement.
+  provider    String?
+  /// Référence de transaction côté prestataire / opérateur.
+  providerRef String?
+  /// Marque et quatre derniers chiffres seulement (VISA-02).
+  cardBrand   String?
+  cardLast4   String? @db.VarChar(4)
+  failureReason String?
+
+  /// Dernier ticket émis : après cette date, le lien de paiement n'ouvre plus rien (un nouveau ticket peut être demandé).
+  ticketExpiresAt DateTime
+  /// Dernière vérification serveur du résultat auprès du service de paiement.
+  verifiedAt      DateTime?
+  settledAt       DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  events PaymentEvent[]
+
+  @@index([bookingId, status])
+  @@index([requesterId, createdAt])
+  @@map("payments")
+}
+
+/// Journal d'audit des changements de statut (SEC-10) : sans donnée sensible.
+model PaymentEvent {
+  id String @id @default(uuid())
+
+  paymentId String
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  /// Identifiant de l'évènement côté service de paiement : unique, donc un rejeu n'est jamais appliqué deux fois (SEC-07).
+  eventId String @unique
+  /// webhook | poll | system
+  source  String
+  type    String
+
+  fromStatus PaymentStatus?
+  toStatus   PaymentStatus
+  details    Json          @default("{}")
+
+  createdAt DateTime @default(now())
+
+  @@index([paymentId, createdAt])
+  @@map("payment_events")
 }

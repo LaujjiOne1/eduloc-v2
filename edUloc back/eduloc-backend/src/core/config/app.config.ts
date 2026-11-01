@@ -23,6 +23,8 @@ const envSchema = z.object({
   /** Justificatifs des structures partenaires (privé) et photos des salles (lecture par URL signée). */
   SUPABASE_PARTNER_DOCS_BUCKET: z.string().default('partner-documents'),
   SUPABASE_ROOM_PHOTOS_BUCKET: z.string().default('room-photos'),
+  /** Photos de profil : bucket PUBLIC (URL stable, mise en cache) ; chemins non devinables (userId + UUID). */
+  SUPABASE_AVATARS_BUCKET: z.string().default('avatars'),
   CENTRIFUGO_URL: z.string().url().default('http://localhost:8000'),
   /** URL WebSocket que le CLIENT utilise (par défaut dérivée de CENTRIFUGO_URL). Sur appareil réel : IP du LAN / domaine public. */
   CENTRIFUGO_PUBLIC_URL: z.string().optional(),
@@ -49,6 +51,32 @@ const envSchema = z.object({
   ROOM_TURNOVER_BUFFER_MINUTES: z.coerce.number().int().min(0).max(240).default(0),
   /** Frais de service EduLoc : taux global sur le tarif du Tuteur (MVP : 10 %). */
   PLATFORM_COMMISSION_RATE: z.coerce.number().min(0).max(1).default(0.1),
+  /**
+   * Service de paiement externe (eduloc-pay-subscriptions). Désactivé par défaut : tant que son API n'est pas prête,
+   * l'émission de tickets répond « paiement indisponible » et rien d'autre dans l'application ne change.
+   */
+  PAYMENTS_ENABLED: z.enum(['true', 'false']).default('false'),
+  /** Adresse PUBLIQUE de la page de paiement (ouverte dans l'application). HTTPS obligatoire en production (SEC-01). */
+  PAY_PUBLIC_URL: z.string().url().optional().or(z.literal('').transform(() => undefined)),
+  /** Adresse de l'API du service de paiement, jointe de serveur à serveur (vérification du statut, MM-03). Facultative. */
+  PAY_API_URL: z.string().url().optional().or(z.literal('').transform(() => undefined)),
+  /** Clé que le backend présente au service de paiement. Jamais exposée au client (SEC-02). */
+  PAY_API_KEY: z.string().optional().default(''),
+  /** Secret de signature des tickets émis vers le service de paiement (HS256). */
+  PAY_TICKET_SECRET: z.string().optional().default(''),
+  /** Secret de signature des notifications reçues du service de paiement (HMAC-SHA256, SEC-05). */
+  PAY_WEBHOOK_SECRET: z.string().optional().default(''),
+  PAY_TICKET_TTL_MINUTES: z.coerce.number().int().min(1).max(120).default(20),
+  /**
+   * Connexion sociale : chaque fournisseur est actif dès qu'il est configuré, sinon /auth/oauth/exchange le refuse pour lui.
+   * Les jetons sont vérifiés par le backend lui-même (clés publiques de Google / Apple, API Graph de Facebook).
+   */
+  /** Identifiants client OAuth acceptés comme destinataire (aud) du jeton Google : web, Android et iOS, séparés par des virgules. */
+  GOOGLE_CLIENT_IDS: z.string().default(''),
+  /** Identifiants acceptés pour Apple : bundle id de l'app (et/ou Services ID), séparés par des virgules. */
+  APPLE_CLIENT_IDS: z.string().default(''),
+  FACEBOOK_APP_ID: z.string().default(''),
+  FACEBOOK_APP_SECRET: z.string().default(''),
   /** Durée du blocage temporaire du créneau (Tuteur + salle) pendant la finalisation d'une réservation. */
   BOOKING_HOLD_MINUTES: z.coerce.number().int().min(1).max(120).default(15),
   /** Plafond du tarif horaire d'une salle : jamais plus chère que le plus haut forfait de déplacement (Ar). */
@@ -101,6 +129,7 @@ export class AppConfig {
   readonly tutorDocsBucket: string;
   readonly partnerDocsBucket: string;
   readonly roomPhotosBucket: string;
+  readonly avatarsBucket: string;
   readonly centrifugoUrl: string;
   readonly centrifugoPublicUrl: string;
   readonly centrifugoApiKey: string;
@@ -130,6 +159,20 @@ export class AppConfig {
   readonly matchingFinalWeights: { pedagogy: number; availability: number; proximity: number; quality: number };
   readonly platformCommissionRate: number;
   readonly bookingHoldMinutes: number;
+  readonly payments: {
+    enabled: boolean;
+    publicUrl: string | null;
+    apiUrl: string | null;
+    apiKey: string;
+    ticketSecret: string;
+    webhookSecret: string;
+    ticketTtlMinutes: number;
+  };
+  readonly oauth: {
+    googleClientIds: string[];
+    appleClientIds: string[];
+    facebook: { appId: string; appSecret: string } | null;
+  };
   readonly roomMaxHourlyFee: number;
   readonly matchingScoring: {
     corroborationWeight: number; corroborationWindow: number; subjectBonus: number; ratingBonus: number;
@@ -162,6 +205,7 @@ export class AppConfig {
     this.tutorDocsBucket = parsed.SUPABASE_TUTOR_DOCS_BUCKET;
     this.partnerDocsBucket = parsed.SUPABASE_PARTNER_DOCS_BUCKET;
     this.roomPhotosBucket = parsed.SUPABASE_ROOM_PHOTOS_BUCKET;
+    this.avatarsBucket = parsed.SUPABASE_AVATARS_BUCKET;
     this.centrifugoUrl = parsed.CENTRIFUGO_URL;
     this.centrifugoPublicUrl = parsed.CENTRIFUGO_PUBLIC_URL
       ?? `${parsed.CENTRIFUGO_URL.replace(/^http/, 'ws').replace(/\/$/, '')}/connection/websocket`;
@@ -195,6 +239,35 @@ export class AppConfig {
     };
     this.platformCommissionRate = parsed.PLATFORM_COMMISSION_RATE;
     this.bookingHoldMinutes = parsed.BOOKING_HOLD_MINUTES;
+    const paymentsEnabled = parsed.PAYMENTS_ENABLED === 'true';
+    if (paymentsEnabled) {
+      // Un paiement activé à moitié est pire qu'un paiement désactivé : on refuse de démarrer.
+      if (!parsed.PAY_PUBLIC_URL) throw new Error('PAYMENTS_ENABLED=true exige PAY_PUBLIC_URL.');
+      if (parsed.PAY_TICKET_SECRET.length < 32) throw new Error('PAY_TICKET_SECRET >= 32 caractères requis (PAYMENTS_ENABLED=true).');
+      if (parsed.PAY_WEBHOOK_SECRET.length < 32) throw new Error('PAY_WEBHOOK_SECRET >= 32 caractères requis (PAYMENTS_ENABLED=true).');
+      if (parsed.PAY_TICKET_SECRET === parsed.PAY_WEBHOOK_SECRET) throw new Error('PAY_TICKET_SECRET et PAY_WEBHOOK_SECRET doivent différer.');
+      if (parsed.NODE_ENV === 'production' && !parsed.PAY_PUBLIC_URL.startsWith('https://')) {
+        throw new Error('PAY_PUBLIC_URL doit être en HTTPS en production (SEC-01).');
+      }
+    }
+    this.payments = {
+      enabled: paymentsEnabled,
+      publicUrl: parsed.PAY_PUBLIC_URL ? parsed.PAY_PUBLIC_URL.replace(/\/$/, '') : null,
+      apiUrl: parsed.PAY_API_URL ? parsed.PAY_API_URL.replace(/\/$/, '') : null,
+      apiKey: parsed.PAY_API_KEY,
+      ticketSecret: parsed.PAY_TICKET_SECRET,
+      webhookSecret: parsed.PAY_WEBHOOK_SECRET,
+      ticketTtlMinutes: parsed.PAY_TICKET_TTL_MINUTES,
+    };
+    if (!!parsed.FACEBOOK_APP_ID !== !!parsed.FACEBOOK_APP_SECRET) {
+      throw new Error('FACEBOOK_APP_ID et FACEBOOK_APP_SECRET vont ensemble : définissez les deux ou aucun.');
+    }
+    const list = (value: string) => value.split(',').map((v) => v.trim()).filter(Boolean);
+    this.oauth = {
+      googleClientIds: list(parsed.GOOGLE_CLIENT_IDS),
+      appleClientIds: list(parsed.APPLE_CLIENT_IDS),
+      facebook: parsed.FACEBOOK_APP_ID ? { appId: parsed.FACEBOOK_APP_ID, appSecret: parsed.FACEBOOK_APP_SECRET } : null,
+    };
     this.roomMaxHourlyFee = parsed.ROOM_MAX_HOURLY_FEE;
     this.matchingScoring = {
       corroborationWeight: parsed.MATCHING_CORROBORATION_WEIGHT,

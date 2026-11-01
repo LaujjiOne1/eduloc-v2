@@ -1,1 +1,100 @@
 @import "tailwindcss";
+
+/* Charte edUloc — mêmes jetons que la landing page et l'application mobile. */
+@theme {
+  --color-ink: #14162b;
+  --color-ink-soft: #585b78;
+  --color-ink-faint: #9799af;
+
+  --color-paper: #faf9f4;
+  --color-surface: #ffffff;
+  --color-paper-alt: #f2f0e7;
+
+  --color-line: #e7e3d7;
+  --color-line-soft: #f0ede3;
+
+  --color-primary: #332e86;
+  --color-primary-dark: #211c5e;
+  --color-primary-tint: #eceaf9;
+  /* Primaire utilisé comme COULEUR DE TEXTE / d'icône : plus clair en mode sombre pour rester lisible. */
+  --color-brand: #332e86;
+  --color-scrim: rgb(20 22 43 / 0.5);
+  --color-violet: #8d7fe3;
+  --color-violet-tint: #f3f0fc;
+
+  --color-accent: #0e9c82;
+  --color-accent-tint: #e1f5ef;
+
+  --color-warning: #bd7e28;
+  --color-warning-tint: #faf0de;
+
+  --color-error: #ac4a40;
+  --color-error-tint: #f6e9e6;
+
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-display: "Space Grotesk", system-ui, sans-serif;
+
+  --shadow-soft: 0 10px 30px -12px rgb(51 46 134 / 0.18);
+}
+
+/* Mode sombre (par défaut) : même charte, fond encre #14162B comme le pied de la landing. L'attribut est posé sur <html>
+   par le script d'index.html puis par src/lib/theme.ts. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --color-ink: #f7f6f2;
+  --color-ink-soft: #b4b6cf;
+  --color-ink-faint: #7f829f;
+
+  --color-paper: #14162b;
+  --color-surface: #1b1e3a;
+  --color-paper-alt: #242749;
+
+  --color-line: #2d3057;
+  --color-line-soft: #23264a;
+
+  --color-primary: #6f63da;
+  --color-primary-dark: #5a4ec4;
+  --color-primary-tint: #26235a;
+  --color-brand: #9b8ceb;
+  --color-violet: #8d7fe3;
+  --color-violet-tint: #2a2557;
+
+  --color-accent: #0e9c82;
+  --color-accent-tint: #12332e;
+  --color-warning: #d9993e;
+  --color-warning-tint: #3a2e17;
+  --color-error: #d4685d;
+  --color-error-tint: #3b2227;
+
+  --color-scrim: rgb(5 6 18 / 0.65);
+  --shadow-soft: 0 10px 30px -12px rgb(0 0 0 / 0.55);
+}
+
+/* Transition douce entre mode clair et sombre : l'attribut n'est posé que pendant le changement (src/lib/theme.ts). */
+html[data-theme-switching],
+html[data-theme-switching] *,
+html[data-theme-switching] *::before,
+html[data-theme-switching] *::after {
+  transition: background-color 0.35s ease, border-color 0.35s ease, color 0.35s ease, fill 0.35s ease,
+    stroke 0.35s ease, box-shadow 0.35s ease, text-decoration-color 0.35s ease !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme-switching],
+  html[data-theme-switching] *,
+  html[data-theme-switching] *::before,
+  html[data-theme-switching] *::after { transition: none !important; }
+}
+
+@layer base {
+  body { @apply bg-paper text-ink font-sans antialiased; }
+  h1, h2, h3, h4 { @apply font-display font-bold tracking-tight; }
+}
+
+/* Dégradé de marque (bleu nuit → violet → émeraude), pour les accents et textes mis en avant. */
+@utility bg-glow { background: linear-gradient(90deg, #332e86 0%, #8d7fe3 49%, #0e9c82 100%); }
+@utility text-glow {
+  background: linear-gradient(90deg, #332e86 0%, #8d7fe3 49%, #0e9c82 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}

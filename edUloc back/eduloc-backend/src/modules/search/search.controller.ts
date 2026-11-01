@@ -1,4 +1,5 @@
-import { BadRequestException, Controller, Get, Param, ParseUUIDPipe, Query } from '@nestjs/common';
+import { BadRequestException, Controller, Get, Headers, Param, ParseUUIDPipe, Query, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
 import { ApiTags } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { IsIn, IsInt, IsNumber, IsOptional, IsUUID, Matches, Max, Min, ValidateIf } from 'class-validator';
@@ -38,17 +39,29 @@ class SlotQueryDto {
 @ApiTags('search')
 @Controller('search')
 export class SearchController {
-  constructor(private readonly service: SearchService) {}
+  constructor(
+    private readonly service: SearchService,
+    private readonly jwt: JwtService,
+  ) {}
 
+  /**
+   * La route reste publique (pas de 401 pour un visiteur) mais la LISTE est réservée aux comptes connectés :
+   *  - jeton valide → les résultats complets (tableau) ;
+   *  - aucun jeton → seulement leur nombre : `{ restricted: true, count }`, jamais un nom, un tarif ni un identifiant ;
+   *  - jeton présent mais invalide ou expiré → 401 TOKEN_INVALID, pour que l'application le renouvelle au lieu de croire que
+   *    l'utilisateur est un visiteur.
+   * La recherche est exécutée dans les deux cas : le nombre est exactement celui que verra l'utilisateur après connexion.
+   */
   @Public()
   @Get('offers')
-  offers(@Query() q: SearchQueryDto) {
+  async offers(@Query() q: SearchQueryDto, @Headers('authorization') authorization?: string) {
     const format = q.format ?? 'BOTH';
     const hasCoordinates = q.lat !== undefined && q.lng !== undefined;
     if (format === 'IN_PERSON' && !hasCoordinates) {
       throw new BadRequestException(['lat est requis pour une recherche en présentiel']);
     }
-    return this.service.searchOffers({
+    const signedIn = await this.isSignedIn(authorization);
+    const results = await this.service.searchOffers({
       subjectId: q.subjectId,
       levelId: q.levelId,
       trackId: q.trackId,
@@ -58,6 +71,18 @@ export class SearchController {
       radiusM: q.radiusM,
       limit: q.limit,
     });
+    return signedIn ? results : { restricted: true, count: results.length };
+  }
+
+  /** Vrai : jeton valide. Faux : pas de jeton. Un jeton invalide ou expiré lève 401 (voir `offers`). */
+  private async isSignedIn(authorization: string | undefined): Promise<boolean> {
+    if (!authorization?.startsWith('Bearer ')) return false;
+    try {
+      await this.jwt.verifyAsync(authorization.slice(7));
+      return true;
+    } catch {
+      throw new UnauthorizedException('TOKEN_INVALID');
+    }
   }
 
   @Public()

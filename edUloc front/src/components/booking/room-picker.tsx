@@ -20,7 +20,7 @@ export function RoomPicker({ rooms, value, onChange }: RoomPickerProps) {
   const { t } = useTranslation();
   if (rooms.length === 0) {
     return (
-      <View className="rounded-lg border border-line bg-surface p-4">
+      <View className="rounded-lg border border-line bg-surface shadow-card p-4">
         <Text className="text-[13.5px] text-ink-soft">{t("booking.roomPicker.noPartnerRoomIsAvailable")}</Text>
       </View>
     );

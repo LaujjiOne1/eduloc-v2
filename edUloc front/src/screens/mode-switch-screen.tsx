@@ -14,7 +14,7 @@ import {
   XCircleIcon,
 } from "@/components/icons";
 import { PressableScale } from "@/components/motion/pressable-scale";
-import { signOut } from "@/lib/sign-out";
+import { requestSignOut } from "@/lib/sign-out";
 import { type UserMode, useAuthStore } from "@/store/auth.store";
 import { useTranslation } from "react-i18next";
 
@@ -34,12 +34,12 @@ export function ModeSwitchScreen() {
     router.replace(mode === "apprenti" ? APPRENTI_DASHBOARD_ROUTE : TUTOR_DASHBOARD_ROUTE);
   };
 
-  const handleLogout = () => signOut(router);
+  const handleLogout = requestSignOut;
 
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 pb-1 pt-[18px]">
-        <Text className="text-[18px] font-bold text-ink">{t("screens.modeSwitch.currentMode")}</Text>
+        <Text className="text-[18px] font-bold font-display text-ink">{t("screens.modeSwitch.currentMode")}</Text>
         {/* The mock's close button links back to 35_Account, but this screen
             is also reached directly from both dashboards' header chip —
             router.back() returns to whichever screen actually opened it. */}

@@ -44,7 +44,7 @@ export function TutorSkillsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorSkills.whatDoYouTeach")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorSkills.whatDoYouTeach")}</Text>
           <Text className="mb-4 text-[13.5px] text-ink-soft">
             {t("tutorOnboarding.tutorSkills.searchForYourSubjectsAnd")}</Text>
         </FadeIn>
@@ -97,7 +97,7 @@ export function TutorSkillsScreen() {
                   placeholderTextColor="#9799AF"
                   multiline
                   maxLength={MAX_SCOPE_LENGTH}
-                  className="min-h-[60px] rounded-lg border border-line bg-surface px-3.5 py-2.5 text-[14px] text-ink"
+                  className="min-h-[60px] rounded-lg border border-line bg-surface shadow-card px-3.5 py-2.5 text-[14px] text-ink"
                   accessibilityLabel={t("tutorOnboarding.tutorSkills.lessonScope", { label: skill.label })}
                 />
               </View>

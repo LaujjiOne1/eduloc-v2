@@ -162,16 +162,26 @@ export class OutboxRelayService {
         select: { token: true },
       });
       const isCall = ev.eventType === 'call.incoming';
+      const isReminder = ev.eventType === 'booking.reminder';
+      const isMessage = ev.eventType.startsWith('message.');
       await this.push.sendToTokens(tokens.map((t) => t.token), {
         title: ev.pushTitle,
         body: ev.pushBody,
         // Les données permettent d'ouvrir le bon écran au toucher (réservation, conversation, appel à rejoindre).
-        data: { ...flattenPayload(ev.payload), eventId: ev.id, type: ev.eventType },
-        channelId: isCall ? 'calls' : 'default',
+        // `tag` : l'application programme AUSSI ce rappel sur l'appareil (alarme locale) avec le même identifiant ; Android
+        // remplace alors la notification au lieu d'en afficher deux.
+        data: {
+          ...flattenPayload(ev.payload),
+          eventId: ev.id,
+          type: ev.eventType,
+          ...(isReminder ? { tag: `reminder:${ev.aggregateId}` } : {}),
+        },
+        // Canaux Android de l'application : sonnerie longue pour un appel, vibration marquée pour un rappel de cours.
+        channelId: isCall ? 'calls_ring' : isReminder ? 'reminders' : isMessage ? 'messages' : 'default',
         priority: 'high',
         // Un appel n'a de sens que pendant qu'il sonne (45 s côté serveur).
         ttlSeconds: isCall ? 45 : undefined,
-        sound: isCall ? 'ringtone.wav' : undefined,
+        sound: isCall ? 'ringtone-call.wav' : undefined,
       });
     }
 

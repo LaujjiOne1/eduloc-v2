@@ -20,7 +20,7 @@ export const DecisionBar: React.FC<{
 }> = ({ actions, busy, subject, onDecide }) => {
   const [pending, setPending] = useState<DecisionAction | null>(null);
 
-  if (actions.length === 0) return <p className="text-sm text-slate-400">Aucune décision possible dans cet état.</p>;
+  if (actions.length === 0) return <p className="text-sm text-ink-soft">Aucune décision possible dans cet état.</p>;
 
   return (
     <>
@@ -51,15 +51,15 @@ export const DecisionBar: React.FC<{
 };
 
 export const History: React.FC<{ events: StatusEvent[] }> = ({ events }) => (
-  events.length === 0 ? <p className="text-sm text-slate-400">Aucun historique.</p> : (
+  events.length === 0 ? <p className="text-sm text-ink-soft">Aucun historique.</p> : (
     <ol className="space-y-2">
       {events.map((e) => (
-        <li key={e.id} className="text-xs p-3 rounded-xl bg-white/5 border border-white/10">
-          <div className="flex flex-wrap justify-between gap-2 text-slate-400">
-            <span>{historyScope(e.scope)} : {e.from ?? '—'} → <strong className="text-slate-200">{e.to}</strong></span>
+        <li key={e.id} className="text-xs p-3 rounded-xl bg-paper border border-line">
+          <div className="flex flex-wrap justify-between gap-2 text-ink-soft">
+            <span>{historyScope(e.scope)} : {e.from ?? '—'} → <strong className="text-ink">{e.to}</strong></span>
             <span>{formatDate(e.at, true)}</span>
           </div>
-          {e.note && <p className="mt-1 text-slate-300">{e.note}</p>}
+          {e.note && <p className="mt-1 text-ink-soft">{e.note}</p>}
         </li>
       ))}
     </ol>

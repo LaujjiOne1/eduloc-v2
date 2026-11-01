@@ -136,7 +136,7 @@ export function SkillCombobox({ degree, selected, onSelect }: SkillComboboxProps
 
       {open ? (
         <View
-          className="mt-2 overflow-hidden rounded-lg border border-line bg-surface"
+          className="mt-2 overflow-hidden rounded-lg border border-line bg-surface shadow-card"
           accessibilityRole="list"
           onTouchStart={cancelClose}
           // @ts-expect-error — web uniquement : garde la liste ouverte pendant le clic (avant le blur du champ).

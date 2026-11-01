@@ -53,12 +53,12 @@ export function CallView({ initial, avatar, name, call, onClose }: CallViewProps
           <ScaleIn delay={20}>
             {avatar ?? (
               <View className="h-24 w-24 items-center justify-center rounded-full bg-white/10">
-                <Text className="text-[30px] font-bold text-white">{initial}</Text>
+                <Text className="text-[30px] font-bold font-display text-white">{initial}</Text>
               </View>
             )}
           </ScaleIn>
         )}
-        <Text className="text-[19px] font-bold text-white">{name}</Text>
+        <Text className="text-[19px] font-bold font-display text-white">{name}</Text>
         {state.phase === "connected" ? (
           <ConnectedTimer />
         ) : state.phase === "failed" ? (

@@ -1,5 +1,6 @@
 import { api } from "@/api/http";
 import { runBeforeLogout } from "@/lib/session-hooks";
+import { getProviderCredential } from "@/lib/social-auth";
 import { ApiError } from "@/api/errors";
 import { Session } from "@/api/session";
 import { toAuthenticatedUser } from "@/api/mappers";
@@ -11,7 +12,8 @@ import { t } from "@/i18n";
 export { ApiError as AuthServiceError };
 
 /** Ouvre la session : jetons → profil complet (/users/me : rôle tuteur, bénéficiaire « moi »…). */
-async function openSession(result: LoginResultDto): Promise<AuthenticatedUser> {
+async function openSession(result: Pick<LoginResultDto, "accessToken" | "refreshToken" | "refreshExpiresAt">, remember = true): Promise<AuthenticatedUser> {
+  Session.setPersistence(remember);
   await Session.setTokens({
     accessToken: result.accessToken,
     refreshToken: result.refreshToken,
@@ -34,10 +36,11 @@ export const AuthService = {
    * 403 EMAIL_NOT_VERIFIED (code "email_not_verified") : le compte existe mais n'est pas vérifié →
    * l'écran envoie l'utilisateur vers la saisie du code.
    */
-  async login(credentials: LoginCredentials): Promise<AuthenticatedUser> {
+  async login(credentials: LoginCredentials, options: { remember?: boolean } = {}): Promise<AuthenticatedUser> {
     if (!credentials.password) throw ApiError.local("invalid_credentials", t("services.authservice.incorrectEmailOrPassword"));
     const result = await api.post<LoginResultDto>("/auth/login", credentials, { auth: false });
-    return openSession(result);
+    // « Rester connecté » décoché : la session ne survit pas à la fermeture de l'app (jetons en mémoire seulement).
+    return openSession(result, options.remember ?? true);
   },
 
   /** Crée le compte (PENDING_VERIFICATION) et déclenche l'envoi du code. N'ouvre PAS de session. */
@@ -83,9 +86,17 @@ export const AuthService = {
     );
   },
 
-  /** Pas de connexion sociale côté backend : on le dit franchement plutôt que d'appeler une route inexistante. */
-  async loginWithProvider(_provider: OAuthProvider): Promise<AuthenticatedUser> {
-    throw ApiError.local("provider_not_configured", t("services.authservice.thisSignInMethodIs"));
+  /**
+   * Connexion / inscription par Google, Apple ou Facebook : l'application obtient un jeton auprès du fournisseur (voir
+   * lib/social-auth), le serveur le vérifie lui-même, lie ou crée le compte et ouvre la session EduLoc (POST /auth/oauth/exchange).
+   * Erreurs : "provider_not_configured" (pas encore branché), "social_cancelled" (fenêtre fermée), 401/422/403/503 du serveur
+   * (jeton refusé, e-mail absent ou non vérifié, compte désactivé, fournisseur non configuré côté serveur).
+   */
+  async loginWithProvider(provider: OAuthProvider, options: { remember?: boolean } = {}): Promise<AuthenticatedUser> {
+    const credential = await getProviderCredential(provider);
+    if (!credential) throw ApiError.local("social_cancelled");
+    const result = await api.post<LoginResultDto & { created?: boolean }>("/auth/oauth/exchange", { provider, ...credential }, { auth: false });
+    return openSession(result, options.remember ?? true);
   },
 
   /** Au démarrage de l'app : relit les jetons persistés puis /users/me. */
@@ -110,10 +121,28 @@ export const AuthService = {
     return toAuthenticatedUser(me);
   },
 
-  async logout(): Promise<void> {
+  /**
+   * @param options.revoke faux : le jeton n'est PAS révoqué côté serveur, car l'appelant vient de le mettre de côté dans le
+   *        coffre de l'appareil pour une reconnexion d'un toucher (voir lib/device-vault). Vrai par défaut.
+   */
+  async logout(options: { revoke?: boolean } = {}): Promise<void> {
     await runBeforeLogout();
     const refreshToken = Session.getTokens()?.refreshToken;
-    if (refreshToken) await api.post("/auth/logout", { refreshToken }).catch(() => undefined);
+    if (refreshToken && options.revoke !== false) await api.post("/auth/logout", { refreshToken }).catch(() => undefined);
     await Session.clear();
+  },
+
+  /**
+   * Reconnexion d'un toucher : échange un jeton gardé dans le coffre contre une session neuve (POST /auth/refresh, qui
+   * renouvelle le jeton : l'ancien devient inutilisable). Erreurs : 401 = jeton refusé ou expiré, "network_error" = hors ligne.
+   */
+  async resumeSession(refreshToken: string): Promise<AuthenticatedUser> {
+    const result = await api.post<{ accessToken: string; refreshToken: string; expiresAt: string }>("/auth/refresh", { refreshToken }, { auth: false });
+    return openSession({ accessToken: result.accessToken, refreshToken: result.refreshToken, refreshExpiresAt: result.expiresAt }, true);
+  },
+
+  /** Révoque un jeton qui n'est pas celui de la session ouverte (compte oublié). Au mieux : sans effet si hors ligne. */
+  async revokeRefreshToken(refreshToken: string): Promise<void> {
+    await api.post("/auth/logout", { refreshToken }, { auth: false }).catch(() => undefined);
   },
 };

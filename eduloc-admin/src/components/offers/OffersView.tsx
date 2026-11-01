@@ -39,14 +39,14 @@ export const OffersView: React.FC<{ refreshKey: number; onChanged: () => void }>
         ) : (
           <Table head={['Offre', 'Tuteur', 'Tarif', 'État', 'Créée', '']}>
             {offers.data.map((o) => (
-              <tr key={o.id} className="hover:bg-white/5">
+              <tr key={o.id} className="hover:bg-paper-alt">
                 <td className="px-4 py-3.5">
-                  <p className="font-bold text-white">{o.title}</p>
-                  <p className="text-[11px] text-slate-400">{o.subject.name}{o.educationLevel ? ` · ${o.educationLevel.name}` : ''} · {o.durationMinutes} min</p>
+                  <p className="font-bold text-ink">{o.title}</p>
+                  <p className="text-[11px] text-ink-soft">{o.subject.name}{o.educationLevel ? ` · ${o.educationLevel.name}` : ''} · {o.durationMinutes} min</p>
                 </td>
                 <td className="px-4 py-3.5">
                   {o.tutorProfile.displayName || fullName(o.tutorProfile.user)}
-                  <span className="block text-[11px] font-mono text-slate-400">{o.tutorProfile.user.email}</span>
+                  <span className="block text-[11px] font-mono text-ink-soft">{o.tutorProfile.user.email}</span>
                   {o.tutorProfile.suspendedAt && <Badge tone="rose">Tuteur suspendu</Badge>}
                 </td>
                 <td className="px-4 py-3.5 whitespace-nowrap">{formatMoney(o.price, o.currency)}</td>
@@ -54,7 +54,7 @@ export const OffersView: React.FC<{ refreshKey: number; onChanged: () => void }>
                   {o.disabledByAdminAt ? <Badge tone="rose">Retirée le {formatDate(o.disabledByAdminAt)}</Badge>
                     : o.isActive ? <Badge tone="green">Visible</Badge> : <Badge tone="slate">Masquée par le tuteur</Badge>}
                 </td>
-                <td className="px-4 py-3.5 text-slate-400">{formatDate(o.createdAt)}</td>
+                <td className="px-4 py-3.5 text-ink-soft">{formatDate(o.createdAt)}</td>
                 <td className="px-4 py-3.5 text-right">
                   {o.disabledByAdminAt
                     ? <Btn small tone="success" onClick={() => setTarget({ offer: o, action: 'enable' })}>Rétablir</Btn>

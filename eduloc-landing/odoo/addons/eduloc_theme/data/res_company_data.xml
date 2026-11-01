@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Logo (login, e-mails, rapports) et couleurs de documents de la société principale.
+         noupdate : une société déjà personnalisée n'est pas écrasée lors d'une mise à jour. -->
+    <record id="base.main_company" model="res.company">
+        <field name="logo" type="base64" file="eduloc_theme/static/img/logo.png"/>
+        <field name="primary_color">#332E86</field>
+        <field name="secondary_color">#8D7FE3</field>
+    </record>
+</odoo>

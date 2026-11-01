@@ -7,9 +7,6 @@ import { useTranslation } from "react-i18next";
 function callRoute(id: string): Href {
   return `/tutor-dashboard/appointments/${id}/call` as Href;
 }
-function voiceRoute(id: string): Href {
-  return `/tutor-dashboard/appointments/${id}/conversation/voice` as Href;
-}
 function documentsRoute(id: string): Href {
   return `/tutor-dashboard/appointments/${id}/conversation/documents` as Href;
 }
@@ -39,7 +36,6 @@ export function TutorAppointmentConversationScreen() {
       }
       statusPositive={confirmed}
       callRoute={callRoute(id ?? "")}
-      voiceRoute={voiceRoute(id ?? "")}
       documentsRoute={documentsRoute(id ?? "")}
     />
   );

@@ -1,13 +1,14 @@
 import { type Href, useFocusEffect, useRouter } from "expo-router";
 import type { ReactNode } from "react";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ArrowLeftIcon, AttachIcon, MicIcon, PhoneIcon } from "@/components/icons";
+import { ArrowLeftIcon, AttachIcon, PhoneIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { MessageBubble } from "@/components/chat/message-bubble";
+import { VoicePill } from "@/components/chat/voice-pill";
 import { useConversationMessages } from "@/hooks/use-conversation-messages";
 import { useTranslation } from "react-i18next";
 
@@ -23,7 +24,6 @@ type ConversationViewProps = {
   statusLabel: string | null;
   statusPositive: boolean;
   callRoute: Href;
-  voiceRoute: Href;
   documentsRoute: Href;
 };
 
@@ -41,7 +41,6 @@ export function ConversationView({
   statusLabel,
   statusPositive,
   callRoute,
-  voiceRoute,
   documentsRoute,
 }: ConversationViewProps) {
   const { t } = useTranslation();
@@ -49,8 +48,10 @@ export function ConversationView({
   const insets = useSafeAreaInsets();
   const { state: messagesState, reload } = useConversationMessages(bookingId);
   const scrollRef = useRef<ScrollView>(null);
+  // Pendant l'enregistrement, la capsule vocale prend toute la largeur du pied de page.
+  const [recordingVoice, setRecordingVoice] = useState(false);
 
-  // Un vocal / un document s'envoie depuis un autre écran : on relit le fil au retour.
+  // Un document s'envoie depuis un autre écran : on relit le fil au retour (le vocal, lui, part depuis la capsule).
   useFocusEffect(
     useCallback(() => {
       reload();
@@ -120,26 +121,18 @@ export function ConversationView({
 
       {canSend ? (
         <View className="flex-shrink-0 flex-row items-center gap-3 border-t border-line-soft px-5 pb-[22px] pt-[14px]">
-          <PressableScale
-            onPress={() => (bookingId ? router.push(documentsRoute) : undefined)}
-            disabled={!bookingId}
-            accessibilityLabel={t("common.addADocument")}
-          >
-            <View className="h-11 w-11 items-center justify-center rounded-full border border-line">
-              <AttachIcon size={18} color="#585B78" />
-            </View>
-          </PressableScale>
-          <PressableScale
-            onPress={() => (bookingId ? router.push(voiceRoute) : undefined)}
-            disabled={!bookingId}
-            accessibilityLabel={t("chat.conversationView.recordAVoiceMessage")}
-            style={{ flex: 1 }}
-          >
-            <View className="w-full flex-row items-center justify-center gap-[10px] rounded-md bg-primary px-[22px] py-[14px]">
-              <MicIcon size={17} color="#fff" />
-              <Text className="text-[15px] font-semibold text-white">{t("chat.conversationView.recordAVoiceNote")}</Text>
-            </View>
-          </PressableScale>
+          {recordingVoice ? null : (
+            <PressableScale
+              onPress={() => (bookingId ? router.push(documentsRoute) : undefined)}
+              disabled={!bookingId}
+              accessibilityLabel={t("common.addADocument")}
+            >
+              <View className="h-[52px] w-[52px] items-center justify-center rounded-full border border-line bg-surface">
+                <AttachIcon size={18} color="#585B78" />
+              </View>
+            </PressableScale>
+          )}
+          <VoicePill bookingId={bookingId} onSent={reload} onActiveChange={setRecordingVoice} />
         </View>
       ) : (
         <View className="flex-shrink-0 border-t border-line-soft px-5 pb-[22px] pt-[16px]">

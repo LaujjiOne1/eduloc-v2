@@ -22,7 +22,29 @@
     "whatWouldYouLikeTo": "What would you like to do?",
     "myActivities": "My activities",
     "switchModeLearner": "Switch mode: Learner",
-    "beneficiaries": "Beneficiaries"
+    "beneficiaries": "Beneficiaries",
+    "appointmentWith": "Appointment with {{tutorName}}",
+    "recommendedNear": "Recommended tutors near {{place}}",
+    "recommendedNearYou": "Recommended tutors near you",
+    "recommendedOnline": "Recommended online tutors",
+    "aroundMe": "Around me",
+    "noRatingYet": "New",
+    "myTutors": "My tutors",
+    "recommendedBadge": "Recommended",
+    "activeCount_one": "{{count}} active",
+    "activeCount_other": "{{count}} active",
+    "noAppointmentsShort": "None",
+    "managePlanning": "Manage my schedule",
+    "beneficiariesCount_one": "{{count}} beneficiary",
+    "beneficiariesCount_other": "{{count}} beneficiaries",
+    "linkedStudents": "Linked students",
+    "openTutor": "View {{tutorName}}'s profile",
+    "lessonsThisWeek": "Lessons this week",
+    "lessonsCount_one": "{{count}} lesson",
+    "lessonsCount_other": "{{count}} lessons",
+    "noLessonsShort": "No lessons",
+    "pendingShort_one": "{{count}} pending",
+    "pendingShort_other": "{{count}} pending"
   },
   "reviewTutor": {
     "howDidTheSessionGo": "How did the session go?",
@@ -42,5 +64,41 @@
     "thisScreenUpdatesByItself": "This screen updates by itself as soon as the tutor starts the session.",
     "theSessionCodeIsOnly": "The session code is only available for a confirmed appointment.",
     "sendTheCodeToThe": "Send the code to the tutor"
+  },
+  "timetable": {
+    "title": "Timetable",
+    "today": "Today",
+    "previousDay": "Previous day",
+    "nextDay": "Next day",
+    "noLessons": "No lessons that day",
+    "noLessonsHint": "Your lessons will appear here as soon as a request is sent.",
+    "pending": "Awaiting confirmation",
+    "pendingHint": "{{name}} must accept the request. This slot is not booked yet.",
+    "confirmed": "Confirmed",
+    "inProgress": "In progress",
+    "completed": "Completed",
+    "startsInMinutes_one": "In {{count}} min",
+    "startsInMinutes_other": "In {{count}} min",
+    "startsInHours": "In {{hours}} h {{minutes}}",
+    "startsInDays_one": "In {{count}} day",
+    "startsInDays_other": "In {{count}} days",
+    "nowLine": "Now"
+  },
+  "drawer": {
+    "open": "Open the drawer",
+    "close": "Close the drawer"
+  },
+  "greeting": {
+    "hello": "Hello",
+    "learnToday": "What would you like to learn today?",
+    "lessonsWeek_one": "You have {{count}} lesson this week.",
+    "lessonsWeek_other": "You have {{count}} lessons this week.",
+    "nextLessonToday": "Next lesson today at {{time}}.",
+    "nextLessonTomorrow": "Next lesson tomorrow at {{time}}.",
+    "nextLessonOn": "Next lesson: {{day}} at {{time}}.",
+    "pending_one": "{{count}} request is waiting for the tutor's answer.",
+    "pending_other": "{{count}} requests are waiting for the tutor's answer.",
+    "unread_one": "{{count}} unread message.",
+    "unread_other": "{{count}} unread messages."
   }
 }

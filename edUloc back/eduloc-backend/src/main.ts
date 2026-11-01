@@ -21,7 +21,13 @@ async function bootstrap(): Promise<void> {
     next();
   });
   app.use(helmet());
-  app.use(json({ limit: '1mb' }));
+  // Corps BRUT conservé (≤ 1 Mo) : la signature HMAC de la notification de paiement se calcule sur les octets exacts reçus.
+  app.use(json({
+    limit: '1mb',
+    verify: (req, _res, buf) => {
+      (req as { rawBody?: Buffer }).rawBody = buf;
+    },
+  }));
   app.use(urlencoded({ extended: true, limit: '1mb' }));
   // En développement, toute origine locale (Expo web 8081/3000, LAN) est acceptée ; en production, la liste blanche seule.
   const devOrigin = /^https?:\/\/(localhost|127\.0\.0\.1|192\.168\.\d+\.\d+|10\.\d+\.\d+\.\d+|172\.(1[6-9]|2\d|3[01])\.\d+\.\d+)(:\d+)?$/;

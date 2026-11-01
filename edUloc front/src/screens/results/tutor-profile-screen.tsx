@@ -74,13 +74,13 @@ function TutorProfileContent({ tutor, insetsBottom, onSelectOffer }: TutorProfil
         <FadeIn delay={30}>
           <View className="items-center pb-5 pt-[6px]">
             <View className="mb-[14px]">
-              <TutorAvatar gender={tutor.gender} photoUrl={tutor.photoUrl} size={88} />
+              <TutorAvatar gender={tutor.gender} photoUrl={tutor.photoUrl} name={`${tutor.firstName} ${tutor.lastName}`} size={88} />
             </View>
-            <Text className="text-[21px] font-bold text-ink">
+            <Text className="text-[21px] font-bold font-display text-ink">
               {tutor.firstName} {tutor.lastName}
             </Text>
             <View className="mt-[6px] flex-row items-center gap-[6px]">
-              <StarIcon size={14} color="#BD7E28" />
+              <StarIcon size={14} color="#D4890A" />
               <Text className="text-[13.5px] font-bold text-ink">
                 {tutor.rating.toFixed(1)} <Text className="font-medium text-ink-faint">{t("common.reviews", { reviewCount: tutor.reviewCount })}</Text>
               </Text>
@@ -169,7 +169,7 @@ function OfferRow({ offer, onPress }: { offer: TutorOfferSummary; onPress: () =>
   const formatLabel = offer.formats.map((f) => FORMAT_LABELS[f]).join(" / ");
   return (
     <PressableScale onPress={onPress} accessibilityLabel={offer.title}>
-      <View className="mb-[10px] flex-row items-center justify-between rounded-lg border border-line bg-surface p-4">
+      <View className="mb-[10px] flex-row items-center justify-between rounded-lg border border-line bg-surface shadow-card p-4">
         <View>
           <Text className="text-[15px] font-bold text-ink">{offer.title}</Text>
           <Text className="mt-[3px] text-[12.5px] text-ink-soft">

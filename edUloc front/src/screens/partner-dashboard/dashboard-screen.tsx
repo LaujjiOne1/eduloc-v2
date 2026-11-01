@@ -7,8 +7,10 @@ import { FadeIn } from "@/components/motion/fade-in";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { Button } from "@/components/ui/button";
+import { ProfilePhotoEditor } from "@/components/ui/profile-photo-editor";
 import { ToneBadge } from "@/components/ui/tone-badge";
 import { usePartnerVenue } from "@/hooks/use-partner-venue";
+import { useAuthStore } from "@/store/auth.store";
 import { PUBLICATION_LABELS, REVIEW_STATUS, SUBSCRIPTION_LABELS } from "@/lib/partner-labels";
 import type { PartnerRoomSummary, PartnerVenue } from "@/types/partner";
 import { useTranslation } from "react-i18next";
@@ -26,6 +28,7 @@ export function PartnerDashboardScreen() {
   const { t } = useTranslation();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const user = useAuthStore((s) => s.user);
   const { state, reload } = usePartnerVenue();
   const back = () => (router.canGoBack() ? router.back() : router.replace(MODE_CHOICE_ROUTE));
 
@@ -33,7 +36,15 @@ export function PartnerDashboardScreen() {
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={back} />
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 28 }} showsVerticalScrollIndicator={false}>
-        <Text className="mb-1 text-[25px] font-bold text-ink">{t("partnerDashboard.dashboard.partnerVenues")}</Text>
+        {user ? (
+          <View className="mb-4 flex-row items-center gap-[14px]">
+            <ProfilePhotoEditor name={`${user.firstName} ${user.lastName}`.trim()} size={56} />
+            <Text className="flex-1 text-[15px] font-bold text-ink" numberOfLines={1}>
+              {`${user.firstName} ${user.lastName}`.trim()}
+            </Text>
+          </View>
+        ) : null}
+        <Text className="mb-1 text-[25px] font-bold font-display text-ink">{t("partnerDashboard.dashboard.partnerVenues")}</Text>
         <Text className="mb-5 text-[13.5px] leading-[20px] text-ink-soft">
           {t("partnerDashboard.dashboard.offerYourRoomsToEduloc")}</Text>
 
@@ -52,7 +63,7 @@ export function PartnerDashboardScreen() {
           </View>
         ) : state.venue === null ? (
           <FadeIn delay={40}>
-            <View className="rounded-lg border border-line bg-surface p-5">
+            <View className="rounded-lg border border-line bg-surface shadow-card p-5">
               <Text className="mb-2 text-[16px] font-bold text-ink">{t("partnerDashboard.dashboard.becomeAPartnerVenue")}</Text>
               <Text className="mb-4 text-[13.5px] leading-[20px] text-ink-soft">
                 {t("partnerDashboard.dashboard.n1PresentYourOrganisationAnd")}</Text>
@@ -99,7 +110,7 @@ function VenueOverview({
     <>
       <FadeIn delay={30}>
         <PressableScale onPress={onOpenVenue} accessibilityLabel={t("partnerDashboard.dashboard.openTheOrganisationPage")}>
-          <View className="rounded-lg border border-line bg-surface p-4">
+          <View className="rounded-lg border border-line bg-surface shadow-card p-4">
             <View className="flex-row items-start justify-between gap-3">
               <View className="flex-1">
                 <Text className="text-[16px] font-bold text-ink">{venue.name}</Text>
@@ -145,7 +156,7 @@ function VenueOverview({
       <FadeIn delay={110}>
         <Text className="mb-2 mt-6 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("common.commercialPlan")}</Text>
         <PressableScale onPress={onOpenSubscription} accessibilityLabel={t("common.manageTheCommercialPlan")}>
-          <View className="flex-row items-center gap-3 rounded-lg border border-line bg-surface p-4">
+          <View className="flex-row items-center gap-3 rounded-lg border border-line bg-surface shadow-card p-4">
             <View className="flex-1">
               <Text className="text-[14.5px] font-bold text-ink">{venue.subscription.plan?.name ?? SUBSCRIPTION_LABELS[venue.subscription.status]}</Text>
               <Text className="mt-[2px] text-[12.5px] text-ink-soft">
@@ -164,7 +175,7 @@ function VenueOverview({
       <FadeIn delay={140}>
         <Text className="mb-2 mt-6 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("common.reservations")}</Text>
         <PressableScale onPress={onOpenReservations} accessibilityLabel={t("partnerDashboard.dashboard.viewConfirmedReservations")}>
-          <View className="flex-row items-center gap-3 rounded-lg border border-line bg-surface p-4">
+          <View className="flex-row items-center gap-3 rounded-lg border border-line bg-surface shadow-card p-4">
             <Text className="flex-1 text-[14.5px] font-bold text-ink">{t("partnerDashboard.dashboard.confirmedSessionsInMyRooms")}</Text>
             <ChevronRightIcon size={16} color="#9799AF" />
           </View>
@@ -174,7 +185,7 @@ function VenueOverview({
       {venue.history.length > 0 ? (
         <FadeIn delay={170}>
           <Text className="mb-2 mt-6 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("partnerDashboard.dashboard.history")}</Text>
-          <View className="rounded-lg border border-line bg-surface px-4">
+          <View className="rounded-lg border border-line bg-surface shadow-card px-4">
             {venue.history.slice(0, 8).map((entry, index) => (
               <View key={entry.id} className={["py-3", index > 0 ? "border-t border-line-soft" : ""].join(" ")}>
                 <Text className="text-[13px] font-semibold text-ink">
@@ -201,7 +212,7 @@ function RoomCard({ room, onPress }: { room: PartnerRoomSummary; onPress: () => 
   const status = REVIEW_STATUS[room.status];
   return (
     <PressableScale onPress={onPress} accessibilityLabel={t("partnerDashboard.dashboard.openTheRoom", { name: room.name })}>
-      <View className="mb-3 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="flex-row items-start justify-between gap-3">
           <Text className="flex-1 text-[15px] font-bold text-ink">{room.name}</Text>
           <ToneBadge label={status.label} tone={status.tone} />

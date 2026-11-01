@@ -162,5 +162,12 @@
   },
   "usePartnerAction": {
     "actionUnavailable": "Tsy azo atao izany. Andramo indray azafady."
+  },
+  "profilePhoto": {
+    "cameraAccessDenied": "Avelao ny fidirana amin'ny fakantsary ao amin'ny fanamboarana mba haka sary.",
+    "unsupportedFormat": "Tsy tohanana ny karazana: misafidiana sary JPG, PNG na WebP.",
+    "tooLarge": "Mihoatra ny 5 Mo ity sary ity. Misafidiana iray maivana kokoa.",
+    "uploadFailed": "Tsy nahomby ny fandefasana ny sary. Andramo indray.",
+    "removeFailed": "Tsy afaka mamafa ny sary izao. Andramo indray."
   }
 }

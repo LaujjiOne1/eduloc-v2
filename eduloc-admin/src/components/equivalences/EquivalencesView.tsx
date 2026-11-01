@@ -49,17 +49,17 @@ export const EquivalencesView: React.FC<{ refreshKey: number }> = ({ refreshKey 
             {list.data.map((e) => {
               const st = equivalenceStatus(e.status);
               return (
-                <tr key={e.id} className="hover:bg-white/5 cursor-pointer" onClick={() => setEditing(e)}>
+                <tr key={e.id} className="hover:bg-paper-alt cursor-pointer" onClick={() => setEditing(e)}>
                   <td className="px-4 py-3.5">
-                    <p className="font-bold text-white">{e.degreeTitle}</p>
-                    {e.specialty && <p className="text-[11px] text-slate-400">{e.specialty}</p>}
+                    <p className="font-bold text-ink">{e.degreeTitle}</p>
+                    {e.specialty && <p className="text-[11px] text-ink-soft">{e.specialty}</p>}
                   </td>
                   <td className="px-4 py-3.5">{e.country}</td>
                   <td className="px-4 py-3.5"><Badge tone={st.tone}>{st.label}</Badge></td>
                   <td className="px-4 py-3.5">
-                    {e.status === 'VALIDATED' ? <>{highestDegree(e.equivalentDegree)}{e.equivalentLevel ? <span className="block text-[11px] text-slate-400">{levelLabel(e.equivalentLevel)}</span> : null}</> : '—'}
+                    {e.status === 'VALIDATED' ? <>{highestDegree(e.equivalentDegree)}{e.equivalentLevel ? <span className="block text-[11px] text-ink-soft">{levelLabel(e.equivalentLevel)}</span> : null}</> : '—'}
                   </td>
-                  <td className="px-4 py-3.5 text-slate-400">{formatDate(e.updatedAt)}</td>
+                  <td className="px-4 py-3.5 text-ink-soft">{formatDate(e.updatedAt)}</td>
                 </tr>
               );
             })}

@@ -6,11 +6,11 @@ import { t } from "@/i18n";
 export type DevicePositionState =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "ready"; latitude: number; longitude: number }
+  | { status: "ready"; latitude: number; longitude: number; /** Quartier, quand le serveur a pu le nommer. */ label: string | null }
   | { status: "unavailable"; message: string };
 
 /** Dernière position obtenue : une seule demande d'autorisation par session, partagée entre les écrans. */
-let lastKnown: { latitude: number; longitude: number } | null = null;
+let lastKnown: { latitude: number; longitude: number; label: string | null } | null = null;
 
 /** Arrondi à ~100 m : une position qui bouge à peine ne relance pas le calcul des distances. */
 const round = (n: number) => Math.round(n * 1000) / 1000;
@@ -28,7 +28,7 @@ export function useDevicePosition() {
     setState({ status: "loading" });
     try {
       const position = await LocationService.getCurrentPosition();
-      lastKnown = { latitude: round(position.latitude), longitude: round(position.longitude) };
+      lastKnown = { latitude: round(position.latitude), longitude: round(position.longitude), label: position.label || null };
       setState({ status: "ready", ...lastKnown });
     } catch (error) {
       setState({

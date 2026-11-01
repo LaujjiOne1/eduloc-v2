@@ -150,11 +150,11 @@ export function BookingSummaryScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-[18px] text-[24px] font-bold text-ink">{t("booking.bookingSummary.yourRequest")}</Text>
+          <Text className="mb-[18px] text-[24px] font-bold font-display text-ink">{t("booking.bookingSummary.yourRequest")}</Text>
         </FadeIn>
 
         <FadeIn delay={80}>
-          <View className="rounded-lg border border-line bg-surface p-4">
+          <View className="rounded-lg border border-line bg-surface shadow-card p-4">
             <SummaryRow label={t("common.tutor")} value={offer.tutorName} />
             <Divider />
             <SummaryRow label={t("booking.bookingSummary.lesson")} value={offer.title} />
@@ -194,7 +194,7 @@ export function BookingSummaryScreen() {
         {isRoom ? (
           <FadeIn delay={95}>
             <View className="mt-[14px] flex-row gap-3 rounded-lg border border-line bg-paper-alt p-4">
-              <AlertTriangleIcon size={18} color="#BD7E28" />
+              <AlertTriangleIcon size={18} color="#D4890A" />
               <Text className="flex-1 text-[12.5px] leading-[19px] text-ink-soft">
                 {t("booking.bookingSummary.thisSlotAndThisRoom")}</Text>
             </View>
@@ -243,7 +243,7 @@ export function BookingSummaryScreen() {
 
         <FadeIn delay={120}>
           <PressableScale onPress={() => router.push(BENEFICIARY_PROFILE_ROUTE)} accessibilityLabel={t("booking.bookingSummary.editYourNeed")}>
-            <View className="mt-[14px] flex-row items-center gap-3 rounded-lg border border-line bg-surface p-4">
+            <View className="mt-[14px] flex-row items-center gap-3 rounded-lg border border-line bg-surface shadow-card p-4">
               <View className="h-9 w-9 items-center justify-center rounded-full bg-accent-tint">
                 <MicIcon size={16} color="#0E9C82" />
               </View>
@@ -299,7 +299,7 @@ function PriceCard({
 }) {
   const { t } = useTranslation();
   return (
-    <View className="mt-[14px] rounded-lg border border-line bg-surface p-4">
+    <View className="mt-[14px] rounded-lg border border-line bg-surface shadow-card p-4">
       <Text className="mb-1 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("booking.bookingSummary.priceBreakdown")}</Text>
       {pricing ? (
         <>

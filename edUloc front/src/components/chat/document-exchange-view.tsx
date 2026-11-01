@@ -51,7 +51,7 @@ export function DocumentExchangeView({ bookingId }: { bookingId: string | undefi
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-4 text-[22px] font-bold text-ink">{t("chat.documentExchangeView.sharedDocuments")}</Text>
+      <Text className="px-5 pb-4 text-[22px] font-bold font-display text-ink">{t("chat.documentExchangeView.sharedDocuments")}</Text>
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
         {messagesState.status === "loading" ? (
@@ -114,7 +114,7 @@ function DocumentRow({ document }: { document: DocumentMessage }) {
 
   return (
     <PressableScale onPress={open} disabled={opening} accessibilityLabel={t("common.open", { fileName: document.fileName })}>
-      <View className="mb-[10px] flex-row items-center gap-3 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-[10px] flex-row items-center gap-3 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="h-10 w-10 items-center justify-center rounded-md bg-primary-tint">
           {opening ? <ActivityIndicator size="small" color="#332E86" /> : <FileIcon size={18} color="#332E86" />}
         </View>

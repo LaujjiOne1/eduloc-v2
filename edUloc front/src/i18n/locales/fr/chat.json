@@ -12,7 +12,15 @@
     "noMessages": "Aucun message",
     "conversationWith": "Conversation avec {{name}}",
     "conversationWithUnread_one": "Conversation avec {{name}}, {{count}} non lu",
-    "conversationWithUnread_other": "Conversation avec {{name}}, {{count}} non lus"
+    "conversationWithUnread_other": "Conversation avec {{name}}, {{count}} non lus",
+    "searchPlaceholder": "Rechercher un contact ou un message…",
+    "filterAll": "Tout",
+    "filterUnread": "Non lus",
+    "noMatchTitle": "Aucun résultat",
+    "noMatchBody": "Essayez un autre nom ou un autre mot.",
+    "unreadBadge_one": "{{count}} message non lu",
+    "unreadBadge_other": "{{count}} messages non lus",
+    "clearSearch": "Effacer la recherche"
   },
   "documentExchangeView": {
     "sharedDocuments": "Documents partagés",
@@ -35,5 +43,9 @@
     "allowTheMicrophoneInYour": "Autorisez le micro dans les réglages de votre appareil (ou de votre navigateur) pour envoyer un message vocal.",
     "preparingTheMicrophone": "Préparation du micro...",
     "recordingInProgress": "Enregistrement en cours"
+  },
+  "voicePill": {
+    "pause": "Mettre en pause",
+    "resume": "Reprendre l'enregistrement"
   }
 }

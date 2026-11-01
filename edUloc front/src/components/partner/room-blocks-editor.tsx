@@ -63,7 +63,7 @@ export function RoomBlocksEditor({ roomId, blocks, onChanged }: RoomBlocksEditor
       {blocks.length === 0 ? (
         <Text className="mb-3 text-[13.5px] text-ink-soft">{t("partner.roomBlocksEditor.noUpcomingClosures")}</Text>
       ) : (
-        <View className="mb-3 rounded-lg border border-line bg-surface px-4">
+        <View className="mb-3 rounded-lg border border-line bg-surface shadow-card px-4">
           {blocks.map((b, i) => (
             <View key={b.id} className={["flex-row items-center py-3", i > 0 ? "border-t border-line-soft" : ""].join(" ")}>
               <View className="flex-1">

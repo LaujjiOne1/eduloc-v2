@@ -6,7 +6,8 @@
     "personalInformationComingSoon": "Fampahalalana manokana (tsy ho ela)",
     "myStudyVenuesPartner": "Ny toeran'ny fianarako (mpiara-miasa)",
     "manageMyPartnerStudyVenues": "Tantano ny toerana fianarana mpiara-miasa",
-    "switchModeLabel": "Fomba {{value}} — ovay ny fomba"
+    "switchModeLabel": "Fomba {{value}} — ovay ny fomba",
+    "learningSpace": "Toerana fianarana"
   },
   "forgotPassword": {
     "enterYourAccountEmailWe": "Ampidiro ny mailaky ny kaontinao: handefa kaody 6 isa aminao izahay.",
@@ -26,6 +27,7 @@
     "location": "Toerana",
     "popularSearches": "Fikarohana malaza",
     "doYouTeach": "Mpampianatra ve ianao?",
+    "becomeATutor": "Ho mpampianatra",
     "becomeAVerifiedTutorOn": "Lasa mpampianatra voamarina ao amin'ny EduLoc",
     "noPopularSearchesAtThe": "Tsy misy fikarohana malaza amin'izao fotoana izao.",
     "search": "Karohy",
@@ -50,7 +52,27 @@
     "serviceRoomsTitle": "Toerana fianarana",
     "serviceRoomsDescription": "Mampanao famandrihana efitrano mpiara-miasa ho an'ny lesona mivantana.",
     "serviceVerifiedTitle": "Mpampianatra voamarina",
-    "serviceVerifiedDescription": "Ankatoavin'ny EduLoc ny mombamomba azy mialoha ny hiseho amin'ny valiny."
+    "serviceVerifiedDescription": "Ankatoavin'ny EduLoc ny mombamomba azy mialoha ny hiseho amin'ny valiny.",
+    "heroTitle": "Tadiavo ny mpampianatra mety eo akaikinao",
+    "tutorsToDiscover": "Mpampianatra hojerena",
+    "carouselHint": "Hosintonina ny karatra mba hahitana ny edUloc",
+    "carouselPrevious": "Karatra teo aloha",
+    "carouselNext": "Karatra manaraka",
+    "alreadyHaveAnAccount": "Efa manana kaonty ve?",
+    "carouselEyebrow": "Hitany ny traikefa",
+    "carouselTitle": "Izay rehetra ilaina mba hahomby amin'ny fianaranao",
+    "carouselSubtitle": "Mpampianatra mahay, akaikin'ny fonenanao na an-tserasera.",
+    "badgeSupport": "Fanampiana",
+    "badgeSecurity": "Fiarovana",
+    "badgeFlexibility": "Fahafaha-mivadika",
+    "badgeTeachers": "Mpampianatra",
+    "searchCta": "Karoka",
+    "headlinePrefix": "Hitady ny mpampianatra mety",
+    "headlineNear": "akaikin'ny fonenanao",
+    "headlineOnline": "an-tserasera, na aiza na aiza",
+    "headlineRooms": "ao amin'ny efitrano fianarana",
+    "headlineVerified": "voamarina sy azo itokisana",
+    "headlineLevels": "avy amin'ny ambaratonga voalohany ka hatrany amin'ny doktora"
   },
   "login": {
     "signInToContinue": "Midira hanohy",
@@ -62,7 +84,32 @@
     "signInOrCreateAn": "Midira na mamorona kaonty: ho eo amin'ny faritra Toerana mpiara-miasa avy hatrany ianao.",
     "continueWithGoogle": "Tohizo amin'ny Google",
     "signingIn": "Miditra...",
-    "continueWithApple": "Tohizo amin'ny Apple"
+    "continueWithApple": "Tohizo amin'ny Apple",
+    "accountsOnDevice": "Kaonty ao amin'ity fitaovana ity",
+    "rememberMe": "Tsy hiala",
+    "forgetAccount": "Hanadino ny {{email}} amin'ity fitaovana ity",
+    "quickSignIn": "Fidirana haingana",
+    "unlockReason": "Alefaso ny fanokafana mba hiditra amin'ny EduLoc",
+    "savedPasswordNoLongerValid": "Tsy mety intsony ny tenimiafina voatahiry. Soraty indray azafady.",
+    "savePassword": "Tahiry ny tenimiafiko",
+    "savePasswordHint": "Voafetra ao amin'ity fitaovana ity ary sokafana amin'ny rantsan-tanana, endrika na kaody.",
+    "continueWithFacebook": "Tohizo amin'ny Facebook"
+  },
+  "signOutPrompt": {
+    "title": "Hiala ve?",
+    "intro": "Inona no atao amin'ny kaontinao amin'ity fitaovana ity?",
+    "keepTitle": "Tazonina ny kaontiko amin'ity fitaovana ity",
+    "keepHint": "Aseho ny mailakao amin'ny fidirana manaraka mba hiditra haingana kokoa.",
+    "forgetTitle": "Hadinoina ity kaonty ity amin'ity fitaovana ity",
+    "forgetHint": "Tsy asehoana intsony ny mailakao. Tsara raha fitaovana iombonana na nampindramina.",
+    "passwordTip": "Tsy mitazona ny tenimiafinao mihitsy ny EduLoc. Ampiasao ny mpitantana tenimiafina ao amin'ny findainao mba tsy hanoratana azy indray.",
+    "oneTapTitle": "Hiditra indray amin'ny tsindry iray",
+    "oneTapHint": "Tsy mila manoratra tenimiafina indray: rantsan-tanana, endrika na kaody.",
+    "keepPasswordTitle": "Tazonina ny tenimiafina voatahiry",
+    "keepPasswordHint": "Esory ny tsiky raha te hamafa azy.",
+    "vaultTip": "Voafetra ao amin'ity fitaovana ity ny tahiry ary tsy misokatra afa-tsy aorian'ny fanokafana. Ny « Hadino ity kaonty ity » dia mamafa azy ireo ary manakatona ny session.",
+    "vaultTipNoPassword": "Raha te hitahiry ny tenimiafina koa, tsindrio ny « Tahiry ny tenimiafiko » amin'ny fidirana manaraka.",
+    "confirm": "Hiala"
   },
   "modeChoice": {
     "howWouldYouLikeTo": "Ahoana no tianao hampiasana ny EduLoc?",
@@ -95,6 +142,22 @@
   "splash": {
     "theRightSupportInThe": "Ny fanampiana mety, amin'ny toerana mety.",
     "continueToTheEdulocHome": "Tohizo mankany amin'ny fandraisana edUloc",
-    "tapToContinue": "Tendreo mba hanohizana"
+    "tapToContinue": "Tendreo mba hanohizana",
+    "start": "Sokafy"
+  },
+  "switchAccount": {
+    "title": "Hanova kaonty",
+    "intro": "Mifindra kaonty tsy miala. Misokatra amin'ny tsindry iray ny kaonty voatazona, aorian'ny fanokafana ny fitaovana.",
+    "active": "Kaonty miasa",
+    "passwordRequired": "Mila tenimiafina",
+    "needsPassword": "Mila ny tenimiafiny ity kaonty ity. Ampiasao ny « Hanampy kaonty » hiditra.",
+    "cannotKeepCurrent": "Tsy voatazona antsika ny kaonty ankehitriny: foana ny fiovana ary mijanona tsy miala ianao.",
+    "addAccount": "Hanampy kaonty",
+    "lockRequired": "Mba hanova kaonty tsy miala, alefaso ny fanidiana ao amin'ity fitaovana ity (rantsan-tanana, endrika na kaody). Raha tsy izany, tsy misy azo tazonina antsika.",
+    "revokeAllTitle": "Foano ny fidirana haingana rehetra",
+    "revokeAllBody": "Ho fafana sy foanana ny fidirana voatazona sy ny tenimiafina voatahiry amin'ity fitaovana ity. Mijanona ao anaty lisitra ny kaonty fa mila tenimiafina.",
+    "revokeAllConfirm": "Foano rehetra",
+    "revokedCount_one": "{{count}} fidirana haingana voafafa.",
+    "revokedCount_other": "{{count}} fidirana haingana voafafa."
   }
 }

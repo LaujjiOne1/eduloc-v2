@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Un tag par catégorie de l'assistant guidé (support_requests.category). -->
+    <record id="tag_trouver_tuteur" model="crm.tag">
+        <field name="name">Trouver un tuteur</field>
+        <field name="color">4</field>
+    </record>
+    <record id="tag_cours_proche" model="crm.tag">
+        <field name="name">Cours pour un proche</field>
+        <field name="color">10</field>
+    </record>
+    <record id="tag_reservation" model="crm.tag">
+        <field name="name">Aide réservation</field>
+        <field name="color">2</field>
+    </record>
+    <record id="tag_autre" model="crm.tag">
+        <field name="name">Autre question</field>
+        <field name="color">8</field>
+    </record>
+</odoo>

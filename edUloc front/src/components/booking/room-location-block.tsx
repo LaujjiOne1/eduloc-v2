@@ -19,7 +19,7 @@ export function RoomLocationBlock({ booking }: { booking: Booking }) {
   const closed = booking.status === "cancelled" || booking.status === "refused";
 
   return (
-    <View className="mb-4 rounded-lg border border-line bg-surface p-4">
+    <View className="mb-4 rounded-lg border border-line bg-surface shadow-card p-4">
       <Text className="mb-2 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("booking.roomLocationBlock.partnerRoom")}</Text>
       {booking.room ? (
         <Text className="text-[14.5px] font-bold text-ink">

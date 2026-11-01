@@ -10,6 +10,8 @@ export interface ConversationSummary {
   counterpartGender?: TutorGender | null;
   counterpartPhotoUrl?: string | null;
   bookingId: string | null;
+  /** Nature du dernier message : un vocal et un document ne s'affichent pas comme une phrase. */
+  lastMessageType: "voice" | "document" | "system" | "call_event" | null;
   lastMessagePreview: string | null;
   lastMessageAt: string | null;
   unreadCount: number;

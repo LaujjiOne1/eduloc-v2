@@ -1,0 +1,57 @@
+# Rendu au démarrage par l'image nginx (envsubst sur ${ODOO_DOMAIN} uniquement : les $variables nginx sont conservées).
+# Certificat attendu dans /etc/letsencrypt/live/${ODOO_DOMAIN}/ (certbot sur l'hôte). Sans lui, nginx refuse de
+# démarrer : c'est voulu, on ne sert jamais Odoo en clair par erreur.
+
+# Résolution DNS à la requête (résolveur Docker) : nginx démarre même si Odoo n'est pas encore joignable
+# (redémarrage de la pile, mise à jour d'Odoo) et répond 502 le temps qu'il revienne, au lieu de boucler.
+resolver 127.0.0.11 valid=10s ipv6=off;
+
+server {
+    listen 80;
+    server_name ${ODOO_DOMAIN};
+    location /.well-known/acme-challenge/ { root /var/www/certbot; }
+    location / { return 301 https://$host$request_uri; }
+}
+
+server {
+    listen 443 ssl;
+    http2 on;
+    server_name ${ODOO_DOMAIN};
+
+    ssl_certificate     /etc/letsencrypt/live/${ODOO_DOMAIN}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${ODOO_DOMAIN}/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    add_header Strict-Transport-Security "max-age=31536000" always;
+    add_header X-Content-Type-Options nosniff always;
+    add_header X-Frame-Options SAMEORIGIN always;
+
+    client_max_body_size 50m;
+    proxy_read_timeout 720s;
+    proxy_connect_timeout 720s;
+    proxy_send_timeout 720s;
+
+    set $odoo_http http://odoo:8069;
+    set $odoo_chat http://odoo:8072;
+
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_redirect off;
+
+    # Gestionnaire de bases : jamais exposé publiquement.
+    location ~ ^/web/database { return 404; }
+
+    location /websocket {
+        proxy_pass $odoo_chat;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+    }
+
+    location / { proxy_pass $odoo_http; }
+
+    gzip on;
+    gzip_types text/css text/plain text/xml application/xml application/json application/javascript;
+}

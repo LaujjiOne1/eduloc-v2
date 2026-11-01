@@ -14,7 +14,7 @@ export const PlansView: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
   return (
     <div className="space-y-5">
       <Card className="p-4 flex items-center justify-between gap-3">
-        <p className="text-xs text-slate-400">Prix et durée sont des données : un changement ne touche pas les souscriptions déjà en cours.</p>
+        <p className="text-xs text-ink-soft">Prix et durée sont des données : un changement ne touche pas les souscriptions déjà en cours.</p>
         <Btn tone="primary" onClick={() => setEditing('new')}><Plus className="w-4 h-4" /> Nouveau plan</Btn>
       </Card>
       {plans.error && <ErrorBox message={plans.error} onRetry={plans.reload} />}
@@ -22,9 +22,9 @@ export const PlansView: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
         {plans.loading && !plans.data ? <Loading /> : !plans.data || plans.data.length === 0 ? <Empty>Aucun plan.</Empty> : (
           <Table head={['Plan', 'Code', 'Prix', 'Durée', 'Proposé aux structures', '']}>
             {plans.data.map((p) => (
-              <tr key={p.id} className="hover:bg-white/5">
-                <td className="px-4 py-3.5"><p className="font-bold text-white">{p.name}</p>{p.description && <p className="text-[11px] text-slate-400 max-w-xs truncate">{p.description}</p>}</td>
-                <td className="px-4 py-3.5 font-mono text-slate-400">{p.code}</td>
+              <tr key={p.id} className="hover:bg-paper-alt">
+                <td className="px-4 py-3.5"><p className="font-bold text-ink">{p.name}</p>{p.description && <p className="text-[11px] text-ink-soft max-w-xs truncate">{p.description}</p>}</td>
+                <td className="px-4 py-3.5 font-mono text-ink-soft">{p.code}</td>
                 <td className="px-4 py-3.5">{Number(p.price.amount) === 0 ? 'Gratuit' : formatMoney(p.price.amount, p.price.currency)}</td>
                 <td className="px-4 py-3.5">{p.durationDays} j</td>
                 <td className="px-4 py-3.5">{p.isActive ? <Badge tone="green">Oui</Badge> : <Badge tone="slate">Non</Badge>}</td>
@@ -78,7 +78,7 @@ const PlanForm: React.FC<{ plan: PartnerPlan | null; busy: boolean; onSubmit: (b
         <Field label="Prix (Ar)" hint="0 = gratuit, activé immédiatement"><TextInput type="number" min={0} value={price} onChange={(e) => setPrice(e.target.value)} /></Field>
         <Field label="Durée (jours)"><TextInput type="number" min={1} value={days} onChange={(e) => setDays(e.target.value)} /></Field>
       </div>
-      <label className="flex items-center gap-2 text-sm text-slate-200">
+      <label className="flex items-center gap-2 text-sm text-ink">
         <input type="checkbox" checked={active} onChange={(e) => setActive(e.target.checked)} /> Proposé aux structures
       </label>
       <div className="flex justify-end">

@@ -21,7 +21,7 @@ export function RequestAcceptedScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 pb-[14px] pt-5">
-        <Text className="text-[21px] font-bold text-ink">
+        <Text className="text-[21px] font-bold font-display text-ink">
           Edu<Text className="text-primary">Loc</Text>
         </Text>
       </View>
@@ -46,7 +46,7 @@ export function RequestAcceptedScreen() {
             </View>
           </ScaleIn>
 
-          <Text className="mb-[10px] text-center text-[22px] font-bold text-ink">{t("tutorDashboard.requestAccepted.requestAccepted")}</Text>
+          <Text className="mb-[10px] text-center text-[22px] font-bold font-display text-ink">{t("tutorDashboard.requestAccepted.requestAccepted")}</Text>
           <Text className="mb-[22px] text-center text-[14.5px] leading-[21px] text-ink-soft">
             {t("tutorDashboard.requestAccepted.theAppointmentWithIsNow", { firstName: state.booking.beneficiary.firstName })}</Text>
           <View className="mb-6">

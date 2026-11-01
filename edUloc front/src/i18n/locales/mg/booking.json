@@ -80,7 +80,8 @@
     "goToTheNextAvailability": "Mankany amin'ny fotoana malalaka manaraka",
     "choosingARoomDoesNot": " Tsy voatokana ny efitrano rehefa mifidy azy; voaray ihany rehefa manaiky ny fangatahana ny mpampianatra.",
     "bookThisSlot": "Mandrisika ity fotoana ity",
-    "slotTaken": "{{range}}, voaray ny fotoana"
+    "slotTaken": "{{range}}, voaray ny fotoana",
+    "noSlotsTitle": "Tsy misy fotoana amin'io andro io"
   },
   "bookingPending": {
     "requestSent": "Nalefa ny fangatahana",

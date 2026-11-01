@@ -23,6 +23,11 @@ const isExpoGo = Constants.executionEnvironment === ExecutionEnvironment.StoreCl
 
 let cached: NotificationsModule | null | undefined;
 
+/** Module de notifications, ou null (Expo Go, web) : les appelants dégradent sans rien casser. */
+export function notificationsModule(): NotificationsModule | null {
+  return notifications();
+}
+
 function notifications(): NotificationsModule | null {
   if (cached !== undefined) return cached;
   if (!isNative || isExpoGo) {
@@ -46,31 +51,70 @@ export function configureForegroundPresentation(): void {
   if (!Notifications) return;
   Notifications.setNotificationHandler({
     handleNotification: async (notification) => {
-      const isCall = notification.request.content.data?.type === "call.incoming";
+      // Un appel et un rappel de cours ont déjà leur bandeau + sonnerie dans l'app : pas de doublon système au premier plan.
+      const type = notification.request.content.data?.type;
+      const inApp = type === "call.incoming" || type === "booking.reminder";
       return {
-        shouldShowBanner: !isCall,
-        shouldShowList: !isCall,
-        shouldPlaySound: !isCall,
+        shouldShowBanner: !inApp,
+        shouldShowList: !inApp,
+        shouldPlaySound: !inApp,
         shouldSetBadge: false,
       };
     },
   });
 }
 
-async function ensureAndroidChannels(Notifications: NotificationsModule): Promise<void> {
-  if (Platform.OS !== "android") return;
+/** Couleur de la marque : liseré et accent des notifications Android (voir aussi `color` du plugin dans app.json). */
+const BRAND_COLOR = "#332E86";
+
+/**
+ * Canaux Android. Un canal est figé à sa création (son, importance) : pour changer un réglage il faut un NOUVEAU
+ * identifiant, d'où `calls_ring` à la place de l'ancien `calls` (dont la sonnerie ne durait que 3 secondes).
+ *  - default   : alertes de réservation, avis, etc. ;
+ *  - reminders : rappels de cours, vibration marquée, visibles sur l'écran de verrouillage ;
+ *  - messages  : vocaux et documents reçus ;
+ *  - calls_ring: appel entrant, priorité maximale, sonnerie d'environ 36 s (comme un téléphone qui sonne), vibration en boucle.
+ */
+export async function ensureAndroidChannels(Notifications: NotificationsModule = notifications() as NotificationsModule): Promise<void> {
+  if (Platform.OS !== "android" || !Notifications) return;
+  const visible = Notifications.AndroidNotificationVisibility.PUBLIC;
   await Notifications.setNotificationChannelAsync("default", {
     name: t("common.notifications"),
     importance: Notifications.AndroidImportance.HIGH,
+    lightColor: BRAND_COLOR,
+    lockscreenVisibility: visible,
   });
-  await Notifications.setNotificationChannelAsync("calls", {
+  await Notifications.setNotificationChannelAsync("reminders", {
+    name: t("lib.push.lessonReminders"),
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 300, 200, 300, 200, 600],
+    enableVibrate: true,
+    lightColor: BRAND_COLOR,
+    lockscreenVisibility: visible,
+  });
+  await Notifications.setNotificationChannelAsync("messages", {
+    name: t("lib.push.messages"),
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: [0, 200, 150, 200],
+    lightColor: BRAND_COLOR,
+    lockscreenVisibility: visible,
+  });
+  await Notifications.setNotificationChannelAsync("calls_ring", {
     name: t("lib.push.incomingCalls"),
     importance: Notifications.AndroidImportance.MAX,
-    sound: "ringtone.wav",
-    vibrationPattern: [0, 800, 1200, 800, 1200],
-    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    sound: "ringtone-call.wav",
+    audioAttributes: {
+      usage: Notifications.AndroidAudioUsage.NOTIFICATION_RINGTONE,
+      contentType: Notifications.AndroidAudioContentType.SONIFICATION,
+    },
+    vibrationPattern: [0, 800, 1200, 800, 1200, 800, 1200, 800, 1200],
     enableVibrate: true,
+    bypassDnd: false,
+    lightColor: BRAND_COLOR,
+    lockscreenVisibility: visible,
   });
+  // Ancien canal d'appel (sonnerie de 3 s) : retiré pour ne pas rester dans les réglages du téléphone.
+  await Notifications.deleteNotificationChannelAsync("calls").catch(() => undefined);
 }
 
 /** Demande la permission, crée les canaux et enregistre le jeton de l'appareil. Ne lève jamais. */
@@ -84,7 +128,11 @@ export async function registerForPush(): Promise<void> {
     if (status !== "granted") return;
 
     const projectId = Constants.expoConfig?.extra?.eas?.projectId ?? Constants.easConfig?.projectId;
-    if (!projectId) return;
+    if (!projectId) {
+      // Sans identifiant de projet EAS, aucun jeton push n'existe : seuls les rappels locaux (alarmes de l'appareil) fonctionnent.
+      if (__DEV__) console.warn("[push] extra.eas.projectId absent (lancer `eas init`) : pas de notification serveur, rappels locaux seulement.");
+      return;
+    }
     const { data: token } = await Notifications.getExpoPushTokenAsync({ projectId });
     await api.post("/devices", { token, platform: Platform.OS === "ios" ? "IOS" : "ANDROID" });
     registeredToken = token;

@@ -41,7 +41,7 @@ export function TutorIntroScreen() {
         </FadeIn>
 
         <FadeIn delay={80}>
-          <Text className="mb-3 text-[29px] font-bold leading-[35px] text-ink">
+          <Text className="mb-3 text-[29px] font-bold font-display leading-[35px] text-ink">
             {t("tutorOnboarding.tutorIntro.becomeATutorOnEduloc")}</Text>
           <Text className="text-[15px] leading-[21px] text-ink-soft">
             {t("tutorOnboarding.tutorIntro.shareYourSkillsWithPeople")}</Text>

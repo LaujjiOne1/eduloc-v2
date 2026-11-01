@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CheckIcon, ClockIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { Button } from "@/components/ui/button";
@@ -207,7 +208,7 @@ export function BookDateScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("booking.bookDate.chooseYourAppointment")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("booking.bookDate.chooseYourAppointment")}</Text>
           <Text className="mb-[18px] text-[13.5px] text-ink-soft">
             {t("booking.bookDate.with", { title: offer.title, tutorName: offer.tutorName })}
           </Text>
@@ -257,7 +258,7 @@ export function BookDateScreen() {
               <RoomPicker rooms={options.rooms} value={roomId} onChange={chooseRoom} />
               {room ? (
                 <View className="mt-4 gap-3">
-                  <View className="flex-row items-center justify-between rounded-lg border border-line bg-surface p-4">
+                  <View className="flex-row items-center justify-between rounded-lg border border-line bg-surface shadow-card p-4">
                     <Text className="text-[14px] font-semibold text-ink">{t("common.participants")}</Text>
                     <View className="flex-row items-center gap-4">
                       <PressableScale
@@ -265,7 +266,7 @@ export function BookDateScreen() {
                         disabled={participants <= 1}
                         accessibilityLabel={t("booking.bookDate.oneParticipantLess")}
                       >
-                        <Text className="text-[22px] font-bold text-primary">−</Text>
+                        <Text className="text-[22px] font-bold font-display text-primary">−</Text>
                       </PressableScale>
                       <Text className="min-w-[24px] text-center text-[16px] font-bold text-ink">{participants}</Text>
                       <PressableScale
@@ -273,7 +274,7 @@ export function BookDateScreen() {
                         disabled={participants >= room.capacity}
                         accessibilityLabel={t("booking.bookDate.oneParticipantMore")}
                       >
-                        <Text className="text-[22px] font-bold text-primary">+</Text>
+                        <Text className="text-[22px] font-bold font-display text-primary">+</Text>
                       </PressableScale>
                     </View>
                   </View>
@@ -346,20 +347,21 @@ export function BookDateScreen() {
                 ))}
               </View>
             ) : daySlots.length === 0 ? (
-              <View className="rounded-lg border border-line bg-surface p-4">
-                <Text className="text-[13.5px] text-ink-soft">
-                  {isRoomMode
-                    ? t("booking.bookDate.noSlotsThatDayIn")
-                    : slots.length === 0 && !loading
-                      ? t("booking.bookDate.noSlotsAvailableAtThe")
-                      : t("booking.bookDate.noSlotsThatDay")}
-                </Text>
-                {nextDate ? (
-                  <PressableScale onPress={() => pickDate(nextDate)} accessibilityLabel={t("booking.bookDate.goToTheNextAvailability")}>
-                    <Text className="mt-2 text-[13.5px] font-bold text-primary">
-                      {t("booking.bookDate.nextAvailability", { toLowerCase: formatDayLabel(nextDate).toLowerCase() })}</Text>
-                  </PressableScale>
-                ) : null}
+              <View className="rounded-2xl border border-line bg-surface shadow-card">
+                <EmptyState
+                  compact
+                  illustration="calendar"
+                  title={t("booking.bookDate.noSlotsTitle")}
+                  message={
+                    isRoomMode
+                      ? t("booking.bookDate.noSlotsThatDayIn")
+                      : slots.length === 0 && !loading
+                        ? t("booking.bookDate.noSlotsAvailableAtThe")
+                        : undefined
+                  }
+                  actionLabel={nextDate ? t("booking.bookDate.nextAvailability", { toLowerCase: formatDayLabel(nextDate).toLowerCase() }) : undefined}
+                  onAction={nextDate ? () => pickDate(nextDate) : undefined}
+                />
               </View>
             ) : (
               <View className="gap-[10px]">

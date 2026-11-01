@@ -159,5 +159,16 @@
     "chooseTheAppLanguage": "Fidio ny fiteny ampiasain'ny rindranasa",
     "close": "Akatony",
     "currentLanguage": "Fiteny: {{language}} — ovay"
+  },
+  "profilePhotoEditor": {
+    "changePhoto": "Hanova ny sarin'ny mombamomba",
+    "addPhoto": "Hanampy sarin'ny mombamomba",
+    "title": "Sarin'ny mombamomba",
+    "subtitle": "Miseho eo akaikin'ny anaranao ao amin'ny application izy.",
+    "takePhoto": "Haka sary",
+    "chooseFromLibrary": "Misafidy ao amin'ny galeriko",
+    "removePhoto": "Hamafa ny sary",
+    "uploading": "Mandefa…",
+    "removing": "Mamafa…"
   }
 }

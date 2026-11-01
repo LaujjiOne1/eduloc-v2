@@ -4,18 +4,19 @@
 
 @import "nativewind/theme";
 
-/* EduLoc design tokens — shared across all screens (see assets/implemented screens/*.html) */
+/* EduLoc design tokens — charte alignée sur la landing page (eduloc-landing/landing page/src/index.css) */
 @theme {
   --color-ink: #14162b;
   --color-ink-soft: #585b78;
   --color-ink-faint: #9799af;
 
-  --color-paper: #ffffff;
+  /* Fond « papier » légèrement crème ; les cartes et champs restent sur la surface blanche. */
+  --color-paper: #faf9f4;
   --color-surface: #ffffff;
-  --color-paper-alt: #f4f5f8;
+  --color-paper-alt: #f1f5f9;
 
-  --color-line: #e6e7ee;
-  --color-line-soft: #f0f1f5;
+  --color-line: #e2e8f0;
+  --color-line-soft: #eef2f7;
 
   --color-primary: #332e86;
   --color-primary-dark: #211c5e;
@@ -36,6 +37,21 @@
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-xl: 22px;
+
+  /* Charte : titres en Space Grotesk 700, corps et interface en Inter 400 / 500 / 600 (polices chargées dans app/_layout.tsx).
+     Une police personnalisée n'a pas de graisse à la demande : chaque graisse est sa propre famille (font-body, -medium, -semibold). */
+  --font-display: "SpaceGrotesk_700Bold", "Space Grotesk", system-ui, sans-serif;
+  --font-display-medium: "SpaceGrotesk_500Medium", "Space Grotesk", system-ui, sans-serif;
+  --font-body: "Inter_400Regular", "Inter", system-ui, sans-serif;
+  --font-body-medium: "Inter_500Medium", "Inter", system-ui, sans-serif;
+  --font-body-semibold: "Inter_600SemiBold", "Inter", system-ui, sans-serif;
+
+  --shadow-soft: 0 10px 30px -12px rgb(51 46 134 / 0.18);
+}
+
+/* Ombre diffuse des cartes (surface blanche sur fond perle). */
+@utility shadow-card {
+  box-shadow: 0 4px 20px -2px rgba(20, 22, 43, 0.06);
 }
 
 /* Glowing Aura Button Effect (EduLoc Theme) */
@@ -113,7 +129,7 @@
 .maplibregl-ctrl-group {
   border-radius: 12px !important;
   box-shadow: 0 4px 14px rgba(20, 22, 43, 0.12) !important;
-  border: 1px solid #e6e7ee !important;
+  border: 1px solid #e2e8f0 !important;
   overflow: hidden;
   background-color: #ffffff !important;
 }
@@ -122,7 +138,7 @@
   width: 36px !important;
   height: 36px !important;
   background-color: #ffffff !important;
-  border-bottom: 1px solid #f0f1f5 !important;
+  border-bottom: 1px solid #eef2f7 !important;
 }
 
 .maplibregl-ctrl-group button:last-child {
@@ -130,5 +146,5 @@
 }
 
 .maplibregl-ctrl-group button:hover {
-  background-color: #f4f5f8 !important;
+  background-color: #f1f5f9 !important;
 }

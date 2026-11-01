@@ -73,7 +73,7 @@ export function StartSessionScreen() {
       <AuthHeader onBack={() => router.back()} />
 
       <View className="flex-1 items-center px-6 pt-5">
-        <Text className="mb-[6px] text-[21px] font-bold text-ink">{t("tutorDashboard.startSession.lesson", { subjectLabel: booking.offer.subjectLabel })}</Text>
+        <Text className="mb-[6px] text-[21px] font-bold font-display text-ink">{t("tutorDashboard.startSession.lesson", { subjectLabel: booking.offer.subjectLabel })}</Text>
         <Text className="mb-6 text-[14px] text-ink-soft">
           {booking.beneficiary.firstName} • {booking.slot.dateLabel} • {booking.slot.startTime}
         </Text>
@@ -142,7 +142,7 @@ function OtpInput({ value, onChange, length, editable }: OtpInputProps) {
           keyboardType="number-pad"
           maxLength={1}
           editable={editable}
-          className="h-12 w-[38px] rounded-sm border border-line bg-surface text-center text-[18px] font-bold text-ink"
+          className="h-12 w-[38px] rounded-sm border border-line bg-surface text-center text-[18px] font-bold font-display text-ink"
           accessibilityLabel={t("tutorDashboard.startSession.digitOfTheCode", { value: i + 1 })}
         />
       ))}

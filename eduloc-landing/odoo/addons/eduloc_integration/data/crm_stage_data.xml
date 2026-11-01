@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Cahier §4.4. « Sans suite » n'est pas une étape : c'est l'action native « Perdu »,
+         qui impose un motif (crm.lost.reason) et archive le dossier. -->
+    <record id="stage_new_request" model="crm.stage">
+        <field name="name">Nouvelle demande</field>
+        <field name="sequence">1</field>
+        <field name="team_ids" eval="[(6, 0, [ref('team_eduloc')])]"/>
+        <field name="rotting_threshold_days">2</field>
+        <field name="requirements">Demande reçue du site : à prendre en charge.</field>
+    </record>
+    <record id="stage_to_qualify" model="crm.stage">
+        <field name="name">À qualifier</field>
+        <field name="sequence">2</field>
+        <field name="team_ids" eval="[(6, 0, [ref('team_eduloc')])]"/>
+        <field name="requirements">Informations à compléter avec le demandeur.</field>
+    </record>
+    <record id="stage_searching" model="crm.stage">
+        <field name="name">En recherche</field>
+        <field name="sequence">3</field>
+        <field name="team_ids" eval="[(6, 0, [ref('team_eduloc')])]"/>
+        <field name="requirements">Recherche d'une solution éducative dans EduLoc.</field>
+    </record>
+    <record id="stage_proposal_sent" model="crm.stage">
+        <field name="name">Proposition envoyée</field>
+        <field name="sequence">4</field>
+        <field name="team_ids" eval="[(6, 0, [ref('team_eduloc')])]"/>
+        <field name="requirements">Solution proposée au demandeur.</field>
+    </record>
+    <record id="stage_waiting" model="crm.stage">
+        <field name="name">En attente</field>
+        <field name="sequence">5</field>
+        <field name="team_ids" eval="[(6, 0, [ref('team_eduloc')])]"/>
+        <field name="requirements">Réponse ou information attendue.</field>
+    </record>
+    <record id="stage_converted" model="crm.stage">
+        <field name="name">Convertie</field>
+        <field name="sequence">6</field>
+        <field name="is_won" eval="True"/>
+        <field name="team_ids" eval="[(6, 0, [ref('team_eduloc')])]"/>
+        <field name="requirements">Une réservation EduLoc a été créée : renseigner sa référence.</field>
+    </record>
+</odoo>

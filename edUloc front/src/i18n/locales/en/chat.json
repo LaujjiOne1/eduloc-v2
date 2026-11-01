@@ -12,7 +12,15 @@
     "noMessages": "No messages",
     "conversationWith": "Conversation with {{name}}",
     "conversationWithUnread_one": "Conversation with {{name}}, {{count}} unread",
-    "conversationWithUnread_other": "Conversation with {{name}}, {{count}} unread"
+    "conversationWithUnread_other": "Conversation with {{name}}, {{count}} unread",
+    "searchPlaceholder": "Search a contact or a message…",
+    "filterAll": "All",
+    "filterUnread": "Unread",
+    "noMatchTitle": "No results",
+    "noMatchBody": "Try another name or word.",
+    "unreadBadge_one": "{{count}} unread message",
+    "unreadBadge_other": "{{count}} unread messages",
+    "clearSearch": "Clear search"
   },
   "documentExchangeView": {
     "sharedDocuments": "Shared documents",
@@ -35,5 +43,9 @@
     "allowTheMicrophoneInYour": "Allow the microphone in your device (or browser) settings to send a voice message.",
     "preparingTheMicrophone": "Preparing the microphone...",
     "recordingInProgress": "Recording in progress"
+  },
+  "voicePill": {
+    "pause": "Pause",
+    "resume": "Resume recording"
   }
 }

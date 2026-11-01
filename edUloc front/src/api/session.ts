@@ -24,6 +24,8 @@ const memoryStorage: SessionStorage = {
 type Listener = (user: MeDto | null) => void;
 
 let storage: SessionStorage = memoryStorage;
+/** Faux : « rester connecté » décoché, les jetons ne vivent qu'en mémoire (ils disparaissent à la fermeture de l'app). */
+let persist = true;
 let restoring: Promise<unknown> | null = null;
 let tokens: AuthTokensDto | null = null;
 let currentUser: MeDto | null = null;
@@ -52,9 +54,14 @@ export const Session = {
   getTokens(): AuthTokensDto | null {
     return tokens;
   },
+  /** À appeler à l'ouverture d'une session, avant `setTokens` ; vaut aussi pour les rafraîchissements qui suivent. */
+  setPersistence(value: boolean) {
+    persist = value;
+  },
   async setTokens(t: AuthTokensDto) {
     tokens = t;
-    await storage.save(t);
+    if (persist) await storage.save(t);
+    else await storage.clear();
   },
   getUser(): MeDto | null {
     return currentUser;

@@ -99,7 +99,7 @@ function RequestDetailContent({ booking, formError }: { booking: Booking; formEr
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View className="mb-[18px] flex-row items-center justify-between">
-        <Text className="text-[24px] font-bold text-ink">{t("common.requestFrom", { firstName: booking.beneficiary.firstName })}</Text>
+        <Text className="text-[24px] font-bold font-display text-ink">{t("common.requestFrom", { firstName: booking.beneficiary.firstName })}</Text>
       </View>
 
       {booking.status !== "pending" ? (
@@ -114,7 +114,7 @@ function RequestDetailContent({ booking, formError }: { booking: Booking; formEr
         <CompetingRequestsNotice competing={booking.competingRequests} />
       ) : null}
 
-      <View className="rounded-lg border border-line bg-surface p-4">
+      <View className="rounded-lg border border-line bg-surface shadow-card p-4">
         <Row label={t("common.beneficiary")} value={booking.beneficiary.firstName} />
         <Divider />
         <Row label={t("common.level")} value={booking.beneficiary.level?.label ?? "—"} />
@@ -134,7 +134,7 @@ function RequestDetailContent({ booking, formError }: { booking: Booking; formEr
         <RoomLocationBlock booking={booking} />
       </View>
 
-      <View className="mt-[14px] flex-row items-center gap-3 rounded-lg border border-line bg-surface p-4">
+      <View className="mt-[14px] flex-row items-center gap-3 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="h-9 w-9 items-center justify-center rounded-full bg-accent-tint">
           <MicIcon size={16} color="#0E9C82" />
         </View>
@@ -157,7 +157,7 @@ function CompetingRequestsNotice({ competing }: { competing: Booking["competingR
   return (
     <View className="mb-[14px] rounded-lg border border-warning/40 bg-warning-tint p-4" accessibilityRole="alert">
       <View className="flex-row items-center gap-2">
-        <AlertTriangleIcon size={16} color="#BD7E28" />
+        <AlertTriangleIcon size={16} color="#D4890A" />
         <Text className="flex-1 text-[14px] font-bold text-warning">
           {many ? t("tutorDashboard.requestDetail.otherRequestsTargetTheSame", { length: competing.length }) : t("tutorDashboard.requestDetail.anotherRequestTargetsTheSame")}
         </Text>

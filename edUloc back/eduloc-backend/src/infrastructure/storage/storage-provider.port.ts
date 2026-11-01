@@ -13,6 +13,8 @@ export interface StoredObjectInfo {
 export interface StorageProvider {
   createSignedUploadUrl(bucket: string, storagePath: string, upsert?: boolean): Promise<SignedUpload>;
   createSignedReadUrl(bucket: string, storagePath: string, expiresInSeconds?: number): Promise<string>;
+  /** URL stable d'un objet d'un bucket PUBLIC (photos de profil). Aucun appel réseau, aucune expiration. */
+  publicUrl(bucket: string, storagePath: string): string;
   getObjectInfo(bucket: string, storagePath: string): Promise<StoredObjectInfo>;
   deleteObject(bucket: string, storagePath: string): Promise<void>;
   /** Contenu du fichier (extraction de texte des justificatifs, côté serveur uniquement). */

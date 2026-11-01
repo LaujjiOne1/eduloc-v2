@@ -41,14 +41,14 @@ export const UsersView: React.FC<{ refreshKey: number }> = ({ refreshKey }) => {
             {users.data.map((u) => {
               const st = userStatus(u.status);
               return (
-                <tr key={u.id} className="hover:bg-white/5">
+                <tr key={u.id} className="hover:bg-paper-alt">
                   <td className="px-4 py-3.5">
-                    <p className="font-bold text-white">{fullName(u)} {u.isAdmin && <Badge tone="indigo">Admin</Badge>}</p>
-                    <p className="text-[11px] font-mono text-slate-400">{u.email}</p>
+                    <p className="font-bold text-ink">{fullName(u)} {u.isAdmin && <Badge tone="indigo">Admin</Badge>}</p>
+                    <p className="text-[11px] font-mono text-ink-soft">{u.email}</p>
                   </td>
                   <td className="px-4 py-3.5"><Badge tone={st.tone}>{st.label}</Badge></td>
-                  <td className="px-4 py-3.5 text-slate-400">{formatDate(u.createdAt)}</td>
-                  <td className="px-4 py-3.5 text-slate-400">{formatDate(u.lastLoginAt, true)}</td>
+                  <td className="px-4 py-3.5 text-ink-soft">{formatDate(u.createdAt)}</td>
+                  <td className="px-4 py-3.5 text-ink-soft">{formatDate(u.lastLoginAt, true)}</td>
                   <td className="px-4 py-3.5 text-right">
                     {u.isAdmin ? null : u.status === 'SUSPENDED'
                       ? <Btn small tone="success" onClick={() => setTarget({ user: u, next: 'ACTIVE' })}>Réactiver</Btn>

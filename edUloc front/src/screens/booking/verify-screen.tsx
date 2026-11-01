@@ -66,7 +66,7 @@ export function VerifyScreen() {
         </FadeIn>
 
         <FadeIn delay={70}>
-          <Text className="mb-2 text-center text-[23px] font-bold text-ink">{t("booking.verify.verifyYourAccount")}</Text>
+          <Text className="mb-2 text-center text-[23px] font-bold font-display text-ink">{t("booking.verify.verifyYourAccount")}</Text>
           <Text className="mb-[26px] text-center text-[14px] text-ink-soft">
             {t("booking.verify.codeSentTo")}{"\n"}
             <Text className="font-bold text-ink">{maskEmail(email)}</Text>

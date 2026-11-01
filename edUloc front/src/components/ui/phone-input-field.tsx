@@ -332,7 +332,7 @@ export function PhoneInputField({
 
             {/* Search Input */}
             <View className="p-4 border-b border-line-soft">
-              <View className="flex-row items-center gap-2.5 rounded-lg border border-line bg-surface px-3 py-2">
+              <View className="flex-row items-center gap-2.5 rounded-lg border border-line bg-surface shadow-card px-3 py-2">
                 <SearchIcon size={16} color="#9799AF" />
                 <TextInput
                   value={searchQuery}

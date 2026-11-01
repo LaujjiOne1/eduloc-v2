@@ -8,7 +8,9 @@ import { FadeIn } from "@/components/motion/fade-in";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { ApprentiBottomNav } from "@/components/ui/apprenti-bottom-nav";
 import { AuthHeader } from "@/components/ui/auth-header";
+import { EmptyState } from "@/components/ui/empty-state";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { useSearchWizardStore } from "@/store/search-wizard.store";
 import { useMyBookings } from "@/hooks/use-my-bookings";
 import type { Booking, BookingStatus } from "@/types/booking";
 import { useTranslation } from "react-i18next";
@@ -32,6 +34,11 @@ export function MyBookingsScreen() {
   const insets = useSafeAreaInsets();
   const [tab, setTab] = useState<Tab>("upcoming");
   const { state, retry } = useMyBookings();
+  const resetSearchWizard = useSearchWizardStore((st) => st.reset);
+  const goToSearch = () => {
+    resetSearchWizard();
+    router.push("/search" as Href);
+  };
 
   const activeStatuses = TABS.find((t) => t.id === tab)!.statuses;
   const bookings = state.status === "success" ? state.bookings.filter((b) => activeStatuses.includes(b.status)) : [];
@@ -39,7 +46,7 @@ export function MyBookingsScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-[14px] text-[25px] font-bold text-ink">{tr("common.myAppointments")}</Text>
+      <Text className="px-5 pb-[14px] text-[25px] font-bold font-display text-ink">{tr("common.myAppointments")}</Text>
 
       <View className="flex-row w-full gap-[6px] px-5 pb-4">
         {TABS.map(({ id, label }) => {
@@ -75,9 +82,12 @@ export function MyBookingsScreen() {
             </PressableScale>
           </View>
         ) : bookings.length === 0 ? (
-          <View className="items-center py-10">
-            <Text className="text-center text-[14px] text-ink-soft">{emptyLabel(tab)}</Text>
-          </View>
+          <EmptyState
+            illustration={tab === "history" ? "notebook" : "calendar"}
+            title={emptyLabel(tab)}
+            actionLabel={tab === "upcoming" ? tr("common.findATutor") : undefined}
+            onAction={tab === "upcoming" ? goToSearch : undefined}
+          />
         ) : (
           bookings.map((booking, index) => (
             <FadeIn key={booking.id} delay={40 + index * 50}>
@@ -107,7 +117,7 @@ function BookingCard({ booking, onPress }: { booking: Booking; onPress: () => vo
   const { t: tr } = useTranslation();
   return (
     <PressableScale onPress={onPress} accessibilityLabel={tr("common.with2", { subjectLabel: booking.offer.subjectLabel, tutorName: booking.offer.tutorName })}>
-      <View className="mb-3 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="flex-row items-start justify-between">
           <View>
             <Text className="text-[15px] font-bold text-ink">{booking.offer.subjectLabel}</Text>

@@ -278,7 +278,7 @@ export function TutorApplicationSummaryScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{tr("tutorOnboarding.tutorApplicationSummary.summaryOfYourFile")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{tr("tutorOnboarding.tutorApplicationSummary.summaryOfYourFile")}</Text>
           <Text className="mb-4 text-[13.5px] text-ink-soft">
             {tr("tutorOnboarding.tutorApplicationSummary.carefullyCheckTheInformationBefore")}</Text>
         </FadeIn>
@@ -286,7 +286,7 @@ export function TutorApplicationSummaryScreen() {
         <FadeIn delay={90}>
           {state.status === "error" && state.code !== "unauthorized" ? <FormError message={state.message} /> : null}
 
-          <View className="rounded-xl border border-line bg-surface p-4">
+          <View className="rounded-xl border border-line bg-surface shadow-card p-4">
             <View className="mb-2 flex-row items-center justify-between border-b border-line-soft pb-2.5">
               <Text className="text-[14px] font-bold text-ink">{tr("tutorOnboarding.tutorApplicationSummary.fileItems")}</Text>
               <PressableScale onPress={() => setIsEditDrawerOpen(true)} accessibilityLabel={tr("tutorOnboarding.tutorApplicationSummary.editTheFile")}>
@@ -345,7 +345,7 @@ export function TutorApplicationSummaryScreen() {
           >
             <View className="mb-4 flex-row items-center justify-between border-b border-line-soft pb-3">
               <View>
-                <Text className="text-[18px] font-bold text-ink">{tr("tutorOnboarding.tutorApplicationSummary.editASpecificStep")}</Text>
+                <Text className="text-[18px] font-bold font-display text-ink">{tr("tutorOnboarding.tutorApplicationSummary.editASpecificStep")}</Text>
                 <Text className="text-[12px] text-ink-soft">
                   {tr("tutorOnboarding.tutorApplicationSummary.goStraightToTheForm")}</Text>
               </View>

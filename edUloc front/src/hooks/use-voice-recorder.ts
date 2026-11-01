@@ -16,7 +16,7 @@ export const MAX_VOICE_MS = 300_000;
 const WAVEFORM_BARS = 64;
 const METERING_INTERVAL_MS = 100;
 
-export type RecorderPhase = "starting" | "recording" | "denied" | "error" | "stopped";
+export type RecorderPhase = "starting" | "recording" | "paused" | "denied" | "error" | "stopped";
 
 export interface RecordedVoice {
   file: LocalFile;
@@ -116,6 +116,27 @@ export function useVoiceRecorder() {
     setPhase("stopped");
   }, [recorder, state.isRecording]);
 
+  /** Met l'enregistrement en pause (le micro se ferme, la durée se fige) ; `resume` le reprend dans le même fichier. */
+  const pause = useCallback(() => {
+    if (phase !== "recording") return;
+    try {
+      recorder.pause();
+      setPhase("paused");
+    } catch {
+      // la pause est un confort : l'enregistrement continue
+    }
+  }, [phase, recorder]);
+
+  const resume = useCallback(() => {
+    if (phase !== "paused") return;
+    try {
+      recorder.record();
+      setPhase("recording");
+    } catch {
+      // la reprise a échoué : l'utilisateur peut encore envoyer ce qui est enregistré
+    }
+  }, [phase, recorder]);
+
   const durationMs = Math.round(state.durationMillis);
   const reachedLimit = phase === "recording" && durationMs >= MAX_VOICE_MS;
 
@@ -129,5 +150,7 @@ export function useVoiceRecorder() {
     reachedLimit,
     stop: finish,
     cancel,
+    pause,
+    resume,
   };
 }

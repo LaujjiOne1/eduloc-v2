@@ -118,7 +118,7 @@ export function BeneficiaryProfileScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("booking.beneficiaryProfile.yourNeed")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("booking.beneficiaryProfile.yourNeed")}</Text>
           <Text className="mb-5 text-[13.5px] text-ink-soft">
             {[beneficiary.isSelf ? t("booking.beneficiaryProfile.forYou") : `Pour ${beneficiary.firstName}`, offer.subjectLabel, beneficiary.level?.label]
               .filter(Boolean)

@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CalendarIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -46,7 +47,7 @@ export function TutorAppointmentsScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-[14px] text-[25px] font-bold text-ink">{tr("common.myAppointments")}</Text>
+      <Text className="px-5 pb-[14px] text-[25px] font-bold font-display text-ink">{tr("common.myAppointments")}</Text>
 
       <View className="flex-row w-full h-[52px] gap-[14px] px-5 pb-4">
         {TABS.map(({ id, label }) => {
@@ -82,9 +83,7 @@ export function TutorAppointmentsScreen() {
             </PressableScale>
           </View>
         ) : bookings.length === 0 ? (
-          <View className="items-center py-10">
-            <Text className="text-center text-[14px] text-ink-soft">{emptyLabel(tab)}</Text>
-          </View>
+          <EmptyState illustration={tab === "history" ? "notebook" : "calendar"} title={emptyLabel(tab)} />
         ) : (
           bookings.map((booking, index) => (
             <FadeIn key={booking.id} delay={40 + index * 50}>
@@ -113,7 +112,7 @@ function emptyLabel(tab: Tab): string {
 function AppointmentCard({ booking, onPress }: { booking: Booking; onPress: () => void }) {
   return (
     <PressableScale onPress={onPress} accessibilityLabel={`${booking.beneficiary.firstName} — ${booking.offer.subjectLabel}`}>
-      <View className="mb-3 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="flex-row items-start justify-between">
           <View>
             <Text className="text-[15px] font-bold text-ink">{booking.beneficiary.firstName}</Text>

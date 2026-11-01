@@ -63,7 +63,7 @@ export function CalendarScreen() {
       <AuthHeader onBack={() => router.back()} />
 
       <View className="px-5 pb-3">
-        <Text className="text-[25px] font-bold text-ink">{t("tutorDashboard.calendar.myCalendar")}</Text>
+        <Text className="text-[25px] font-bold font-display text-ink">{t("tutorDashboard.calendar.myCalendar")}</Text>
         <Text className="mt-1 text-[13.5px] text-ink-soft">
           {t("tutorDashboard.calendar.viewAndManageYourAvailabilities")}</Text>
       </View>

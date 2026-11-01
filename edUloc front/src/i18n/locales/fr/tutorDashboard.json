@@ -68,7 +68,27 @@
     "viewAllAppointments": "Voir tous les rendez-vous",
     "openTheFullCalendar": "Ouvrir le calendrier complet",
     "seeAllRequests": "Tout voir les demandes",
-    "viewSRequest": "Voir la demande de {{firstName}}"
+    "viewSRequest": "Voir la demande de {{firstName}}",
+    "statusVisible": "Profil visible",
+    "statusInReview": "En vérification",
+    "statusHidden": "Profil masqué",
+    "statusRestricted": "Compte restreint",
+    "readyTitle": "Prêt à recevoir des élèves ?",
+    "readyBody": "Ajoutez vos créneaux libres pour apparaître dans les recherches près de chez vous.",
+    "readyCta": "Ajouter mes créneaux",
+    "requestsWaiting_one": "{{count}} demande en attente",
+    "requestsWaiting_other": "{{count}} demandes en attente",
+    "noRequestsTitle": "Aucune demande",
+    "boostProfile": "Booster mon profil",
+    "nextLesson": "Prochain cours",
+    "noNextLesson": "Aucun cours à venir",
+    "todayAt": "Aujourd'hui à {{time}}",
+    "tomorrowAt": "Demain à {{time}}",
+    "myStudents": "Mes élèves",
+    "shareProfile": "Partager mon profil",
+    "shareMessage": "Retrouvez-moi sur edUloc pour des cours de soutien : {{link}}",
+    "openStudent": "Voir le rendez-vous de {{name}}",
+    "shortcuts": "Raccourcis"
   },
   "manageOffer": {
     "otherDurationsOffered": "Autres durées proposées",
@@ -183,5 +203,8 @@
   "appointmentConversation": {
     "forNameConfirmed": "Pour {{name}} • rendez-vous confirmé",
     "forNamePending": "Pour {{name}} • en attente de confirmation"
+  },
+  "timetable": {
+    "pendingHint": "{{name}} attend votre réponse. Acceptez ou refusez la demande."
   }
 }

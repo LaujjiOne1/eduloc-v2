@@ -97,12 +97,12 @@ export function MapLibreResultsMap({ tutors, selectedTutorId, onSelectTutor, ori
               key={tutor.id}
               id={tutor.id}
               lngLat={getCoordinatesForTutor(tutor, index)}
-              anchor="bottom"
+              anchor="center"
               onPress={() => onSelectTutor(tutor)}
             >
-              <View style={[styles.marker, isSelected && styles.selectedMarker]}>
-                <Text style={[styles.markerLabel, isSelected && styles.selectedMarkerLabel]}>
-                  {tutor.firstName[0]}
+              <View style={[styles.pill, isSelected && styles.selectedPill]}>
+                <Text style={[styles.pillLabel, isSelected && styles.selectedPillLabel]}>
+                  {tutor.offers[0]?.priceLabel ?? tutor.firstName}
                 </Text>
               </View>
             </Marker>
@@ -123,18 +123,21 @@ export function MapLibreResultsMap({ tutors, selectedTutorId, onSelectTutor, ori
 const styles = StyleSheet.create({
   container: { flex: 1, overflow: "hidden" },
   map: { flex: 1 },
-  marker: {
-    alignItems: "center",
+  pill: {
     backgroundColor: "#ffffff",
-    borderColor: "#332E86",
-    borderRadius: 18,
-    borderWidth: 2,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
+    borderColor: "#eef2f7",
+    borderRadius: 999,
+    borderWidth: 1,
+    elevation: 5,
+    paddingHorizontal: 11,
+    paddingVertical: 6,
+    shadowColor: "#14162B",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
   },
-  selectedMarker: { backgroundColor: "#332E86", transform: [{ scale: 1.15 }] },
+  selectedPill: { backgroundColor: "#332E86", borderColor: "#332E86", transform: [{ scale: 1.12 }] },
+  pillLabel: { color: "#332E86", fontSize: 12.5, fontWeight: "700" },
+  selectedPillLabel: { color: "#ffffff" },
   me: { backgroundColor: "#1d7cf2", borderColor: "#ffffff", borderRadius: 10, borderWidth: 3, height: 20, width: 20 },
-  markerLabel: { color: "#332E86", fontSize: 15, fontWeight: "700" },
-  selectedMarkerLabel: { color: "#ffffff" },
 });

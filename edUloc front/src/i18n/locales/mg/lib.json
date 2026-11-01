@@ -13,7 +13,9 @@
     "lessonsForTheLevel": "Lesona {{label}} ho an'ny ambaratonga {{offerLevelLabel}}."
   },
   "push": {
-    "incomingCalls": "Antso miditra"
+    "incomingCalls": "Antso miditra",
+    "lessonReminders": "Fampahatsiahivana lesona",
+    "messages": "Hafatra"
   },
   "experienceTypes": {
     "teachingTutoring": "Fampianarana / Fanampiana ara-pianarana",
@@ -59,5 +61,12 @@
   "call": {
     "requiresDevBuild": "Ny antso dia mitaky ny rindranasa EduLoc voaforona (build fampandrosoana), fa tsy Expo Go.",
     "requiresNativeOrWeb": "Ny antso dia mitaky ny rindranasa EduLoc natif voaforona (dev build) na ny dikan-tserasera."
+  },
+  "lessonReminders": {
+    "title": "Lesona afaka {{lead}}",
+    "leadMinutes": "{{count}} min",
+    "leadHour": "1 ora",
+    "bodyRequester": "{{subject}} amin'ny {{time}}. Miomàna.",
+    "bodyTutor": "{{student}} · {{subject}} amin'ny {{time}}."
   }
 }

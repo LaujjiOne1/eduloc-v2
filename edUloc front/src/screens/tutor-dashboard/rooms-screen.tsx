@@ -23,7 +23,7 @@ export function RoomsScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-1 text-[25px] font-bold text-ink">{t("common.partnerRooms")}</Text>
+      <Text className="px-5 pb-1 text-[25px] font-bold font-display text-ink">{t("common.partnerRooms")}</Text>
       <Text className="px-5 pb-4 text-[13px] leading-[19px] text-ink-soft">
         {t("tutorDashboard.rooms.indicateTheRoomsWhereYou")}</Text>
 
@@ -122,7 +122,7 @@ function RoomRow({
 }) {
   const { t } = useTranslation();
   return (
-    <View className="mb-3 rounded-lg border border-line bg-surface p-4">
+    <View className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
       <Text className="text-[15px] font-bold text-ink">{room.name}</Text>
       <Text className="mt-[2px] text-[12.5px] text-ink-soft">
         {[room.zoneLabel, t("common.seatCount", { count: room.capacity }), room.pricePerHourLabel].filter(Boolean).join(" · ")}

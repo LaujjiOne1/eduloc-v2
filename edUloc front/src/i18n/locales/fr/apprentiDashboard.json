@@ -22,7 +22,29 @@
     "whatWouldYouLikeTo": "Que souhaitez-vous faire ?",
     "myActivities": "Mes activités",
     "switchModeLearner": "Changer de mode : Apprenti",
-    "beneficiaries": "Bénéficiaires"
+    "beneficiaries": "Bénéficiaires",
+    "appointmentWith": "Rendez-vous avec {{tutorName}}",
+    "recommendedNear": "Tuteurs recommandés près de {{place}}",
+    "recommendedNearYou": "Tuteurs recommandés près de vous",
+    "recommendedOnline": "Tuteurs recommandés en ligne",
+    "aroundMe": "Autour de moi",
+    "noRatingYet": "Nouveau",
+    "myTutors": "Mes tuteurs",
+    "recommendedBadge": "Recommandé",
+    "activeCount_one": "{{count}} actif",
+    "activeCount_other": "{{count}} actifs",
+    "noAppointmentsShort": "Aucun",
+    "managePlanning": "Gérer mon planning",
+    "beneficiariesCount_one": "{{count}} bénéficiaire",
+    "beneficiariesCount_other": "{{count}} bénéficiaires",
+    "linkedStudents": "Élèves rattachés",
+    "openTutor": "Voir le profil de {{tutorName}}",
+    "lessonsThisWeek": "Cours cette semaine",
+    "lessonsCount_one": "{{count}} cours",
+    "lessonsCount_other": "{{count}} cours",
+    "noLessonsShort": "Aucun cours",
+    "pendingShort_one": "{{count}} en attente",
+    "pendingShort_other": "{{count}} en attente"
   },
   "reviewTutor": {
     "howDidTheSessionGo": "Comment s'est passée la séance ?",
@@ -42,5 +64,41 @@
     "thisScreenUpdatesByItself": "Cet écran se met à jour tout seul dès que le tuteur démarre la séance.",
     "theSessionCodeIsOnly": "Le code de séance n'est disponible que pour un rendez-vous confirmé.",
     "sendTheCodeToThe": "Envoyer le code au tuteur"
+  },
+  "timetable": {
+    "title": "Emploi du temps",
+    "today": "Aujourd'hui",
+    "previousDay": "Jour précédent",
+    "nextDay": "Jour suivant",
+    "noLessons": "Aucun cours ce jour-là",
+    "noLessonsHint": "Vos cours apparaîtront ici dès qu'une demande sera envoyée.",
+    "pending": "En attente de confirmation",
+    "pendingHint": "{{name}} doit accepter la demande. Ce créneau n'est pas encore réservé.",
+    "confirmed": "Confirmé",
+    "inProgress": "En cours",
+    "completed": "Terminé",
+    "startsInMinutes_one": "Dans {{count}} min",
+    "startsInMinutes_other": "Dans {{count}} min",
+    "startsInHours": "Dans {{hours}} h {{minutes}}",
+    "startsInDays_one": "Dans {{count}} jour",
+    "startsInDays_other": "Dans {{count}} jours",
+    "nowLine": "Maintenant"
+  },
+  "drawer": {
+    "open": "Ouvrir le tiroir",
+    "close": "Refermer le tiroir"
+  },
+  "greeting": {
+    "hello": "Bonjour",
+    "learnToday": "Que voulez-vous apprendre aujourd'hui ?",
+    "lessonsWeek_one": "Vous avez {{count}} cours cette semaine.",
+    "lessonsWeek_other": "Vous avez {{count}} cours cette semaine.",
+    "nextLessonToday": "Prochain cours aujourd'hui à {{time}}.",
+    "nextLessonTomorrow": "Prochain cours demain à {{time}}.",
+    "nextLessonOn": "Prochain cours : {{day}} à {{time}}.",
+    "pending_one": "{{count}} demande attend la réponse du tuteur.",
+    "pending_other": "{{count}} demandes attendent la réponse du tuteur.",
+    "unread_one": "{{count}} message non lu.",
+    "unread_other": "{{count}} messages non lus."
   }
 }

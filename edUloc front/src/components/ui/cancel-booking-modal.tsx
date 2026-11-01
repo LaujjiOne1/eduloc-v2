@@ -48,7 +48,7 @@ export function CancelBookingModal({ visible, hoursToStart, pending, title, erro
       <View className="flex-1 justify-end bg-black/50">
         <View className="rounded-t-2xl bg-surface p-5" style={{ paddingBottom: Math.max(insets.bottom, 24) }}>
           <View className="mb-3 flex-row items-center justify-between">
-            <Text className="text-[18px] font-bold text-ink">{title}</Text>
+            <Text className="text-[18px] font-bold font-display text-ink">{title}</Text>
             <PressableScale onPress={onClose} disabled={pending} accessibilityLabel={t("common.close")}>
               <View className="h-8 w-8 items-center justify-center rounded-full bg-paper">
                 <XIcon size={16} color="#585B78" />

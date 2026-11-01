@@ -1,42 +1,28 @@
 import { type Href, useRouter } from "expo-router";
-import type { ComponentType } from "react";
 import { ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import {
-  BellIcon,
-  ChevronRightIcon,
-  GraduationCapIcon,
-  HouseIcon,
-  type IconProps,
-  LockIcon,
-  LogoutIcon,
-  PersonIcon,
-  TeachIcon,
-  VerifiedBadgeIcon,
-} from "@/components/icons";
+import { BellIcon, GraduationCapIcon, HouseIcon, LockIcon, PersonIcon, TeachIcon, VerifiedBadgeIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
-import { PressableScale } from "@/components/motion/pressable-scale";
-import { LessonAlarmCard } from "@/components/ui/lesson-alarm-card";
+import { AccountActions, ModeCard, SectionLabel, SettingsCard, SettingsRow } from "@/components/ui/account-sections";
 import { ApprentiBottomNav } from "@/components/ui/apprenti-bottom-nav";
-import { TutorBottomNav } from "@/components/ui/tutor-bottom-nav";
 import { AuthHeader } from "@/components/ui/auth-header";
-import { signOut } from "@/lib/sign-out";
-import { useAuthStore } from "@/store/auth.store";
-import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "@/components/ui/language-selector";
+import { LessonAlarmCard } from "@/components/ui/lesson-alarm-card";
+import { ProfilePhotoEditor } from "@/components/ui/profile-photo-editor";
+import { TutorBottomNav } from "@/components/ui/tutor-bottom-nav";
+import { useAuthStore } from "@/store/auth.store";
+import { useTranslation } from "react-i18next";
 
 const MODE_SWITCH_ROUTE = "/mode-switch" as Href;
 const NOTIFICATIONS_ROUTE = "/notifications" as Href;
 const PARTNER_DASHBOARD_ROUTE = "/partner-dashboard" as Href;
 
-/** « jean.rakoto@mail.com » → « j•••@mail.com » : l'e-mail n'est jamais affiché en entier. */
-function maskEmail(email: string): string {
-  const [name, domain] = email.split("@");
-  if (!name || !domain) return email;
-  return `${name.charAt(0)}•••@${domain}`;
-}
-
+/**
+ * Profil du demandeur. Même structure que celui du tuteur (my-profile-screen) : carte d'identité, carte de mode, sections
+ * étiquetées, paramètres, puis « Changer de compte » et « Déconnexion », assemblés à partir des mêmes blocs
+ * (`account-sections`).
+ */
 export function AccountScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -45,13 +31,8 @@ export function AccountScreen() {
   const user = useAuthStore((s) => s.user);
 
   const displayName = user ? `${user.firstName} ${user.lastName}`.trim() : "";
-  const initials = displayName.split(" ")
-    .map((part) => part.charAt(0))
-    .join("")
-    .slice(0, 2);
   const isApprenti = activeMode === "apprenti";
-
-  const handleLogout = () => signOut(router);
+  const openModeSwitch = () => router.push(MODE_SWITCH_ROUTE);
 
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
@@ -59,55 +40,54 @@ export function AccountScreen() {
 
       <ScrollView
         className="flex-1"
-        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 6, paddingBottom: Math.max(insets.bottom, 20) }}
+        contentContainerStyle={{ paddingHorizontal: 20, paddingTop: 6, paddingBottom: 28 }}
         showsVerticalScrollIndicator={false}
       >
+        {/* 1. Identité (même carte que celle du tuteur) */}
         <FadeIn delay={30}>
-          <View className="mb-[22px] flex-row items-center gap-[14px]">
-            <View className="h-14 w-14 items-center justify-center rounded-full bg-primary-tint">
-              <Text className="text-[19px] font-bold text-primary">{initials}</Text>
-            </View>
-            <View>
-              <Text className="text-[17px] font-bold text-ink">{displayName}</Text>
-              <Text className="text-[13px] text-ink-soft">{user ? maskEmail(user.email) : ""}</Text>
+          <View className="mb-5 flex-row items-center rounded-xl border border-line bg-surface p-4 shadow-card">
+            <View className="flex-1 flex-row items-center gap-[14px]">
+              <ProfilePhotoEditor name={displayName} size={64} />
+              <View className="flex-1">
+                <Text className="text-[17.5px] font-bold font-display text-ink" numberOfLines={1}>
+                  {displayName}
+                </Text>
+                <Text className="mt-0.5 text-[13px] text-ink-soft" numberOfLines={1}>
+                  {user?.email ?? ""}
+                </Text>
+              </View>
             </View>
           </View>
         </FadeIn>
 
-        <FadeIn delay={70}>
-          <Text className="mb-2 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("common.mode")}</Text>
-          <PressableScale
-            onPress={() => router.push(MODE_SWITCH_ROUTE)}
-            accessibilityLabel={t("screens.account.switchModeLabel", { value: isApprenti ? t("common.learner") : t("common.tutor") })}
-          >
-            <View className="mb-[22px] flex-row items-center gap-3 rounded-lg border border-line bg-surface p-4">
-              <View className="flex-1 flex-row items-center gap-2">
-                {isApprenti ? (
-                  <GraduationCapIcon size={17} color="#332E86" />
-                ) : (
-                  <TeachIcon size={17} color="#332E86" />
-                )}
-                <Text className="text-[14.5px] font-bold text-ink">{t("screens.account.mode", { value: isApprenti ? t("common.learner") : t("common.tutor") })}</Text>
-              </View>
-              <View className="flex-row items-center gap-[6px] rounded-full border border-line bg-surface px-[14px] py-[9px]">
-                <TeachIcon size={13} color="#585B78" />
-                <Text className="text-[13.5px] font-semibold text-ink-soft">
-                  {t("screens.account.switchTo", { value: isApprenti ? t("common.tutor") : t("common.learner") })}
-                </Text>
-              </View>
-            </View>
-          </PressableScale>
+        {/* 2. Mode */}
+        <FadeIn delay={60}>
+          <SectionLabel>{t("common.mode")}</SectionLabel>
+          <ModeCard
+            icon={isApprenti ? <GraduationCapIcon size={17} color="#332E86" /> : <TeachIcon size={17} color="#332E86" />}
+            title={t("screens.account.mode", { value: isApprenti ? t("common.learner") : t("common.tutor") })}
+            subtitle={isApprenti ? t("screens.account.learningSpace") : t("tutorDashboard.myProfile.teachingSpace")}
+            switchLabel={t("screens.account.switchTo", { value: isApprenti ? t("common.tutor") : t("common.learner") })}
+            switchIcon={isApprenti ? <TeachIcon size={14} color="#585B78" /> : <GraduationCapIcon size={14} color="#585B78" />}
+            openAccessibilityLabel={t("screens.account.switchModeLabel", { value: isApprenti ? t("common.learner") : t("common.tutor") })}
+            switchAccessibilityLabel={t("screens.account.switchTo", { value: isApprenti ? t("common.tutor") : t("common.learner") })}
+            onOpen={openModeSwitch}
+            onSwitch={openModeSwitch}
+          />
         </FadeIn>
 
+        {/* 3. Rappels */}
         <FadeIn delay={90}>
-          <Text className="mb-2 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("screens.account.reminders")}</Text>
-          <View className="mb-[22px]">
+          <SectionLabel>{t("screens.account.reminders")}</SectionLabel>
+          <View className="mb-5">
             <LessonAlarmCard />
           </View>
         </FadeIn>
 
-        <FadeIn delay={110}>
-          <View className="rounded-lg border border-line bg-surface px-4">
+        {/* 4. Paramètres (mêmes lignes que le tuteur, plus « Mes lieux d'étude ») */}
+        <FadeIn delay={120}>
+          <SectionLabel>{t("common.settings")}</SectionLabel>
+          <SettingsCard>
             <SettingsRow
               Icon={PersonIcon}
               label={t("common.personalInformation")}
@@ -124,64 +104,18 @@ export function AccountScreen() {
             <LanguageSelector variant="row" />
             <View className="h-px bg-line-soft" />
             <SettingsRow Icon={BellIcon} label={t("common.notifications")} onPress={() => router.push(NOTIFICATIONS_ROUTE)} />
-            <SettingsRow
-              Icon={VerifiedBadgeIcon}
-              label={t("common.privacy")}
-              onPress={() => {}}
-              disabled
-              accessibilityLabel={t("common.privacyComingSoon")}
-            />
-            <SettingsRow
-              Icon={LockIcon}
-              label={t("common.security")}
-              onPress={() => {}}
-              disabled
-              last
-              accessibilityLabel={t("common.securityComingSoon")}
-            />
-          </View>
+            <SettingsRow Icon={VerifiedBadgeIcon} label={t("common.privacy")} onPress={() => {}} disabled accessibilityLabel={t("common.privacyComingSoon")} />
+            <SettingsRow Icon={LockIcon} label={t("common.security")} onPress={() => {}} disabled last accessibilityLabel={t("common.securityComingSoon")} />
+          </SettingsCard>
         </FadeIn>
 
+        {/* 5. Changer de compte, Déconnexion */}
         <FadeIn delay={150}>
-          <PressableScale onPress={handleLogout} accessibilityLabel={t("common.logOut")}>
-            <View className="mt-[22px] flex-row items-center gap-[10px] py-2">
-              <LogoutIcon size={18} color="#AC4A40" />
-              <Text className="text-[14.5px] font-bold text-error">{t("common.logOut")}</Text>
-            </View>
-          </PressableScale>
+          <AccountActions />
         </FadeIn>
       </ScrollView>
 
       {isApprenti ? <ApprentiBottomNav active="profile" /> : <TutorBottomNav active="profile" />}
-    </View>
-  );
-}
-
-function SettingsRow({
-  Icon,
-  label,
-  onPress,
-  disabled,
-  last,
-  accessibilityLabel,
-}: {
-  Icon: ComponentType<IconProps>;
-  label: string;
-  onPress: () => void;
-  disabled?: boolean;
-  last?: boolean;
-  accessibilityLabel?: string;
-}) {
-  return (
-    <View>
-      <PressableScale onPress={onPress} disabled={disabled} accessibilityLabel={accessibilityLabel ?? label}>
-        <View className="flex-row items-center gap-[14px] py-[13px]">
-          <Icon size={18} color="#585B78" />
-          <Text className="flex-1 text-[14.5px] font-semibold text-ink">{label}</Text>
-          <ChevronRightIcon size={16} color="#9799AF" />
-        </View>
-      </PressableScale>
-      {last ? null : <View className="h-px bg-line-soft" />}
     </View>
   );
 }

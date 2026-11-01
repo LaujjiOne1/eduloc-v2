@@ -8,7 +8,11 @@ import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
 import { PhoneInputField } from "@/components/ui/phone-input-field";
 import { TextField } from "@/components/ui/text-field";
+import { SocialAuthButtons } from "@/components/ui/social-auth-buttons";
 import { useSignupForm } from "@/hooks/use-signup-form";
+import { useSocialSignIn } from "@/hooks/use-social-sign-in";
+import { routeAfterAuth } from "@/lib/auth-routing";
+import { rememberAccount } from "@/lib/device-login";
 import { useAuthStore } from "@/store/auth.store";
 import { useTranslation } from "react-i18next";
 import { LanguageSelector } from "@/components/ui/language-selector";
@@ -20,6 +24,8 @@ export function SignupScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const setPendingUser = useAuthStore((s) => s.setPendingUser);
+  const setUser = useAuthStore((s) => s.setUser);
+  const setRememberMe = useAuthStore((s) => s.setRememberMe);
 
   const {
     firstName,
@@ -42,6 +48,15 @@ export function SignupScreen() {
     router.push(VERIFY_ROUTE);
   });
 
+  // Inscription par Google, Apple ou Facebook : le serveur crée (ou retrouve) le compte, déjà vérifié : pas de code à saisir.
+  const social = useSocialSignIn((user) => {
+    setRememberMe(true);
+    rememberAccount(user);
+    setUser(user);
+    router.replace(routeAfterAuth(user));
+  });
+  const busy = isSubmitting || social.pending !== null;
+
   return (
     <KeyboardAvoidingView
       className="flex-1 bg-paper"
@@ -57,13 +72,13 @@ export function SignupScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-[6px] text-[25px] font-bold text-ink">{t("screens.signup.createYourAccount")}</Text>
+          <Text className="mb-[6px] text-[25px] font-bold font-display text-ink">{t("screens.signup.createYourAccount")}</Text>
           <Text className="mb-6 text-[14px] text-ink-soft">
             {t("screens.signup.justTheEssentials30Seconds")}</Text>
         </FadeIn>
 
         <FadeIn delay={100}>
-          {formError ? <FormError message={formError} /> : null}
+          {formError ?? social.error ? <FormError message={(formError ?? social.error) as string} /> : null}
 
           <TextField
             label={t("common.firstName")}
@@ -127,9 +142,15 @@ export function SignupScreen() {
             label={t("screens.signup.createMyAccount")}
             loading={isSubmitting}
             loadingLabel={t("screens.signup.creating")}
-            disabled={!canSubmit}
+            disabled={!canSubmit || busy}
             onPress={submit}
           />
+          <View className="my-5 flex-row items-center gap-3">
+            <View className="h-px flex-1 bg-line-soft" />
+            <Text className="text-[12.5px] text-ink-faint font-body-semibold">{t("screens.login.or")}</Text>
+            <View className="h-px flex-1 bg-line-soft" />
+          </View>
+          <SocialAuthButtons onPress={(provider) => void social.continueWith(provider)} pending={social.pending} disabled={isSubmitting} />
         </View>
       </FadeIn>
       </ScrollView>

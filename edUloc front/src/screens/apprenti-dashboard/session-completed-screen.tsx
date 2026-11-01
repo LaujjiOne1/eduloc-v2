@@ -22,7 +22,7 @@ export function SessionCompletedScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 pb-[14px] pt-5">
-        <Text className="text-[21px] font-bold text-ink">
+        <Text className="text-[21px] font-bold font-display text-ink">
           Edu<Text className="text-primary">Loc</Text>
         </Text>
       </View>
@@ -44,7 +44,7 @@ export function SessionCompletedScreen() {
               <CheckCircleIcon size={34} color="#0E9C82" />
             </View>
           </ScaleIn>
-          <Text className="mb-[10px] text-center text-[23px] font-bold text-ink">{t("common.sessionCompleted2")}</Text>
+          <Text className="mb-[10px] text-center text-[23px] font-bold font-display text-ink">{t("common.sessionCompleted2")}</Text>
           <Text className="mb-[6px] text-center text-[14.5px] text-ink-soft">
             {t("common.with2", { subjectLabel: state.booking.offer.subjectLabel, tutorName: state.booking.offer.tutorName })}
           </Text>

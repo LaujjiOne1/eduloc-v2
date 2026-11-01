@@ -61,7 +61,7 @@ export function TutorSubjectsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorSubjects.subjectsAndLevels")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorSubjects.subjectsAndLevels")}</Text>
           <Text className="mb-3 text-[13.5px] text-ink-soft">
             {t("tutorOnboarding.tutorSubjects.forEachSkillSpecifyThe")}</Text>
 
@@ -74,7 +74,7 @@ export function TutorSubjectsScreen() {
 
           {/* Les niveaux proposés suivent le diplôme (qualification) */}
           {background.degree ? (
-            <View className="mb-4 flex-row items-start gap-2 rounded-lg border border-line bg-surface p-3">
+            <View className="mb-4 flex-row items-start gap-2 rounded-lg border border-line bg-surface shadow-card p-3">
               <SparklesIcon size={14} color="#332E86" />
               <Text className="flex-1 text-[12.5px] text-ink-soft">
                 {t("tutorOnboarding.tutorSubjects.levelsOfferedAccordingToYour", { degreeLabel })}</Text>
@@ -152,7 +152,7 @@ function SubjectCard({ skill, levels, chosenLevels, onToggleLevel, onRemove }: S
   }, []);
 
   return (
-    <View className="rounded-lg border border-line bg-surface p-4">
+    <View className="rounded-lg border border-line bg-surface shadow-card p-4">
       <View className="mb-[10px] flex-row items-center justify-between">
         <Text className="flex-1 text-[15.5px] font-bold text-ink">{skill.label}</Text>
         <Text className="text-[12px] font-semibold text-primary">

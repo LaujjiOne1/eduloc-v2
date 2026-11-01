@@ -40,10 +40,10 @@ export const RoomsView: React.FC<Props> = ({ refreshKey, onChanged, openRoomId, 
               const st = roomStatusLabel(r.status);
               const pub = publicationLabel(r.publication);
               return (
-                <tr key={r.id} className="hover:bg-white/5 cursor-pointer" onClick={() => setSelectedId(r.id)}>
-                  <td className="px-4 py-3.5 font-bold text-white">{r.name}{!r.isActive && <span className="ml-2 text-[11px] font-normal text-slate-400">(désactivée par le Gestionnaire)</span>}</td>
+                <tr key={r.id} className="hover:bg-paper-alt cursor-pointer" onClick={() => setSelectedId(r.id)}>
+                  <td className="px-4 py-3.5 font-bold text-ink">{r.name}{!r.isActive && <span className="ml-2 text-[11px] font-normal text-ink-soft">(désactivée par le Gestionnaire)</span>}</td>
                   <td className="px-4 py-3.5">{r.venue.name}</td>
-                  <td className="px-4 py-3.5 text-slate-400">{formatDate(r.submittedAt)}</td>
+                  <td className="px-4 py-3.5 text-ink-soft">{formatDate(r.submittedAt)}</td>
                   <td className="px-4 py-3.5"><Badge tone={st.tone}>{st.label}</Badge></td>
                   <td className="px-4 py-3.5"><Badge tone={pub.tone}>{pub.label}</Badge></td>
                 </tr>
@@ -85,9 +85,9 @@ const RoomDrawer: React.FC<{ id: string; onClose: () => void; onChanged: () => v
       onClose={onClose}
       subtitle={<><Badge tone={st.tone}>{st.label}</Badge><Badge tone={pub.tone}>{pub.label}</Badge><span>{r.venue.name}</span></>}
     >
-      {r.reviewNote && <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300"><strong>Dernière note :</strong> {r.reviewNote}</div>}
+      {r.reviewNote && <div className="p-3 rounded-xl bg-paper border border-line text-sm text-ink-soft"><strong>Dernière note :</strong> {r.reviewNote}</div>}
       {r.venue.status !== 'APPROVED' && r.status !== 'APPROVED' && (
-        <p className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200">
+        <p className="p-3 rounded-xl bg-warning-tint border border-warning/30 text-xs text-warning">
           La structure « {r.venue.name} » n’est pas validée : une salle ne peut être validée qu’après sa structure.
         </p>
       )}
@@ -103,17 +103,17 @@ const RoomDrawer: React.FC<{ id: string; onClose: () => void; onChanged: () => v
             return done;
           }}
         />
-        <p className="mt-2 text-[11px] text-slate-400">Valider une salle ne valide aucune autre salle de la structure. Suspendre ou refuser une salle publiée la dépublie.</p>
+        <p className="mt-2 text-[11px] text-ink-soft">Valider une salle ne valide aucune autre salle de la structure. Suspendre ou refuser une salle publiée la dépublie.</p>
       </Section>
 
       <Section title="Publication">
-        <p className="text-sm text-slate-300 mb-3">
+        <p className="text-sm text-ink-soft mb-3">
           {r.bookable ? 'La salle est actuellement réservable par le public.' : 'La salle n’est pas réservable (validation, publication, offre commerciale ou activation manquante).'}
           {r.upcomingConfirmedBookings > 0 && <> {r.upcomingConfirmedBookings} séance(s) confirmée(s) à venir.</>}
         </p>
         {r.publication === 'PUBLISHED' && <Btn tone="danger" disabled={busy} onClick={() => setPublicationDialog('UNPUBLISH')}>Retirer de la publication</Btn>}
         {r.publication === 'UNPUBLISHED_BY_ADMIN' && <Btn tone="success" disabled={busy} onClick={() => setPublicationDialog('RESTORE')}>Lever le retrait</Btn>}
-        {r.publication === 'UNPUBLISHED_BY_ADMIN' && <p className="mt-2 text-[11px] text-slate-400">Lever le retrait ne republie pas : le Gestionnaire republie lui-même.</p>}
+        {r.publication === 'UNPUBLISHED_BY_ADMIN' && <p className="mt-2 text-[11px] text-ink-soft">Lever le retrait ne republie pas : le Gestionnaire republie lui-même.</p>}
       </Section>
 
       <Section title="Lieu et accueil">
@@ -126,25 +126,25 @@ const RoomDrawer: React.FC<{ id: string; onClose: () => void; onChanged: () => v
         <Row label="Tarif horaire">{r.pricePerHour ? formatMoney(r.pricePerHour.amount, r.pricePerHour.currency) : null}</Row>
         <Row label="Équipements">{r.equipment.join(', ')}</Row>
         <Row label="Accessibilité">{r.accessibility.join(', ')}</Row>
-        {r.description && <p className="mt-3 text-sm text-slate-300 whitespace-pre-line">{r.description}</p>}
-        {r.rules && <p className="mt-3 text-sm text-slate-300 whitespace-pre-line"><strong>Règles :</strong> {r.rules}</p>}
-        {r.cancellationPolicy && <p className="mt-3 text-sm text-slate-300 whitespace-pre-line"><strong>Annulation :</strong> {r.cancellationPolicy}</p>}
+        {r.description && <p className="mt-3 text-sm text-ink-soft whitespace-pre-line">{r.description}</p>}
+        {r.rules && <p className="mt-3 text-sm text-ink-soft whitespace-pre-line"><strong>Règles :</strong> {r.rules}</p>}
+        {r.cancellationPolicy && <p className="mt-3 text-sm text-ink-soft whitespace-pre-line"><strong>Annulation :</strong> {r.cancellationPolicy}</p>}
       </Section>
 
       <Section title="Horaires d’ouverture">
-        {r.availabilities.length === 0 ? <p className="text-sm text-slate-400">Aucun horaire déclaré.</p> : (
-          <ul className="text-sm text-slate-300 grid sm:grid-cols-2 gap-x-6">
+        {r.availabilities.length === 0 ? <p className="text-sm text-ink-soft">Aucun horaire déclaré.</p> : (
+          <ul className="text-sm text-ink-soft grid sm:grid-cols-2 gap-x-6">
             {r.availabilities.map((a) => <li key={a.id}>{weekday(a.dayOfWeek)} : {a.startTime} – {a.endTime}</li>)}
           </ul>
         )}
       </Section>
 
       <Section title={`Photos (${r.photos.length})`}>
-        {r.photos.length === 0 ? <p className="text-sm text-slate-400">Aucune photo.</p> : (
+        {r.photos.length === 0 ? <p className="text-sm text-ink-soft">Aucune photo.</p> : (
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             {r.photos.map((p) => (
               <a key={p.id} href={p.url} target="_blank" rel="noopener noreferrer">
-                <img src={p.url} alt="" className="w-full h-32 object-cover rounded-xl border border-white/10" />
+                <img src={p.url} alt="" className="w-full h-32 object-cover rounded-xl border border-line" />
               </a>
             ))}
           </div>

@@ -62,7 +62,7 @@ export const ApplicationDetail: React.FC<Props> = ({ app, levels, onChanged, onC
       }
     >
       {app.status === 'REJECTED' && app.rejectionReason && (
-        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-sm text-rose-200">
+        <div className="p-3 rounded-xl bg-error-tint border border-error/30 text-sm text-error">
           <strong>Motif du refus :</strong> {app.rejectionReason}
         </div>
       )}
@@ -73,7 +73,7 @@ export const ApplicationDetail: React.FC<Props> = ({ app, levels, onChanged, onC
         <Row label="Domaine / spécialisation">{[p.fieldOfStudy, p.specialization].filter(Boolean).join(' · ')}</Row>
         <Row label="Établissement">{p.degreeInstitution}</Row>
         <Row label="Pays du diplôme">{p.degreeCountry}</Row>
-        {p.bio && <p className="mt-3 text-sm text-slate-300 whitespace-pre-line">{p.bio}</p>}
+        {p.bio && <p className="mt-3 text-sm text-ink-soft whitespace-pre-line">{p.bio}</p>}
       </Section>
 
       {(p.highestDegree === 'OTHER' || p.degreeEquivalence) && (
@@ -82,7 +82,7 @@ export const ApplicationDetail: React.FC<Props> = ({ app, levels, onChanged, onC
 
       <Section title="Matières déclarées">
         {p.subjects.length === 0 ? (
-          <p className="text-sm text-slate-400">Aucune matière.</p>
+          <p className="text-sm text-ink-soft">Aucune matière.</p>
         ) : (
           <div className="flex flex-wrap gap-2">
             {p.subjects.map((s) => <Badge key={s.id} tone="slate">{s.subject.name} · {s.educationLevel.name}</Badge>)}
@@ -92,14 +92,14 @@ export const ApplicationDetail: React.FC<Props> = ({ app, levels, onChanged, onC
 
       <Section title="Expériences déclarées">
         {p.experiences.length === 0 ? (
-          <p className="text-sm text-slate-400">Aucune expérience.</p>
+          <p className="text-sm text-ink-soft">Aucune expérience.</p>
         ) : (
           <ul className="space-y-2">
             {p.experiences.map((x) => (
-              <li key={x.id} className="p-3 rounded-xl bg-white/5 border border-white/10 text-sm">
-                <p className="font-semibold text-white">{x.title} <span className="font-normal text-slate-400">· {x.organization}</span></p>
-                <p className="text-xs text-slate-400">{x.period}</p>
-                {x.description && <p className="mt-1 text-slate-300 whitespace-pre-line">{x.description}</p>}
+              <li key={x.id} className="p-3 rounded-xl bg-paper border border-line text-sm">
+                <p className="font-semibold text-ink">{x.title} <span className="font-normal text-ink-soft">· {x.organization}</span></p>
+                <p className="text-xs text-ink-soft">{x.period}</p>
+                {x.description && <p className="mt-1 text-ink-soft whitespace-pre-line">{x.description}</p>}
               </li>
             ))}
           </ul>
@@ -111,7 +111,7 @@ export const ApplicationDetail: React.FC<Props> = ({ app, levels, onChanged, onC
         aside={docsToReview > 0 ? <Badge tone="amber">{docsToReview} à contrôler</Badge> : undefined}
       >
         {app.documents.length === 0 ? (
-          <p className="text-sm text-slate-400">Aucun justificatif transmis.</p>
+          <p className="text-sm text-ink-soft">Aucun justificatif transmis.</p>
         ) : (
           <div className="space-y-3">
             {app.documents.map((d) => (
@@ -134,7 +134,7 @@ export const ApplicationDetail: React.FC<Props> = ({ app, levels, onChanged, onC
         {isPending && (
           <div className="space-y-3">
             {(docsToReview > 0 || docsRejected > 0 || !p.academicLevel) && (
-              <ul className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 space-y-1 list-disc list-inside">
+              <ul className="p-3 rounded-xl bg-warning-tint border border-warning/30 text-xs text-warning space-y-1 list-disc list-inside">
                 {docsToReview > 0 && <li>{docsToReview} justificatif(s) pas encore contrôlé(s).</li>}
                 {docsRejected > 0 && <li>{docsRejected} justificatif(s) refusé(s).</li>}
                 {!p.academicLevel && <li>Aucun niveau académique validé : le tuteur ne sera pas éligible aux niveaux universitaires.</li>}
@@ -162,11 +162,11 @@ export const ApplicationDetail: React.FC<Props> = ({ app, levels, onChanged, onC
               )}
             </div>
             {p.suspendedAt && (
-              <p className="text-xs text-slate-400">Ce tuteur est suspendu : il n’apparaît plus dans la recherche et ses séances à venir sont signalées dans « Conflits ». Levez la suspension pour le rétablir.</p>
+              <p className="text-xs text-ink-soft">Ce tuteur est suspendu : il n’apparaît plus dans la recherche et ses séances à venir sont signalées dans « Conflits ». Levez la suspension pour le rétablir.</p>
             )}
           </div>
         )}
-        {!isPending && !isApproved && <p className="text-sm text-slate-400">Dossier clôturé le {formatDate(app.reviewedAt)}.</p>}
+        {!isPending && !isApproved && <p className="text-sm text-ink-soft">Dossier clôturé le {formatDate(app.reviewedAt)}.</p>}
       </Section>
 
       {dialog?.kind === 'approve' && (
@@ -279,24 +279,24 @@ const DocumentCard: React.FC<{
   const s = documentStatus(doc.status);
   const check = doc.autoCheck && typeof doc.autoCheck === 'object' ? doc.autoCheck : null;
   return (
-    <div className="p-4 rounded-xl bg-white/5 border border-white/10 space-y-2">
+    <div className="p-4 rounded-xl bg-paper border border-line space-y-2">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex items-center gap-2 min-w-0">
-          <FileText className="w-4 h-4 text-slate-400 shrink-0" />
-          <span className="font-semibold text-white text-sm">{t.label}</span>
+          <FileText className="w-4 h-4 text-ink-soft shrink-0" />
+          <span className="font-semibold text-ink text-sm">{t.label}</span>
           <Badge tone={s.tone}>{s.label}</Badge>
         </div>
-        <span className="text-[11px] text-slate-400 truncate">{doc.fileName ?? doc.mimeType} · reçu le {formatDate(doc.uploadedAt)}</span>
+        <span className="text-[11px] text-ink-soft truncate">{doc.fileName ?? doc.mimeType} · reçu le {formatDate(doc.uploadedAt)}</span>
       </div>
-      <p className="text-xs text-slate-400 flex items-start gap-1.5">
-        {AUTHENTICITY_TYPES.has(doc.type) && <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0 mt-0.5" />}
+      <p className="text-xs text-ink-soft flex items-start gap-1.5">
+        {AUTHENTICITY_TYPES.has(doc.type) && <ShieldAlert className="w-3.5 h-3.5 text-warning shrink-0 mt-0.5" />}
         {doc.approvalMeaning}
       </p>
-      {doc.status === 'REJECTED' && doc.rejectionReason && <p className="text-xs text-rose-300">Motif : {doc.rejectionReason}</p>}
+      {doc.status === 'REJECTED' && doc.rejectionReason && <p className="text-xs text-error">Motif : {doc.rejectionReason}</p>}
       {check && (
-        <details className="text-xs text-slate-400">
+        <details className="text-xs text-ink-soft">
           <summary className="cursor-pointer select-none">Pré-contrôle automatique (indicatif, jamais décisionnel)</summary>
-          <pre className="mt-2 p-3 rounded-lg bg-slate-950/60 overflow-x-auto text-[11px] text-slate-300">{JSON.stringify(check, null, 2)}</pre>
+          <pre className="mt-2 p-3 rounded-lg bg-surface overflow-x-auto text-[11px] text-ink-soft">{JSON.stringify(check, null, 2)}</pre>
         </details>
       )}
       <div className="flex flex-wrap gap-2 pt-1">
@@ -319,18 +319,18 @@ const EquivalenceBlock: React.FC<{ app: TutorApplication; levels: EducationLevel
   return (
     <Section title="Équivalence du diplôme">
       {applied && (
-        <p className="text-sm text-slate-300 mb-3">
+        <p className="text-sm text-ink-soft mb-3">
           Équivalence appliquée : <strong>{applied.degreeTitle}</strong> ({applied.country}) →{' '}
           <strong>{highestDegree(applied.equivalentDegree)}</strong>{applied.equivalentLevel ? ` · ${levelLabel(applied.equivalentLevel)}` : ''}.
         </p>
       )}
       {suggestion && suggestion.id !== applied?.id && (
-        <div className="p-3 rounded-xl bg-white/5 border border-white/10 space-y-2">
-          <p className="text-sm text-slate-200 flex items-center gap-2 flex-wrap">
+        <div className="p-3 rounded-xl bg-paper border border-line space-y-2">
+          <p className="text-sm text-ink flex items-center gap-2 flex-wrap">
             Décision déjà prise pour ce diplôme : <Badge tone={equivalenceStatus(suggestion.status).tone}>{equivalenceStatus(suggestion.status).label}</Badge>
             {suggestion.status === 'VALIDATED' && <span>→ {highestDegree(suggestion.equivalentDegree)}{suggestion.equivalentLevel ? ` · ${levelLabel(suggestion.equivalentLevel)}` : ''}</span>}
           </p>
-          {suggestion.notes && <p className="text-xs text-slate-400">{suggestion.notes}</p>}
+          {suggestion.notes && <p className="text-xs text-ink-soft">{suggestion.notes}</p>}
           {suggestion.status === 'VALIDATED' && (
             <>
               <Btn
@@ -341,16 +341,16 @@ const EquivalenceBlock: React.FC<{ app: TutorApplication; levels: EducationLevel
               >
                 Appliquer au dossier
               </Btn>
-              <p className="text-[11px] text-slate-400">Met à jour le plus haut diplôme et le niveau académique validé du tuteur.</p>
+              <p className="text-[11px] text-ink-soft">Met à jour le plus haut diplôme et le niveau académique validé du tuteur.</p>
             </>
           )}
         </div>
       )}
       {!suggestion && !applied && !creating && (
         <div className="space-y-2">
-          <p className="text-sm text-slate-400">Aucune décision n’existe encore pour « {p.degreeTitle ?? '—'} » ({p.degreeCountry ?? 'pays inconnu'}).</p>
+          <p className="text-sm text-ink-soft">Aucune décision n’existe encore pour « {p.degreeTitle ?? '—'} » ({p.degreeCountry ?? 'pays inconnu'}).</p>
           <Btn small onClick={() => setCreating(true)} disabled={!p.degreeTitle || !p.degreeCountry}>Trancher l’équivalence</Btn>
-          {(!p.degreeTitle || !p.degreeCountry) && <p className="text-[11px] text-amber-300">Intitulé ou pays manquant : demandez-les au tuteur.</p>}
+          {(!p.degreeTitle || !p.degreeCountry) && <p className="text-[11px] text-warning">Intitulé ou pays manquant : demandez-les au tuteur.</p>}
         </div>
       )}
       {creating && (
@@ -386,7 +386,7 @@ const AcademicLevelBlock: React.FC<{ app: TutorApplication; levels: EducationLev
 
   return (
     <Section title="Niveau académique validé">
-      <p className="text-xs text-slate-400 mb-3">
+      <p className="text-xs text-ink-soft mb-3">
         Le niveau déclaré ne compte pas : seul le niveau que vous validez ici rend le tuteur éligible aux niveaux universitaires.
         {p.academicLevel && p.academicLevelValidatedAt ? ` Validé le ${formatDate(p.academicLevelValidatedAt)}.` : ''}
       </p>

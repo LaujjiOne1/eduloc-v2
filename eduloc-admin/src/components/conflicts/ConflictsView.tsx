@@ -42,20 +42,20 @@ export const ConflictsView: React.FC<{ refreshKey: number; onChanged: () => void
               <Card key={c.id} className="p-5 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="font-bold text-white">{conflictType(c.type)}</p>
-                    <p className="text-xs text-slate-400">Détecté le {formatDate(c.createdAt, true)}</p>
+                    <p className="font-bold text-ink">{conflictType(c.type)}</p>
+                    <p className="text-xs text-ink-soft">Détecté le {formatDate(c.createdAt, true)}</p>
                   </div>
                   <Badge tone={st.tone}>{st.label}</Badge>
                 </div>
-                <div className="p-3 rounded-xl bg-slate-950/40 border border-white/5 text-sm space-y-1">
-                  <p className="text-slate-200">
+                <div className="p-3 rounded-xl bg-paper border border-line-soft text-sm space-y-1">
+                  <p className="text-ink">
                     Séance « {c.booking.offerTitle} » · {teachingMode(c.booking.teachingMode)} · {formatDate(c.booking.startAt, true)}
                   </p>
-                  <p className="flex items-center gap-2 text-xs text-slate-400">Statut de la séance : <Badge tone={bs.tone}>{bs.label}</Badge></p>
-                  {reason(c) && <p className="text-xs text-slate-300">Motif enregistré : {reason(c)}</p>}
+                  <p className="flex items-center gap-2 text-xs text-ink-soft">Statut de la séance : <Badge tone={bs.tone}>{bs.label}</Badge></p>
+                  {reason(c) && <p className="text-xs text-ink-soft">Motif enregistré : {reason(c)}</p>}
                 </div>
                 {c.status !== 'OPEN' && (
-                  <p className="text-xs text-slate-400">
+                  <p className="text-xs text-ink-soft">
                     {c.status === 'RESOLVED' ? 'Résolu' : 'Classé'} le {formatDate(c.resolvedAt, true)}{c.resolvedBy ? ` par ${fullName(c.resolvedBy)}` : ''}
                     {c.resolution ? ` — ${c.resolution}` : ''}
                   </p>

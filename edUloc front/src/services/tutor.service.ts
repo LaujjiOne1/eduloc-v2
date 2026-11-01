@@ -28,6 +28,9 @@ export function usesSemanticMatching(criteria: SearchCriteria): boolean {
 /** Seuls ces objectifs existent côté matching (REMEDIAL | ONGOING | EXCELLENCE). */
 const MATCHING_OBJECTIVES = { remedial: "REMEDIAL", ongoing: "ONGOING", excellence: "EXCELLENCE" } as const;
 
+/** Résultat d'une recherche : les tuteurs (compte connecté) ou seulement leur nombre (visiteur). */
+export type TutorSearchOutcome = { kind: "tutors"; tutors: Tutor[] } | { kind: "restricted"; count: number };
+
 export const TutorService = {
   /**
    * Niveau universitaire, utilisateur connecté, recherche « pour moi » : POST /matching/search. Le serveur décide de
@@ -69,7 +72,11 @@ export const TutorService = {
    * format = "online"   → offres à distance, aucune coordonnée requise ;
    * format = "in_person"/"both" → coordonnées obligatoires pour le présentiel (le serveur répond 400 sinon).
    */
-  async searchTutors(criteria: SearchCriteria): Promise<Tutor[]> {
+  /**
+   * Recherche classique. Le jeton de connexion est envoyé : le serveur renvoie la liste complète à un compte connecté, et à un
+   * visiteur SEULEMENT le nombre de résultats (`{ restricted: true, count }`).
+   */
+  async searchOutcome(criteria: SearchCriteria): Promise<TutorSearchOutcome> {
     if (!criteria.subjectId) {
       // Matière saisie librement : le catalogue ne la connaît pas, la recherche publique ne peut pas la traiter.
       throw ApiError.local("validation_error", t("services.tutorservice.signInToSearchFor"));
@@ -79,7 +86,7 @@ export const TutorService = {
     if (needsPosition && !criteria.coordinates) {
       throw ApiError.local("validation_error", t("services.tutorservice.enterAPlaceToFind"));
     }
-    const results = await api.get<SearchResultDto[]>(
+    const results = await api.get<SearchResultDto[] | { restricted: true; count: number }>(
       "/search/offers",
       {
         subjectId: criteria.subjectId,
@@ -92,9 +99,15 @@ export const TutorService = {
         radiusM: criteria.radiusKm === undefined ? DEFAULT_RADIUS_M : Math.round(criteria.radiusKm * 1000),
         limit: 20,
       },
-      { auth: false },
     );
-    return results.map(toTutorFromSearch);
+    if (!Array.isArray(results)) return { kind: "restricted", count: results.count };
+    return { kind: "tutors", tutors: results.map(toTutorFromSearch) };
+  },
+
+  /** Liste de tuteurs ; un visiteur n'en reçoit pas (voir `searchOutcome`) : liste vide. */
+  async searchTutors(criteria: SearchCriteria): Promise<Tutor[]> {
+    const outcome = await TutorService.searchOutcome(criteria);
+    return outcome.kind === "tutors" ? outcome.tutors : [];
   },
 
   async getTutorById(id: string): Promise<Tutor> {

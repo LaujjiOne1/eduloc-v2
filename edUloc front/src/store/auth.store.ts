@@ -43,6 +43,18 @@ interface AuthStore {
    * destination that screen already hardcodes" — transient, not persisted.
    */
   returnTo: Href | null;
+  /**
+   * « Rester connecté » : vrai (par défaut), la session est conservée sur l'appareil ; faux, elle prend fin à la fermeture
+   * de l'application. C'est le dernier choix fait à la connexion, qui le propose de nouveau tel quel.
+   */
+  rememberMe: boolean;
+  setRememberMe: (value: boolean) => void;
+  /**
+   * Compteur incrémenté à chaque changement de compte sans déconnexion : la racine de l'application s'en sert comme clé
+   * pour repartir à neuf (aucun écran, aucune donnée du compte précédent ne survit). Jamais persisté.
+   */
+  accountEpoch: number;
+  bumpAccountEpoch: () => void;
   setUser: (user: AuthenticatedUser) => void;
   setPendingUser: (user: AuthenticatedUser) => void;
   clearPendingUser: () => void;
@@ -50,7 +62,8 @@ interface AuthStore {
   confirmPendingUser: () => void;
   setActiveMode: (mode: UserMode) => void;
   setReturnTo: (route: Href | null) => void;
-  logout: () => void;
+  /** `revokeSession: false` : le jeton a été mis de côté dans le coffre de l'appareil, on ne le révoque pas. */
+  logout: (options?: { revokeSession?: boolean }) => void;
   /** La session a été perdue côté serveur (refresh refusé) : on vide l'UI sans rappeler /auth/logout. */
   sessionLost: () => void;
 }
@@ -69,6 +82,11 @@ export const useAuthStore = create<AuthStore>()(
       hasHydrated: false,
       activeMode: "apprenti",
       returnTo: null,
+      rememberMe: true,
+      accountEpoch: 0,
+
+      setRememberMe: (rememberMe) => set({ rememberMe }),
+      bumpAccountEpoch: () => set((s) => ({ accountEpoch: s.accountEpoch + 1 })),
 
       setUser: (user) => set({ user, pendingUser: null }),
 
@@ -84,17 +102,22 @@ export const useAuthStore = create<AuthStore>()(
 
       sessionLost: () => set({ user: null, pendingUser: null, activeMode: "apprenti" }),
 
-      logout: () => {
+      logout: (options) => {
         // Best-effort: revoke the refresh token server-side, but never block
         // the local sign-out on a network failure.
-        AuthService.logout().catch(() => undefined);
+        AuthService.logout({ revoke: options?.revokeSession }).catch(() => undefined);
         set({ user: null, pendingUser: null, activeMode: "apprenti", returnTo: null });
       },
     }),
     {
       name: "eduloc-auth",
       storage: createJSONStorage(authStorage),
-      partialize: (state) => ({ user: state.user, activeMode: state.activeMode }),
+      // Sans « rester connecté », rien de l'utilisateur n'est écrit sur l'appareil.
+      partialize: (state) => ({
+        user: state.rememberMe ? state.user : null,
+        activeMode: state.rememberMe ? state.activeMode : "apprenti",
+        rememberMe: state.rememberMe,
+      }),
       onRehydrateStorage: () => () => {
         useAuthStore.setState({ hasHydrated: true });
       },

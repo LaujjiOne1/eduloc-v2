@@ -57,5 +57,8 @@
     "regular": "Régulier",
     "intensive": "Intensif",
     "atTheBeneficiarySHome": "Au domicile du bénéficiaire"
+  },
+  "paymentservice": {
+    "invalidCheckoutUrl": "Adresse de paiement invalide."
   }
 }

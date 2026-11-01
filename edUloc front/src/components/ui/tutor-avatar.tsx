@@ -1,13 +1,17 @@
 import { Image } from "expo-image";
-import { View } from "react-native";
+import { LinearGradient } from "expo-linear-gradient";
+import { Text, View } from "react-native";
 import { Circle, Path, Svg } from "react-native-svg";
 
+import { rebaseLocalhost } from "@/api/config";
 import type { TutorGender } from "@/types/common";
 
 type TutorAvatarProps = {
   gender?: TutorGender | null;
-  /** Photo de profil : prioritaire sur la silhouette. */
+  /** Photo de profil : prioritaire sur tout le reste. */
   photoUrl?: string | null;
+  /** Nom complet : sans photo, l'avatar affiche ses initiales sur un dégradé pastel plutôt qu'une silhouette anonyme. */
+  name?: string | null;
   size?: number;
   /** « full » : rond ; sinon rayon en pixels (carte de résultat : 12). */
   radius?: number | "full";
@@ -16,11 +20,34 @@ type TutorAvatarProps = {
 
 type Palette = { bg: string; body: string; hair: string };
 
+/** Dégradés pastel des initiales : la teinte vient du nom, donc reste la même d'un écran à l'autre. */
+const INITIALS_GRADIENTS: readonly { colors: readonly [string, string]; text: string }[] = [
+  { colors: ["#ECEAF9", "#C9C2F2"], text: "#332E86" },
+  { colors: ["#E1F5EF", "#AEE6D6"], text: "#0B7A66" },
+  { colors: ["#FEF3DC", "#F9D79A"], text: "#9A5F06" },
+  { colors: ["#F3F0FC", "#DCCFF7"], text: "#5B4BC4" },
+  { colors: ["#FCE8E4", "#F5C3BB"], text: "#9A3A30" },
+];
+
+function initialsOf(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "";
+  const first = words[0][0] ?? "";
+  const last = words.length > 1 ? (words[words.length - 1][0] ?? "") : "";
+  return (first + last).toLocaleUpperCase();
+}
+
+function gradientFor(name: string) {
+  let hash = 0;
+  for (const char of name) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+  return INITIALS_GRADIENTS[hash % INITIALS_GRADIENTS.length];
+}
+
 /** Couleurs EduLoc : violet profond pour l'homme, violet clair pour la femme, gris chaud sans information. */
 const PALETTES: Record<TutorGender | "unknown", Palette> = {
   male: { bg: "#E6E3F7", body: "#332E86", hair: "#1F1B5C" },
   female: { bg: "#F1ECFC", body: "#8D7FE3", hair: "#5B4BC4" },
-  unknown: { bg: "#f0f1f5", body: "#B4B6C8", hair: "#9799AF" },
+  unknown: { bg: "#eef2f7", body: "#B4B6C8", hair: "#9799AF" },
 };
 
 /**
@@ -28,7 +55,7 @@ const PALETTES: Record<TutorGender | "unknown", Palette> = {
  * réseau social) choisie d'après le sexe de son profil, et une silhouette neutre quand il n'est pas renseigné.
  * Jamais d'initiale : l'avatar se reconnaît d'un coup d'œil.
  */
-export function TutorAvatar({ gender, photoUrl, size = 48, radius = "full", accessibilityLabel }: TutorAvatarProps) {
+export function TutorAvatar({ gender, photoUrl, name, size = 48, radius = "full", accessibilityLabel }: TutorAvatarProps) {
   const palette = PALETTES[gender ?? "unknown"];
   const borderRadius = radius === "full" ? size / 2 : radius;
 
@@ -39,7 +66,18 @@ export function TutorAvatar({ gender, photoUrl, size = 48, radius = "full", acce
       style={{ width: size, height: size, borderRadius, overflow: "hidden", backgroundColor: palette.bg }}
     >
       {photoUrl ? (
-        <Image source={{ uri: photoUrl }} style={{ width: size, height: size }} contentFit="cover" />
+        // En développement, le backend enregistre l'adresse en « localhost » (stockage local) : on la ramène à l'hôte de l'API,
+        // seul joignable depuis un téléphone ou un émulateur.
+        <Image source={{ uri: rebaseLocalhost(photoUrl) }} style={{ width: size, height: size }} contentFit="cover" />
+      ) : name && initialsOf(name) ? (
+        <LinearGradient
+          colors={gradientFor(name).colors}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}
+        >
+          <Text style={{ color: gradientFor(name).text, fontSize: size * 0.36, fontWeight: "700", letterSpacing: 0.5 }}>{initialsOf(name)}</Text>
+        </LinearGradient>
       ) : (
         <Svg width={size} height={size} viewBox="0 0 64 64">
           {gender === "female" ? (

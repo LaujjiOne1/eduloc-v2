@@ -101,7 +101,7 @@ export function TutorIdentityScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorIdentity.aFewMoreDetails")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorIdentity.aFewMoreDetails")}</Text>
           <Text className="mb-5 text-[13.5px] text-ink-soft">
             {t("tutorOnboarding.tutorIdentity.yourNamePhoneNumberAnd")}</Text>
         </FadeIn>

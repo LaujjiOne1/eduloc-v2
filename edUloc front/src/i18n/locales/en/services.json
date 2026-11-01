@@ -57,5 +57,8 @@
     "regular": "Regular",
     "intensive": "Intensive",
     "atTheBeneficiarySHome": "At the beneficiary's home"
+  },
+  "paymentservice": {
+    "invalidCheckoutUrl": "Invalid payment address."
   }
 }

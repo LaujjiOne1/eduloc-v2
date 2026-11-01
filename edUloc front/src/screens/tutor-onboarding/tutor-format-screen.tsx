@@ -51,7 +51,7 @@ export function TutorFormatScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">
             {t("tutorOnboarding.tutorFormat.howWouldYouLikeTo")}</Text>
           <Text className="mb-5 text-[13.5px] text-ink-soft">{t("tutorOnboarding.tutorFormat.chooseOneOrMoreFormats")}</Text>
         </FadeIn>

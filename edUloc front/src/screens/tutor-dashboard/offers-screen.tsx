@@ -26,7 +26,7 @@ export function OffersScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-4 text-[25px] font-bold text-ink">{t("tutorDashboard.offers.myOffers")}</Text>
+      <Text className="px-5 pb-4 text-[25px] font-bold font-display text-ink">{t("tutorDashboard.offers.myOffers")}</Text>
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
         {state.status === "loading" ? (
@@ -67,7 +67,7 @@ export function OffersScreen() {
 function OfferCard({ offer, onEdit }: { offer: Offer; onEdit: () => void }) {
   const { t } = useTranslation();
   return (
-    <View className="mb-3 rounded-lg border border-line bg-surface p-4">
+    <View className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
       <View className="flex-row items-start justify-between">
         <View>
           <Text className="text-[15px] font-bold text-ink">{offer.title}</Text>

@@ -15,6 +15,7 @@ import {
   XCircleIcon,
 } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { ApprentiBottomNav } from "@/components/ui/apprenti-bottom-nav";
 import { TutorBottomNav } from "@/components/ui/tutor-bottom-nav";
@@ -26,13 +27,13 @@ import type { AppNotification, AppNotificationType } from "@/types/notification"
 import { useTranslation } from "react-i18next";
 
 const NOTIFICATION_VISUAL: Record<AppNotificationType, { Icon: ComponentType<IconProps>; bgClass: string; color: string }> = {
-  booking_request: { Icon: CalendarIcon, bgClass: "bg-warning-tint", color: "#BD7E28" },
+  booking_request: { Icon: CalendarIcon, bgClass: "bg-warning-tint", color: "#D4890A" },
   booking_confirmed: { Icon: CheckCircleIcon, bgClass: "bg-accent-tint", color: "#0E9C82" },
   booking_refused: { Icon: XCircleIcon, bgClass: "bg-error-tint", color: "#AC4A40" },
   booking_cancelled: { Icon: XCircleIcon, bgClass: "bg-error-tint", color: "#AC4A40" },
   session_started: { Icon: CheckCircleIcon, bgClass: "bg-primary-tint", color: "#332E86" },
   session_completed: { Icon: CheckCircleIcon, bgClass: "bg-accent-tint", color: "#0E9C82" },
-  review_request: { Icon: StarIcon, bgClass: "bg-warning-tint", color: "#BD7E28" },
+  review_request: { Icon: StarIcon, bgClass: "bg-warning-tint", color: "#D4890A" },
   tutor_application: { Icon: BellIcon, bgClass: "bg-primary-tint", color: "#332E86" },
   tutor_application_approved: { Icon: CheckCircleIcon, bgClass: "bg-accent-tint", color: "#0E9C82" },
   tutor_application_rejected: { Icon: XCircleIcon, bgClass: "bg-error-tint", color: "#AC4A40" },
@@ -41,7 +42,7 @@ const NOTIFICATION_VISUAL: Record<AppNotificationType, { Icon: ComponentType<Ico
   document_message: { Icon: FileIcon, bgClass: "bg-primary-tint", color: "#332E86" },
   incoming_call: { Icon: PhoneIcon, bgClass: "bg-accent-tint", color: "#0E9C82" },
   missed_call: { Icon: PhoneIcon, bgClass: "bg-error-tint", color: "#AC4A40" },
-  reminder: { Icon: CalendarIcon, bgClass: "bg-warning-tint", color: "#BD7E28" },
+  reminder: { Icon: CalendarIcon, bgClass: "bg-warning-tint", color: "#D4890A" },
   system: { Icon: BellIcon, bgClass: "bg-surface-tint", color: "#606482" },
 };
 
@@ -98,7 +99,7 @@ export function NotificationsScreen() {
           router.back() returns to whichever dashboard actually opened it. */}
       <AuthHeader onBack={() => router.back()} />
       <View className="flex-row items-center justify-between px-5 pb-2">
-        <Text className="text-[24px] font-bold text-ink">{t("common.notifications")}</Text>
+        <Text className="text-[24px] font-bold font-display text-ink">{t("common.notifications")}</Text>
         {unreadCount > 0 ? (
           <PressableScale onPress={() => void markAllRead()} accessibilityLabel={t("screens.notifications.markAllAsRead")}>
             <Text className="text-[13px] font-semibold text-primary">{t("screens.notifications.markAllAsRead")}</Text>
@@ -125,9 +126,7 @@ export function NotificationsScreen() {
             </PressableScale>
           </View>
         ) : state.status === "empty" ? (
-          <View className="items-center py-10">
-            <Text className="text-center text-[14px] text-ink-soft">{t("screens.notifications.noNotificationsAtTheMoment")}</Text>
-          </View>
+          <EmptyState illustration="chat" title={t("screens.notifications.noNotificationsAtTheMoment")} />
         ) : (
           groups.map((group, groupIndex) => (
             <View key={group.label}>

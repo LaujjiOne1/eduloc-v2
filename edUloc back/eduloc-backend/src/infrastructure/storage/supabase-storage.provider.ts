@@ -31,6 +31,10 @@ export class SupabaseStorageProvider implements StorageProvider {
     return data.signedUrl;
   }
 
+  publicUrl(bucket: string, storagePath: string): string {
+    return this.client.storage.from(bucket).getPublicUrl(storagePath).data.publicUrl;
+  }
+
   async getObjectInfo(bucket: string, storagePath: string): Promise<StoredObjectInfo> {
     const { data, error } = await this.client.storage
       .from(bucket)

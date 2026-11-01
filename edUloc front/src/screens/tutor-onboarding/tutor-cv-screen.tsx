@@ -60,7 +60,7 @@ export function TutorCvScreen() {
             showsVerticalScrollIndicator={false}
           >
             <FadeIn delay={40}>
-              <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorCv.importMyCv")}</Text>
+              <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorCv.importMyCv")}</Text>
               <Text className="mb-5 text-[13.5px] text-ink-soft">
                 {t("tutorOnboarding.tutorCv.saveTimeWePreFill")}</Text>
             </FadeIn>
@@ -92,7 +92,7 @@ export function TutorCvScreen() {
             )}
 
             <FadeIn delay={120}>
-              <View className="mt-5 flex-row items-start gap-2 rounded-lg border border-line bg-surface p-3">
+              <View className="mt-5 flex-row items-start gap-2 rounded-lg border border-line bg-surface shadow-card p-3">
                 <SparklesIcon size={14} color="#332E86" />
                 <Text className="flex-1 text-[12.5px] text-ink-soft">
                   {t("tutorOnboarding.tutorCv.theAnalysisCanBeWrong")}</Text>
@@ -136,7 +136,7 @@ function progressIndex(state: CvImportState): number {
 /** Les étapes de l'import : faites (coche), en cours (indicateur), à venir (point). */
 function CvProgress({ current }: { current: number }) {
   return (
-    <View className="rounded-2xl border border-line bg-surface p-5" accessibilityRole="progressbar" accessibilityLabel={PROGRESS_STEPS[current]?.label}>
+    <View className="rounded-2xl border border-line bg-surface shadow-card p-5" accessibilityRole="progressbar" accessibilityLabel={PROGRESS_STEPS[current]?.label}>
       {PROGRESS_STEPS.map((step, index) => {
         const done = index < current;
         const active = index === current;
@@ -191,7 +191,7 @@ function Review({ prefill, bottomInset, onConfirm, onRetry, onManual }: ReviewPr
     <>
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 24 }} showsVerticalScrollIndicator={false}>
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorCv.checkYourCv")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorCv.checkYourCv")}</Text>
           <View className="mb-4 flex-row items-start gap-2 rounded-lg bg-accent-tint/40 px-3.5 py-2.5">
             <CheckIcon size={14} color="#0E9C82" />
             <Text className="flex-1 text-[12.5px] font-semibold text-accent">

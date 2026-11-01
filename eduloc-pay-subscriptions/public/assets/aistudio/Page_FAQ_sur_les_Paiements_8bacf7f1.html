@@ -1,0 +1,218 @@
+<!-- faq-paiement.html -->
+<section class="faq-container">
+    <h1>Questions fréquentes sur les paiements</h1>
+    
+    <div class="faq-categories">
+        <!-- Sécurité -->
+        <div class="faq-category">
+            <h2>🔒 Sécurité et confidentialité</h2>
+            
+            <details class="faq-item">
+                <summary>Mes données bancaires sont-elles en sécurité ?</summary>
+                <div class="faq-answer">
+                    <p><strong>Oui, absolument.</strong> edUloc utilise un prestataire de paiement certifié <strong>PCI DSS Niveau 1</strong>, le plus haut niveau de certification pour la sécurité des cartes bancaires.</p>
+                    <ul>
+                        <li>Vos numéros de carte ne transitent jamais par nos serveurs</li>
+                        <li>Le CVV n'est jamais stocké (interdiction PCI DSS)</li>
+                        <li>Toutes les transactions sont chiffrées (HTTPS/TLS)</li>
+                        <li>Authentification 3D Secure obligatoire</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Puis-je enregistrer ma carte pour les prochains paiements ?</summary>
+                <div class="faq-answer">
+                    <p>Non, par mesure de sécurité, edUloc <strong>ne conserve pas les numéros de carte complets</strong>. Conformément à PCI DSS, nous ne stockons que :</p>
+                    <ul>
+                        <li>Un jeton (token) fourni par le prestataire</li>
+                        <li>Les 4 derniers chiffres de la carte</li>
+                        <li>La marque de carte (Visa, Mastercard)</li>
+                    </ul>
+                    <p>Vous devrez ressaisir votre numéro de carte à chaque paiement, mais le CVV ne sera jamais enregistré.</p>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Qu'est-ce que le 3D Secure ?</summary>
+                <div class="faq-answer">
+                    <p>Le <strong>3D Secure (Visa Secure)</strong> est un protocole d'authentification qui ajoute une couche de sécurité supplémentaire. Après avoir saisi vos informations de carte, votre banque peut vous demander :</p>
+                    <ul>
+                        <li>Un code SMS à usage unique</li>
+                        <li>Une validation via l'application mobile de votre banque</li>
+                        <li>Une empreinte digitale ou reconnaissance faciale</li>
+                    </ul>
+                    <p>Cette authentification est gérée directement par votre banque, pas par edUloc.</p>
+                </div>
+            </details>
+        </div>
+        
+        <!-- Mobile Money -->
+        <div class="faq-category">
+            <h2>📱 Mobile Money</h2>
+            
+            <details class="faq-item">
+                <summary>Quels opérateurs Mobile Money acceptez-vous ?</summary>
+                <div class="faq-answer">
+                    <p>Nous acceptons les principaux opérateurs à Madagascar :</p>
+                    <ul>
+                        <li><strong>Orange Money</strong> (numéros commençant par 034)</li>
+                        <li><strong>MVol a (Telma)</strong> (numéros commençant par 032 ou 033)</li>
+                        <li><strong>Airtel Money</strong> (numéros commençant par 031)</li>
+                    </ul>
+                    <p>L'opérateur est automatiquement détecté à partir de votre numéro de téléphone.</p>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Est-ce que je dois donner mon code PIN ?</summary>
+                <div class="faq-answer">
+                    <p><strong>NON, JAMAIS !</strong> edUloc ne vous demandera <strong>jamais</strong> votre code PIN Mobile Money. La saisie du PIN se fait exclusivement :</p>
+                    <ul>
+                        <li>Dans le menu USSD qui s'affiche sur votre téléphone</li>
+                        <li>Ou dans l'application officielle de l'opérateur</li>
+                    </ul>
+                    <p><strong>Aucun agent edUloc</strong> ne peut vous demander votre code secret. Si quelqu'un vous le demande, il s'agit d'une tentative de fraude.</p>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Combien de temps pour recevoir la demande USSD ?</summary>
+                <div class="faq-answer">
+                    <p>La demande USSD arrive généralement dans les <strong>30 secondes</strong> suivant votre clic sur "Payer". Si vous ne la recevez pas :</p>
+                    <ol>
+                        <li>Vérifiez que votre téléphone a du réseau</li>
+                        <li>Vérifiez que le numéro saisi est correct</li>
+                        <li>Vérifiez que votre compte Mobile Money est actif</li>
+                        <li>Contactez notre support si le problème persiste</li>
+                    </ol>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Que faire si je reçois un SMS de confirmation mais que ma réservation n'est pas validée ?</summary>
+                <div class="faq-answer">
+                    <p>Un SMS de confirmation ou une capture d'écran <strong>ne suffit pas</strong> à valider automatiquement votre réservation. Notre système doit recevoir la confirmation officielle de l'API de l'opérateur.</p>
+                    <p>En cas de désynchronisation :</p>
+                    <ol>
+                        <li>Attendez quelques minutes (la vérification automatique peut prendre jusqu'à 5 minutes)</li>
+                        <li>Vérifiez votre solde Mobile Money pour confirmer le débit</li>
+                        <li>Contactez notre support avec :</li>
+                        <ul>
+                            <li>La référence de votre réservation</li>
+                            <li>La référence de transaction Mobile Money</li>
+                            <li>Une capture du SMS de confirmation</li>
+                        </ul>
+                    </ol>
+                    <p>Nous vérifierons manuellement le statut auprès de l'opérateur.</p>
+                </div>
+            </details>
+        </div>
+        
+        <!-- Problèmes et erreurs -->
+        <div class="faq-category">
+            <h2>⚠️ Problèmes et résolution</h2>
+            
+            <details class="faq-item">
+                <summary>Mon paiement a échoué, que faire ?</summary>
+                <div class="faq-answer">
+                    <p>Plusieurs raisons peuvent expliquer un échec :</p>
+                    <ul>
+                        <li><strong>Carte bancaire :</strong> Solde insuffisant, plafond dépassé, authentification 3D Secure échouée</li>
+                        <li><strong>Mobile Money :</strong> Solde insuffisant, code PIN erroné, transaction expirée</li>
+                    </ul>
+                    <p><strong>Actions recommandées :</strong></p>
+                    <ol>
+                        <li>Vérifiez votre solde ou plafond</li>
+                        <li>Réessayez avec un autre moyen de paiement</li>
+                        <li>Contactez votre banque ou opérateur si le problème persiste</li>
+                        <li>Contactez notre support pour vérifier l'état de votre réservation</li>
+                    </ol>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>J'ai été débité mais ma réservation n'est pas confirmée</summary>
+                <div class="faq-answer">
+                    <p>Cette situation est rare mais peut arriver en cas de problème de communication entre les systèmes.</p>
+                    <p><strong>Ne paniquez pas :</strong></p>
+                    <ol>
+                        <li>Attendez 10-15 minutes (le système effectue des vérifications automatiques)</li>
+                        <li>Vérifiez vos emails (la confirmation peut arriver avec retard)</li>
+                        <li>Contactez notre support immédiatement avec :</li>
+                        <ul>
+                            <li>Votre numéro de réservation</li>
+                            <li>La référence de transaction</li>
+                            <li>La preuve de débit (SMS ou relevé)</li>
+                        </ul>
+                    </ol>
+                    <p>Nous effectuerons un rapprochement manuel et :</p>
+                    <ul>
+                        <li>Soit nous confirmerons votre réservation</li>
+                        <li>Soit nous déclencherons un remboursement sous 24-48h</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Peut-on annuler un paiement ?</summary>
+                <div class="faq-answer">
+                    <p><strong>Avant confirmation :</strong> Oui, si le paiement est encore en statut "PENDING", vous pouvez annuler depuis votre espace edUloc.</p>
+                    <p><strong>Après confirmation :</strong> Les paiements confirmés ne peuvent pas être annulés directement. Vous devez :</p>
+                    <ol>
+                        <li>Annuler votre réservation (sous réserve de notre politique d'annulation)</li>
+                        <li>Demander un remboursement qui sera traité sous 5-10 jours ouvrés</li>
+                    </ol>
+                    <p>Les remboursements sont réservés aux rôles autorisés et nécessitent une validation.</p>
+                </div>
+            </details>
+        </div>
+        
+        <!-- Odoo CRM -->
+        <div class="faq-category">
+            <h2>🔗 Support et CRM</h2>
+            
+            <details class="faq-item">
+                <summary>Le support peut-il voir mes informations de paiement ?</summary>
+                <div class="faq-answer">
+                    <p>Nos agents ont accès dans Odoo CRM à :</p>
+                    <ul>
+                        <li>✓ La référence de transaction</li>
+                        <li>✓ Le moyen de paiement utilisé</li>
+                        <li>✓ Le statut du paiement</li>
+                        <li>✓ Le montant et la devise</li>
+                        <li>✓ Les 4 derniers chiffres de carte (pour Visa)</li>
+                        <li>✓ Le numéro de téléphone masqué (pour Mobile Money)</li>
+                    </ul>
+                    <p><strong>Mais jamais :</strong></p>
+                    <ul>
+                        <li>❌ Le numéro complet de carte</li>
+                        <li>❌ Le code CVV</li>
+                        <li>❌ Le code PIN Mobile Money</li>
+                        <li> Les secrets API</li>
+                    </ul>
+                </div>
+            </details>
+            
+            <details class="faq-item">
+                <summary>Comment contacter le support pour un problème de paiement ?</summary>
+                <div class="faq-answer">
+                    <p>Plusieurs canaux sont disponibles :</p>
+                    <ul>
+                        <li><strong>Email :</strong> support@edUloc.mg (réponse sous 24h)</li>
+                        <li><strong>Téléphone :</strong> +261 XX XX XXX XX (du lundi au vendredi, 8h-17h)</li>
+                        <li><strong>WhatsApp :</strong> +261 XX XX XXX XX (réponse rapide)</li>
+                        <li><strong>Formulaire :</strong> Depuis votre espace edUloc</li>
+                    </ul>
+                    <p><strong>Informations à fournir :</strong></p>
+                    <ul>
+                        <li>Votre numéro de réservation</li>
+                        <li>La référence de transaction</li>
+                        <li>Une description du problème</li>
+                        <li>Toute capture d'écran utile</li>
+                    </ul>
+                </div>
+            </details>
+        </div>
+    </div>
+</section>

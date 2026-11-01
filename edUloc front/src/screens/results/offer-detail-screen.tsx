@@ -77,7 +77,7 @@ function OfferDetailContent({ offer, insetsBottom, onBook }: OfferDetailContentP
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={30}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{offer.title}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{offer.title}</Text>
           <View className="mb-5 flex-row items-center gap-2">
             <TutorAvatar gender={offer.tutorGender} photoUrl={offer.tutorPhotoUrl} size={26} />
             <Text className="text-[14px] text-ink-soft">{t("common.with", { tutorName: offer.tutorName })}</Text>
@@ -119,7 +119,7 @@ type StatCardProps = {
 
 function StatCard({ icon, value, label }: StatCardProps) {
   return (
-    <View className="flex-1 items-center rounded-lg border border-line bg-surface p-[14px]">
+    <View className="flex-1 items-center rounded-lg border border-line bg-surface shadow-card p-[14px]">
       <View className="mb-[6px]">{icon}</View>
       <Text className="text-[14px] font-bold text-ink" numberOfLines={1}>
         {value}

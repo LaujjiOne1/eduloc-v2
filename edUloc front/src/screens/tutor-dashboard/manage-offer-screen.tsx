@@ -193,7 +193,7 @@ function ManageOfferForm({
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
         <View className="mb-[18px] flex-row items-center justify-between gap-3">
-          <Text className="flex-1 text-[22px] font-bold text-ink">{existingOffer ? existingOffer.title : t("common.newOffer")}</Text>
+          <Text className="flex-1 text-[22px] font-bold font-display text-ink">{existingOffer ? existingOffer.title : t("common.newOffer")}</Text>
           {existingOffer ? <OfferStatusBadge isActive={existingOffer.isActive} /> : null}
         </View>
 

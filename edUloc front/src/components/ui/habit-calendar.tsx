@@ -7,6 +7,7 @@ import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withTiming } from 
 
 import { ChevronRightIcon, PlusIcon } from "@/components/icons";
 import { PressableScale } from "@/components/motion/pressable-scale";
+import { BRAND_GRADIENT, BRAND_GRADIENT_END, BRAND_GRADIENT_START } from "@/lib/brand";
 import { SlidingPager } from "@/components/ui/sliding-pager";
 import {
   addDays,
@@ -19,14 +20,13 @@ import {
   toIsoDate,
   weekDays,
 } from "@/lib/week";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next";
 import { t as translate } from "@/i18n";
 
 const WEEKDAY_INITIALS = ["L", "M", "M", "J", "V", "S", "D"];
 const CHIP = 44;
 const ROW = 54; // une ligne de jours (pastille + espace)
 const SLIDE_MS = 260;
-const GRADIENT = ["#332E86", "#3F3994"] as const;
 
 export type DayMarkers = { availability?: boolean; booking?: boolean };
 
@@ -65,6 +65,8 @@ export function HabitCalendar({
   onViewChange,
 }: HabitCalendarProps) {
   const { t } = useTranslation();
+  // Variante « card » : fond blanc épuré, jour choisi en pilule violette. Le bandeau « header » garde le dégradé de marque.
+  const light = variant === "card";
   const today = useMemo(() => new Date(), []);
   const todayIso = toIsoDate(today);
   const selected = fromIsoDate(selectedDate);
@@ -178,18 +180,26 @@ export function HabitCalendar({
             style={{
               width: CHIP,
               height: CHIP,
-              borderWidth: isToday && !isSelected ? 2 : 1,
-              borderColor: isSelected ? "#FFFFFF" : isToday ? "#FFFFFF" : "rgba(255,255,255,0.32)",
-              backgroundColor: isSelected ? "#FFFFFF" : "transparent",
+              borderWidth: light ? (isToday && !isSelected ? 1.5 : 0) : isToday && !isSelected ? 2 : 1,
+              borderColor: light ? "#5B4BD5" : isSelected ? "#FFFFFF" : isToday ? "#FFFFFF" : "rgba(255,255,255,0.32)",
+              backgroundColor: light ? (isSelected ? "#5B4BD5" : "transparent") : isSelected ? "#FFFFFF" : "transparent",
               opacity: disabled ? 0.3 : muted ? 0.45 : 1,
             }}
-            className="items-center justify-center rounded-[14px]"
+            className={light ? "items-center justify-center rounded-full" : "items-center justify-center rounded-[14px]"}
           >
-            <Text className={["text-[17px] font-bold", isSelected ? "text-primary" : "text-white"].join(" ")}>{date.getDate()}</Text>
+            <Text
+              className={[
+                "text-[17px] font-bold font-display",
+                light ? (isSelected ? "text-white" : "text-ink") : isSelected ? "text-primary" : "text-white",
+              ].join(" ")}
+            >
+              {date.getDate()}
+            </Text>
             {mark?.availability || mark?.booking ? (
-              <View className="absolute bottom-[5px] flex-row gap-[3px]">
-                {mark.availability ? <View className="h-[5px] w-[5px] rounded-full" style={{ backgroundColor: isSelected ? "#0E9C82" : "#6EE7C7" }} /> : null}
-                {mark.booking ? <View className="h-[5px] w-[5px] rounded-full" style={{ backgroundColor: isSelected ? "#BD7E28" : "#F8C46A" }} /> : null}
+              <View className="absolute bottom-[4px] flex-row gap-[3px]">
+                {/* Vert : créneau libre. Bleu : cours calé (ambre sur le bandeau sombre). */}
+                {mark.availability ? <View className="h-[5px] w-[5px] rounded-full" style={{ backgroundColor: light ? (isSelected ? "#A7F3D0" : "#0E9C82") : isSelected ? "#0E9C82" : "#6EE7C7" }} /> : null}
+                {mark.booking ? <View className="h-[5px] w-[5px] rounded-full" style={{ backgroundColor: light ? (isSelected ? "#C7D2FE" : "#4F46E5") : isSelected ? "#D4890A" : "#F8C46A" }} /> : null}
               </View>
             ) : null}
           </View>
@@ -226,34 +236,34 @@ export function HabitCalendar({
   const shiftMonth = (delta: number) => setViewMonth((current) => monthStart(current, delta));
 
   return (
-    <View className={variant === "card" ? "overflow-hidden rounded-[28px]" : "overflow-hidden rounded-b-[28px]"}>
-      <LinearGradient colors={GRADIENT} style={{ position: "absolute", inset: 0 }} />
+    <View className={light ? "overflow-hidden rounded-3xl border border-line-soft bg-surface shadow-card" : "overflow-hidden rounded-b-[28px]"}>
+      {light ? null : <LinearGradient colors={BRAND_GRADIENT} start={BRAND_GRADIENT_START} end={BRAND_GRADIENT_END} style={{ position: "absolute", inset: 0 }} />}
 
       <View className="px-3 pt-3">
         {/* Ligne du haut : Aujourd'hui · date (flèche = mois) · + */}
         <View className="mb-1 flex-row items-center justify-between px-1">
           <PressableScale onPress={goToday} accessibilityLabel={t("ui.habitCalendar.backToToday")}>
-            <View className="rounded-full border border-white/70 px-4 py-2">
-              <Text className="text-[13.5px] font-bold text-white">{t("common.today")}</Text>
+            <View className={light ? "rounded-full bg-primary-tint px-4 py-2" : "rounded-full border border-white/70 px-4 py-2"}>
+              <Text className={["text-[13.5px] font-bold", light ? "text-primary" : "text-white"].join(" ")}>{t("common.today")}</Text>
             </View>
           </PressableScale>
 
           <PressableScale onPress={toggle} accessibilityLabel={expanded ? t("ui.habitCalendar.collapseToWeek") : t("ui.habitCalendar.showTheMonth")}>
             <View className="items-center">
               <View className="flex-row items-center gap-1.5">
-                <Text className="text-[18px] font-bold text-white">{compactDateLabel(selected)}</Text>
+                <Text className={["text-[18px] font-bold font-display", light ? "text-ink" : "text-white"].join(" ")}>{compactDateLabel(selected)}</Text>
                 <Animated.View style={chevronStyle}>
-                  <ChevronRightIcon size={14} color="#FFFFFF" />
+                  <ChevronRightIcon size={14} color={light ? "#332E86" : "#FFFFFF"} />
                 </Animated.View>
               </View>
-              <Text className="text-[11.5px] text-white/65">{monthYearLabel(expanded ? viewMonth : viewMonday)}</Text>
+              <Text className={["text-[11.5px]", light ? "text-ink-soft" : "text-white/65"].join(" ")}>{monthYearLabel(expanded ? viewMonth : viewMonday)}</Text>
             </View>
           </PressableScale>
 
           {onAdd ? (
             <PressableScale onPress={onAdd} accessibilityLabel={addLabel}>
-              <View className="h-[42px] w-[42px] items-center justify-center rounded-full bg-white">
-                <PlusIcon size={20} color="#332E86" />
+              <View className={["h-[42px] w-[42px] items-center justify-center rounded-full", light ? "bg-primary" : "bg-white"].join(" ")}>
+                <PlusIcon size={20} color={light ? "#FFFFFF" : "#332E86"} />
               </View>
             </PressableScale>
           ) : (
@@ -265,7 +275,7 @@ export function HabitCalendar({
         <View className="mb-1 flex-row" onLayout={onLayout}>
           {WEEKDAY_INITIALS.map((initial, index) => (
             <View key={index} className="flex-1 items-center py-1.5">
-              <Text className="text-[12.5px] font-semibold text-white/75">{initial}</Text>
+              <Text className={["text-[12.5px] font-semibold", light ? "text-ink-faint" : "text-white/75"].join(" ")}>{initial}</Text>
             </View>
           ))}
         </View>
@@ -306,7 +316,7 @@ export function HabitCalendar({
         <View className="items-center pb-3 pt-1.5">
           <PressableScale onPress={toggle} accessibilityLabel={expanded ? t("ui.habitCalendar.collapseTheCalendar") : t("ui.habitCalendar.expandTheCalendar")}>
             <View className="h-[22px] w-[90px] items-center justify-center">
-              <View className="h-[5px] w-[56px] rounded-full bg-white/45" />
+              <View className={["h-[5px] w-[56px] rounded-full", light ? "bg-line" : "bg-white/45"].join(" ")} />
             </View>
           </PressableScale>
         </View>

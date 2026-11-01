@@ -31,7 +31,7 @@ export function BeneficiariesScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-4 text-[24px] font-bold text-ink">{t("beneficiaries.beneficiaries.myBeneficiaries")}</Text>
+      <Text className="px-5 pb-4 text-[24px] font-bold font-display text-ink">{t("beneficiaries.beneficiaries.myBeneficiaries")}</Text>
 
       <ScrollView
         className="flex-1"
@@ -86,7 +86,7 @@ function BeneficiaryCard({ beneficiary }: { beneficiary: SavedBeneficiary }) {
     : `${beneficiary.relationLabel ?? "—"} • ${beneficiary.level?.label ?? "—"}`;
 
   return (
-    <View className="mb-[10px] flex-row items-center gap-[14px] rounded-lg border border-line bg-surface p-4">
+    <View className="mb-[10px] flex-row items-center gap-[14px] rounded-lg border border-line bg-surface shadow-card p-4">
       <View className="h-11 w-11 items-center justify-center rounded-full bg-violet-tint">
         <Text className="text-[15px] font-bold text-violet">{initial}</Text>
       </View>

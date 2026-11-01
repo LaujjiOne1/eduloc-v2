@@ -2,6 +2,7 @@ import { useRouter } from "expo-router";
 import { useEffect } from "react";
 import { AppState, Platform } from "react-native";
 
+import { useLessonReminderSync } from "@/hooks/use-lesson-reminder-sync";
 import { isPageHidden, requestWebAlertPermission, showWebAlert } from "@/lib/web-alerts";
 import { routeForNotification } from "@/lib/notification-routing";
 import { configureForegroundPresentation, onNotificationOpened, registerForPush, unregisterPush } from "@/lib/push";
@@ -38,6 +39,8 @@ const ALERT_TEXT: Record<string, { title: string; body: string }> = {
  */
 export function RealtimeEffects() {
   const router = useRouter();
+  // Rappels de cours programmés sur l'appareil : ils sonnent à l'heure même hors connexion, application fermée.
+  useLessonReminderSync();
 
   // Pastille : valeur initiale, puis à chaque événement ; remise à zéro à la déconnexion.
   useEffect(() => {

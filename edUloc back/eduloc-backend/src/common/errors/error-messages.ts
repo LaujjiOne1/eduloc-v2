@@ -19,6 +19,24 @@ export const ERROR_MESSAGES: Record<string, string> = {
   REFRESH_REUSE_DETECTED: 'Session invalidée par sécurité. Reconnectez-vous.',
   RATE_LIMITED: 'Trop de tentatives. Réessayez dans quelques instants.',
 
+  // Connexion sociale (Google, Apple, Facebook)
+  OAUTH_TOKEN_INVALID: 'La connexion avec ce service a échoué. Réessayez.',
+  OAUTH_PROVIDER_DISABLED: 'Cette méthode de connexion n’est pas encore disponible.',
+  OAUTH_EMAIL_REQUIRED: 'Ce service ne nous a pas communiqué d’adresse e-mail. Inscrivez-vous avec votre e-mail.',
+  OAUTH_EMAIL_UNVERIFIED: 'L’adresse e-mail de ce service n’est pas vérifiée. Inscrivez-vous avec votre e-mail.',
+  OAUTH_LINK_FORBIDDEN: 'Ce compte ne peut pas être lié automatiquement. Connectez-vous avec votre mot de passe.',
+
+  // Paiements
+  PAYMENTS_UNAVAILABLE: 'Le paiement en ligne n’est pas encore disponible.',
+  PAYMENT_NOT_FOUND: 'Paiement introuvable.',
+  PAYMENT_BOOKING_NOT_OWNED: 'Cette réservation ne vous appartient pas.',
+  PAYMENT_BOOKING_NOT_PAYABLE: 'Cette réservation ne peut pas encore être payée.',
+  PAYMENT_ALREADY_SETTLED: 'Cette réservation est déjà payée.',
+  PAYMENT_AMOUNT_UNAVAILABLE: 'Le montant de cette réservation n’est pas disponible.',
+  PAYMENT_SIGNATURE_INVALID: 'Signature de notification invalide.',
+  PAYMENT_EVENT_INVALID: 'Notification de paiement invalide.',
+  PAYMENT_MISMATCH: 'Le paiement notifié ne correspond pas à la réservation.',
+
   // Ressources
   USER_NOT_FOUND: 'Utilisateur introuvable.',
   BENEFICIARY_NOT_FOUND: 'Bénéficiaire introuvable.',

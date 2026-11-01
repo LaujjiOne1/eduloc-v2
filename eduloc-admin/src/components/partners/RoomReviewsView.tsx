@@ -31,17 +31,17 @@ export const RoomReviewsView: React.FC<{ refreshKey: number }> = ({ refreshKey }
             <Card key={r.id} className="p-5 space-y-2">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <p className="font-bold text-white">{r.room.name}</p>
-                  <p className="text-xs text-slate-400">{fullName(r.author)} · {formatDate(r.createdAt)}</p>
+                  <p className="font-bold text-ink">{r.room.name}</p>
+                  <p className="text-xs text-ink-soft">{fullName(r.author)} · {formatDate(r.createdAt)}</p>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="inline-flex items-center gap-1 text-sm text-amber-300"><Star className="w-4 h-4 fill-amber-300" />{r.overall}/5</span>
+                  <span className="inline-flex items-center gap-1 text-sm text-warning"><Star className="w-4 h-4 fill-warning" />{r.overall}/5</span>
                   {r.hiddenAt && <Badge tone="rose">Masqué le {formatDate(r.hiddenAt)}</Badge>}
                 </div>
               </div>
-              {r.comment ? <p className="text-sm text-slate-200 whitespace-pre-line">{r.comment}</p> : <p className="text-sm text-slate-500">Sans commentaire.</p>}
-              {r.partnerReply && <p className="text-xs p-3 rounded-xl bg-white/5 border border-white/10 text-slate-300"><strong>Réponse du partenaire :</strong> {r.partnerReply}</p>}
-              {r.hiddenReason && <p className="text-xs text-rose-300">Motif du masquage : {r.hiddenReason}</p>}
+              {r.comment ? <p className="text-sm text-ink whitespace-pre-line">{r.comment}</p> : <p className="text-sm text-ink-faint">Sans commentaire.</p>}
+              {r.partnerReply && <p className="text-xs p-3 rounded-xl bg-paper border border-line text-ink-soft"><strong>Réponse du partenaire :</strong> {r.partnerReply}</p>}
+              {r.hiddenReason && <p className="text-xs text-error">Motif du masquage : {r.hiddenReason}</p>}
               <div>
                 {r.hiddenAt
                   ? <Btn small tone="success" disabled={busy} onClick={async () => { if (await run(() => adminApi.unhideRoomReview(r.id), 'Avis rétabli.')) reviews.reload(); }}>Rétablir l’avis</Btn>

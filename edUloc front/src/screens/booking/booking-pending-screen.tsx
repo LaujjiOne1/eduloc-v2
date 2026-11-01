@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useBookingWizardStore } from "@/store/booking-wizard.store";
 import { useTranslation } from "react-i18next";
+import { Logo } from "@/components/ui/logo";
 
 const HOME_ROUTE = "/home" as Href;
 
@@ -46,9 +47,7 @@ export function BookingPendingScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 pb-[14px] pt-5">
-        <Text className="text-[21px] font-bold text-ink">
-          edU<Text className="text-primary">loc</Text>
-        </Text>
+        <Logo size={32} />
       </View>
 
       <ScrollView
@@ -63,7 +62,7 @@ export function BookingPendingScreen() {
         </ScaleIn>
 
         <FadeIn delay={90}>
-          <Text className="mb-[10px] text-center text-[24px] font-bold text-ink">{t("booking.bookingPending.requestSent")}</Text>
+          <Text className="mb-[10px] text-center text-[24px] font-bold font-display text-ink">{t("booking.bookingPending.requestSent")}</Text>
         </FadeIn>
 
         <FadeIn delay={130}>
@@ -78,7 +77,7 @@ export function BookingPendingScreen() {
         </FadeIn>
 
         <FadeIn delay={190}>
-          <View className="mb-6 w-full rounded-lg border border-line bg-surface p-4">
+          <View className="mb-6 w-full rounded-lg border border-line bg-surface shadow-card p-4">
             <Text className="text-[15px] font-bold text-ink">{offer.title}</Text>
             <Text className="mt-[3px] text-[13px] text-ink-soft">{t("common.with", { tutorName: offer.tutorName })}</Text>
             <View className="my-3 h-px bg-line-soft" />

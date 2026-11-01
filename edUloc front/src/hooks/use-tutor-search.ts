@@ -13,6 +13,8 @@ export type TutorsState =
   | { status: "loading" }
   | { status: "error"; message: string }
   | { status: "empty" }
+  /** Visiteur : le serveur n'a renvoyé que le nombre de tuteurs trouvés (au moins 1). */
+  | { status: "restricted"; count: number }
   | { status: "success"; tutors: Tutor[] };
 
 /** Loads tutors matching the wizard's search criteria for the Results / ResultsMap steps. */
@@ -54,7 +56,14 @@ export function useTutorSearch(criteria: SearchWizardCriteria) {
           console.warn("[matching] indisponible, recherche classique", error);
         }
       }
-      tutors = tutors ?? (await TutorService.searchTutors(searchCriteria));
+      if (!tutors) {
+        const outcome = await TutorService.searchOutcome(searchCriteria);
+        if (outcome.kind === "restricted") {
+          setState(outcome.count > 0 ? { status: "restricted", count: outcome.count } : { status: "empty" });
+          return;
+        }
+        tutors = outcome.tutors;
+      }
       setState(tutors.length > 0 ? { status: "success", tutors } : { status: "empty" });
     } catch (error) {
       // Le message de l'API (« Connexion impossible… ») est plus utile qu'un texte générique.

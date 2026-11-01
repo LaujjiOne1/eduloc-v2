@@ -50,12 +50,12 @@ export function ReviewTutorScreen() {
         </View>
       ) : (
         <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 24, paddingTop: 12, paddingBottom: 20, alignItems: "center" }} showsVerticalScrollIndicator={false}>
-          <Text className="mb-6 text-center text-[22px] font-bold text-ink">{t("apprentiDashboard.reviewTutor.howDidTheSessionGo")}</Text>
+          <Text className="mb-6 text-center text-[22px] font-bold font-display text-ink">{t("apprentiDashboard.reviewTutor.howDidTheSessionGo")}</Text>
 
           <View className="mb-7 flex-row justify-center gap-2">
             {RATING_VALUES.map((value) => (
               <PressableScale key={value} onPress={() => setRating(value)} accessibilityLabel={t("apprentiDashboard.reviewTutor.starCount", { count: value })}>
-                <StarIcon size={30} color="#BD7E28" filled={value <= rating} />
+                <StarIcon size={30} color="#D4890A" filled={value <= rating} />
               </PressableScale>
             ))}
           </View>

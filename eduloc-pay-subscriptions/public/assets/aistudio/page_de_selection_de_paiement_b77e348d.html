@@ -1,0 +1,108 @@
+<!-- payment-method-selection.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Paiement Sécurisé - edUloc</title>
+    <link rel="stylesheet" href="styles/payment.css">
+</head>
+<body class="payment-flow">
+    <header class="edUloc-header">
+        <div class="logo-container">
+            <svg class="graduation-cap" viewBox="0 0 24 24" fill="none" stroke="#332E86" stroke-width="1.8">
+                <path d="M12 4 2.5 9 12 14l9.5-5Z" />
+                <path d="M6.5 11.4V16c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3v-4.6" />
+            </svg>
+            <span class="brand-name">ed<span class="u-highlight">U</span>loc</span>
+        </div>
+        <p class="baseline">Le bon accompagnement, au bon endroit.</p>
+    </header>
+
+    <main class="payment-container">
+        <section class="reservation-summary">
+            <h2>Récapitulatif de votre réservation</h2>
+            <div class="summary-card">
+                <div class="summary-item">
+                    <span class="label">Cours de Mathématiques</span>
+                    <span class="value">45 000 Ar</span>
+                </div>
+                <div class="summary-item">
+                    <span class="label">Frais de plateforme</span>
+                    <span class="value">2 000 Ar</span>
+                </div>
+                <div class="summary-total">
+                    <span class="label">Total à payer</span>
+                    <span class="value">47 000 Ar</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="payment-methods">
+            <h2>Choisissez votre mode de paiement</h2>
+            
+            <!-- Visa/Card Option -->
+            <div class="payment-method-card" data-method="visa">
+                <div class="method-header">
+                    <div class="method-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="2" y="5" width="20" height="14" rx="2"/>
+                            <line x1="2" y1="10" x2="22" y2="10"/>
+                        </svg>
+                    </div>
+                    <div class="method-info">
+                        <h3>Carte Bancaire</h3>
+                        <p>Visa, Mastercard sécurisées</p>
+                    </div>
+                    <div class="security-badges">
+                        <span class="badge pci">PCI DSS</span>
+                        <span class="badge secure">3D Secure</span>
+                    </div>
+                </div>
+                <button class="btn-select" onclick="selectPaymentMethod('visa')">
+                    Choisir ce mode
+                </button>
+            </div>
+
+            <!-- Mobile Money Options -->
+            <div class="payment-method-card" data-method="mobile-money">
+                <div class="method-header">
+                    <div class="method-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="5" y="2" width="14" height="20" rx="2"/>
+                            <line x1="12" y1="18" x2="12" y2="18"/>
+                        </svg>
+                    </div>
+                    <div class="method-info">
+                        <h3>Mobile Money</h3>
+                        <p>Orange Money, MVola, Airtel Money</p>
+                    </div>
+                    <div class="security-badges">
+                        <span class="badge gsma">GSMA</span>
+                        <span class="badge secure">USSD Sécurisé</span>
+                    </div>
+                </div>
+                <button class="btn-select" onclick="selectPaymentMethod('mobile-money')">
+                    Choisir ce mode
+                </button>
+            </div>
+        </section>
+
+        <!-- Security Notice -->
+        <div class="security-notice">
+            <div class="notice-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#0E9C82" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+            </div>
+            <div class="notice-content">
+                <h4>Paiement 100% sécurisé</h4>
+                <p>Vos données sont protégées selon les standards internationaux PCI DSS et GSMA Mobile Money.</p>
+                <a href="securite-paiement.html" class="link-learn-more">En savoir plus sur notre sécurité →</a>
+            </div>
+        </div>
+    </main>
+
+    <script src="scripts/payment-flow.js"></script>
+</body>
+</html>

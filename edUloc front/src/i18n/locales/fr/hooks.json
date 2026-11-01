@@ -162,5 +162,12 @@
   },
   "usePartnerAction": {
     "actionUnavailable": "Action impossible. Réessayez."
+  },
+  "profilePhoto": {
+    "cameraAccessDenied": "Autorisez l'accès à l'appareil photo dans les réglages pour prendre une photo.",
+    "unsupportedFormat": "Format non pris en charge : choisissez une photo JPG, PNG ou WebP.",
+    "tooLarge": "Cette photo dépasse 5 Mo. Choisissez-en une plus légère.",
+    "uploadFailed": "L'envoi de la photo a échoué. Réessayez.",
+    "removeFailed": "Impossible de supprimer la photo pour le moment. Réessayez."
   }
 }

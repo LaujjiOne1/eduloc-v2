@@ -68,7 +68,27 @@
     "viewAllAppointments": "View all appointments",
     "openTheFullCalendar": "Open the full calendar",
     "seeAllRequests": "See all requests",
-    "viewSRequest": "View {{firstName}}'s request"
+    "viewSRequest": "View {{firstName}}'s request",
+    "statusVisible": "Profile visible",
+    "statusInReview": "Under review",
+    "statusHidden": "Profile hidden",
+    "statusRestricted": "Restricted account",
+    "readyTitle": "Ready to welcome students?",
+    "readyBody": "Add your free slots to show up in searches near you.",
+    "readyCta": "Add my slots",
+    "requestsWaiting_one": "{{count}} pending request",
+    "requestsWaiting_other": "{{count}} pending requests",
+    "noRequestsTitle": "No requests",
+    "boostProfile": "Boost my profile",
+    "nextLesson": "Next lesson",
+    "noNextLesson": "No upcoming lesson",
+    "todayAt": "Today at {{time}}",
+    "tomorrowAt": "Tomorrow at {{time}}",
+    "myStudents": "My students",
+    "shareProfile": "Share my profile",
+    "shareMessage": "Find me on edUloc for tutoring: {{link}}",
+    "openStudent": "View {{name}}'s appointment",
+    "shortcuts": "Shortcuts"
   },
   "manageOffer": {
     "otherDurationsOffered": "Other durations offered",
@@ -183,5 +203,8 @@
   "appointmentConversation": {
     "forNameConfirmed": "For {{name}} • appointment confirmed",
     "forNamePending": "For {{name}} • awaiting confirmation"
+  },
+  "timetable": {
+    "pendingHint": "{{name}} is waiting for your answer. Accept or decline the request."
   }
 }

@@ -14,6 +14,7 @@ import lib from "./lib.json";
 import map from "./map.json";
 import partner from "./partner.json";
 import partnerDashboard from "./partnerDashboard.json";
+import payment from "./payment.json";
 import realtime from "./realtime.json";
 import results from "./results.json";
 import screens from "./screens.json";
@@ -39,6 +40,7 @@ export const en: DeepString<typeof fr> = {
   map,
   partner,
   partnerDashboard,
+  payment,
   realtime,
   results,
   screens,

@@ -57,5 +57,8 @@
     "regular": "Tsy tapaka",
     "intensive": "Mafy",
     "atTheBeneficiarySHome": "Any an-tranon'ny mpandray soa"
+  },
+  "paymentservice": {
+    "invalidCheckoutUrl": "Adiresy fandoavam-bola diso."
   }
 }

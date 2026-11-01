@@ -70,7 +70,7 @@ export function TutorOfferScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorOffer.yourRates")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorOffer.yourRates")}</Text>
           <Text className="mb-4 text-[13.5px] text-ink-soft">
             {t("tutorOnboarding.tutorOffer.setAnHourlyPriceFor")}</Text>
         </FadeIn>
@@ -121,9 +121,9 @@ function SkillOfferCard({ skill, onRemove }: { skill: TutorSkill; onRemove: () =
   };
 
   return (
-    <View className="rounded-xl border border-line bg-surface p-4">
+    <View className="rounded-xl border border-line bg-surface shadow-card p-4">
       <Text className="text-[12px] font-semibold uppercase tracking-[0.03em] text-ink-faint">{t("common.subject")}</Text>
-      <Text className="mb-[6px] text-[18px] font-bold text-ink">{skill.label}</Text>
+      <Text className="mb-[6px] text-[18px] font-bold font-display text-ink">{skill.label}</Text>
       <Text className="mb-3 text-[13px] text-ink-soft">
         {selectedLabels.length > 0 ? t("tutorOnboarding.tutorOffer.selectedLevels", { join: selectedLabels.join(", ") }) : t("tutorOnboarding.tutorOffer.noLevelSelected")}
       </Text>

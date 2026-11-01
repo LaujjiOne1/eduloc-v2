@@ -6,6 +6,7 @@ import { SearchIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { RadioCard } from "@/components/ui/selectable-card";
+import { TrackTile } from "@/components/ui/track-tile";
 import type { TracksState } from "@/hooks/use-tracks";
 import type { AcademicTrack } from "@/types/track";
 
@@ -101,13 +102,24 @@ export function TrackStep({ state, kind, selectedId, onRetry, onSelect }: TrackS
                   {group.title}
                 </Text>
               ) : null}
-              <View className="gap-[8px]">
-                {group.items.map((track, index) => (
-                  <FadeIn key={track.id} delay={Math.min(index, 8) * 25}>
-                    <RadioCard label={track.label} selected={track.id === selectedId} onPress={() => onSelect(track)} />
-                  </FadeIn>
-                ))}
-              </View>
+              {grouped ? (
+                // Séries du lycée : des tuiles à icône, deux par ligne, plutôt qu'une liste uniforme.
+                <View className="flex-row flex-wrap justify-between gap-y-[10px]">
+                  {group.items.map((track, index) => (
+                    <FadeIn key={track.id} delay={Math.min(index, 8) * 25} style={{ width: "48.5%" }}>
+                      <TrackTile track={track} selected={track.id === selectedId} onPress={() => onSelect(track)} />
+                    </FadeIn>
+                  ))}
+                </View>
+              ) : (
+                <View className="gap-[8px]">
+                  {group.items.map((track, index) => (
+                    <FadeIn key={track.id} delay={Math.min(index, 8) * 25}>
+                      <RadioCard label={track.label} selected={track.id === selectedId} onPress={() => onSelect(track)} />
+                    </FadeIn>
+                  ))}
+                </View>
+              )}
             </View>
           ))}
         </View>

@@ -6,7 +6,8 @@
     "personalInformationComingSoon": "Informations personnelles (bientôt disponible)",
     "myStudyVenuesPartner": "Mes lieux d'étude (partenaire)",
     "manageMyPartnerStudyVenues": "Gérer mes lieux d'étude partenaires",
-    "switchModeLabel": "Mode {{value}} — changer de mode"
+    "switchModeLabel": "Mode {{value}} — changer de mode",
+    "learningSpace": "Espace d'apprentissage"
   },
   "forgotPassword": {
     "enterYourAccountEmailWe": "Indiquez l'e-mail de votre compte : nous vous envoyons un code à 6 chiffres.",
@@ -26,6 +27,7 @@
     "location": "Localisation",
     "popularSearches": "Recherches populaires",
     "doYouTeach": "Vous enseignez ?",
+    "becomeATutor": "Devenir tuteur",
     "becomeAVerifiedTutorOn": "Devenez tuteur validé sur EduLoc",
     "noPopularSearchesAtThe": "Aucune recherche populaire pour le moment.",
     "search": "Rechercher",
@@ -50,7 +52,27 @@
     "serviceRoomsTitle": "Lieux d'étude",
     "serviceRoomsDescription": "Réservez une salle partenaire pour vos cours en présentiel.",
     "serviceVerifiedTitle": "Tuteurs validés",
-    "serviceVerifiedDescription": "Les profils sont validés par EduLoc avant d'apparaître dans les résultats."
+    "serviceVerifiedDescription": "Les profils sont validés par EduLoc avant d'apparaître dans les résultats.",
+    "heroTitle": "Trouvez le bon tuteur près de chez vous",
+    "tutorsToDiscover": "Tuteurs à découvrir",
+    "carouselHint": "Faites glisser les cartes pour découvrir edUloc",
+    "carouselPrevious": "Carte précédente",
+    "carouselNext": "Carte suivante",
+    "alreadyHaveAnAccount": "Déjà un compte ?",
+    "carouselEyebrow": "Découvrez l'expérience",
+    "carouselTitle": "Tout pour réussir vos cours",
+    "carouselSubtitle": "Des tuteurs qualifiés, près de chez vous ou en ligne.",
+    "badgeSupport": "Accompagnement",
+    "badgeSecurity": "Sécurité",
+    "badgeFlexibility": "Flexibilité",
+    "badgeTeachers": "Enseignants",
+    "searchCta": "Chercher",
+    "headlinePrefix": "Trouvez le bon tuteur",
+    "headlineNear": "près de chez vous",
+    "headlineOnline": "en visio, où que vous soyez",
+    "headlineRooms": "dans une salle d'étude",
+    "headlineVerified": "validé et de confiance",
+    "headlineLevels": "du primaire au doctorat"
   },
   "login": {
     "signInToContinue": "Connectez-vous pour continuer",
@@ -62,7 +84,32 @@
     "signInOrCreateAn": "Connectez-vous ou créez un compte : vous arriverez directement sur l'espace Lieux partenaires.",
     "continueWithGoogle": "Continuer avec Google",
     "signingIn": "Connexion...",
-    "continueWithApple": "Continuer avec Apple"
+    "continueWithApple": "Continuer avec Apple",
+    "accountsOnDevice": "Comptes sur cet appareil",
+    "rememberMe": "Rester connecté",
+    "forgetAccount": "Oublier {{email}} sur cet appareil",
+    "quickSignIn": "Reconnexion rapide",
+    "unlockReason": "Déverrouillez pour vous connecter à EduLoc",
+    "savedPasswordNoLongerValid": "Le mot de passe enregistré n'est plus valide. Saisissez-le de nouveau.",
+    "savePassword": "Enregistrer mon mot de passe",
+    "savePasswordHint": "Chiffré sur cet appareil et déverrouillé par votre empreinte, votre visage ou le code de l'appareil.",
+    "continueWithFacebook": "Continuer avec Facebook"
+  },
+  "signOutPrompt": {
+    "title": "Se déconnecter ?",
+    "intro": "Que faire de votre compte sur cet appareil ?",
+    "keepTitle": "Garder mon compte sur cet appareil",
+    "keepHint": "Votre e-mail sera proposé à la prochaine connexion, pour vous reconnecter plus vite.",
+    "forgetTitle": "Oublier ce compte sur cet appareil",
+    "forgetHint": "Votre e-mail ne sera plus proposé. Idéal si l'appareil est partagé ou prêté.",
+    "passwordTip": "EduLoc ne conserve jamais votre mot de passe. Pour le retrouver sans le retaper, laissez le gestionnaire de mots de passe de votre téléphone l'enregistrer quand il vous le propose à la connexion.",
+    "oneTapTitle": "Me reconnecter d'un toucher",
+    "oneTapHint": "Sans retaper le mot de passe : empreinte, visage ou code de l'appareil.",
+    "keepPasswordTitle": "Garder mon mot de passe enregistré",
+    "keepPasswordHint": "Décochez pour le supprimer de cet appareil.",
+    "vaultTip": "Vos secrets sont chiffrés sur cet appareil et ne s'ouvrent qu'après déverrouillage. « Oublier ce compte » les supprime et ferme la session.",
+    "vaultTipNoPassword": "Pour enregistrer aussi votre mot de passe, cochez « Enregistrer mon mot de passe » à la prochaine connexion.",
+    "confirm": "Se déconnecter"
   },
   "modeChoice": {
     "howWouldYouLikeTo": "Comment souhaitez-vous utiliser EduLoc ?",
@@ -95,6 +142,22 @@
   "splash": {
     "theRightSupportInThe": "Le bon accompagnement, au bon endroit.",
     "continueToTheEdulocHome": "Continuer vers l'accueil edUloc",
-    "tapToContinue": "Touchez pour continuer"
+    "tapToContinue": "Touchez pour continuer",
+    "start": "Ouvrir"
+  },
+  "switchAccount": {
+    "title": "Changer de compte",
+    "intro": "Passez d'un compte à l'autre sans vous déconnecter. Les comptes gardés se rouvrent d'un toucher, après déverrouillage de l'appareil.",
+    "active": "Compte actif",
+    "passwordRequired": "Mot de passe requis",
+    "needsPassword": "Ce compte demande son mot de passe. Utilisez « Ajouter un compte » pour vous y connecter.",
+    "cannotKeepCurrent": "Impossible de garder le compte actuel en sécurité : le changement est annulé et vous restez connecté.",
+    "addAccount": "Ajouter un compte",
+    "lockRequired": "Pour changer de compte sans vous déconnecter, activez un verrouillage sur cet appareil (empreinte, visage ou code). Sans cela, rien ne peut être gardé en sécurité.",
+    "revokeAllTitle": "Révoquer toutes les connexions rapides",
+    "revokeAllBody": "Les connexions gardées et les mots de passe enregistrés sur cet appareil seront supprimés et révoqués. Les comptes resteront dans la liste, mais il faudra saisir le mot de passe.",
+    "revokeAllConfirm": "Tout révoquer",
+    "revokedCount_one": "{{count}} connexion rapide révoquée.",
+    "revokedCount_other": "{{count}} connexions rapides révoquées."
   }
 }

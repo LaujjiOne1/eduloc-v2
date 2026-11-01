@@ -69,7 +69,7 @@ export function AddBeneficiaryScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={30}>
-          <Text className="mb-5 text-[24px] font-bold text-ink">{t("common.addABeneficiary")}</Text>
+          <Text className="mb-5 text-[24px] font-bold font-display text-ink">{t("common.addABeneficiary")}</Text>
         </FadeIn>
 
         <FadeIn delay={70}>

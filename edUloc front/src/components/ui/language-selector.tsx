@@ -52,7 +52,7 @@ export function LanguageSelector({ variant = "pill" }: LanguageSelectorProps) {
             <View className="rounded-t-2xl bg-surface p-5" style={{ paddingBottom: Math.max(insets.bottom, 24) }}>
               <View className="mb-4 flex-row items-center justify-between border-b border-line-soft pb-3">
                 <View className="flex-1 pr-3">
-                  <Text className="text-[17px] font-bold text-ink">{t("ui.languageSelector.language")}</Text>
+                  <Text className="text-[17px] font-bold font-display text-ink">{t("ui.languageSelector.language")}</Text>
                   <Text className="text-[12px] text-ink-soft">{t("ui.languageSelector.chooseTheAppLanguage")}</Text>
                 </View>
                 <PressableScale onPress={() => setOpen(false)} accessibilityLabel={t("ui.languageSelector.close")}>

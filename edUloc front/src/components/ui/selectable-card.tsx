@@ -42,7 +42,7 @@ export function MenuCard({
 }: MenuCardProps) {
   return (
     <PressableScale onPress={onPress} disabled={disabled} accessibilityLabel={accessibilityLabel ?? title}>
-      <View className="flex-row items-center gap-3 rounded-lg border border-line bg-surface p-4">
+      <View className="flex-row items-center gap-3 rounded-lg border border-line bg-surface shadow-card p-4">
         <View
           className={["items-center justify-center", SIZE_CLASSES[iconSize], TONE_CLASSES[iconTone]].join(" ")}
         >
@@ -100,7 +100,7 @@ export function RadioCard({
         ) : (
           <View
             className="h-5 w-5 rounded-full"
-            style={{ borderWidth: selected ? 6 : 2, borderColor: selected ? "#332E86" : "#e6e7ee" }}
+            style={{ borderWidth: selected ? 6 : 2, borderColor: selected ? "#332E86" : "#e2e8f0" }}
           />
         )}
       </View>

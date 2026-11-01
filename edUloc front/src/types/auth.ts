@@ -4,6 +4,8 @@ export interface AuthenticatedUser {
   lastName: string;
   email: string;
   phone?: string | null;
+  /** Photo de profil (URL publique stable) ; null tant que l'utilisateur n'en a pas enregistré. */
+  avatarUrl?: string | null;
   emailVerified: boolean; // [v1+]
   status: "active" | "suspended" | "pending_verification"; // [v1+]
   /** [v1+] Bénéficiaire SELF — remplace CURRENT_BENEFICIARY_ID */
@@ -40,7 +42,8 @@ export interface SignupPayload {
   phone?: string;
 }
 
-export type OAuthProvider = "google" | "apple";
+/** Connexion sociale : le serveur vérifie lui-même le jeton du fournisseur (POST /auth/oauth/exchange). */
+export type OAuthProvider = "google" | "apple" | "facebook";
 
 export type AuthErrorCode =
   | "invalid_credentials"

@@ -67,7 +67,7 @@ export function SessionInProgressPresentialScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 pb-[14px] pt-5">
-        <Text className="text-[21px] font-bold text-ink">
+        <Text className="text-[21px] font-bold font-display text-ink">
           Edu<Text className="text-primary">Loc</Text>
         </Text>
       </View>
@@ -76,7 +76,7 @@ export function SessionInProgressPresentialScreen() {
         <View className="mb-5 h-16 w-16 items-center justify-center rounded-full bg-primary-tint">
           <TeachIcon size={28} color="#332E86" />
         </View>
-        <Text className="mb-[6px] text-[20px] font-bold text-ink">{t("tutorDashboard.sessionInProgressPresential.inPersonLesson")}</Text>
+        <Text className="mb-[6px] text-[20px] font-bold font-display text-ink">{t("tutorDashboard.sessionInProgressPresential.inPersonLesson")}</Text>
         <Text className="mb-1 text-[14px] text-ink-soft">{booking.offer.subjectLabel}</Text>
         <Text className="mb-5 text-[13px] text-ink-faint">{booking.beneficiary.firstName}</Text>
         <View className="mb-2">

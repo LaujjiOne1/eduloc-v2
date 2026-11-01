@@ -113,13 +113,13 @@ export function WeekStrip({ firstMonday, weekCount, weekIndex, onWeekChange, sel
 
   return (
     <View
-      className={["rounded-xl border border-line bg-surface p-3.5", locked ? "opacity-50" : ""].join(" ")}
+      className={["rounded-xl border border-line bg-surface shadow-card p-3.5", locked ? "opacity-50" : ""].join(" ")}
       pointerEvents={locked ? "none" : "auto"}
       accessibilityState={{ disabled: locked }}
     >
       <View className="mb-3 flex-row items-center justify-between">
         <View className="flex-1 pr-2">
-          <Text className="text-[17px] font-bold text-ink">{weekMonthLabel(monday)}</Text>
+          <Text className="text-[17px] font-bold font-display text-ink">{weekMonthLabel(monday)}</Text>
           <Text className="mt-0.5 text-[12px] text-ink-soft">
             {t("ui.weekStrip.weekOf", { range: weekRangeLabel(monday) })}
             {weekIndex === 0 ? t("ui.weekStrip.thisWeek") : ""}

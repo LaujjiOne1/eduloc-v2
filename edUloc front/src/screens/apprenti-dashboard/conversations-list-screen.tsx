@@ -13,8 +13,6 @@ export function ConversationsListScreen() {
   const { t } = useTranslation();
   return (
     <ConversationsListView
-      tone="primary"
-      subtitle={t("apprentiDashboard.conversationsList.exchangeVoiceMessagesAndDocuments")}
       emptyTitle={t("apprentiDashboard.conversationsList.noActiveConversations")}
       emptyBody={t("apprentiDashboard.conversationsList.bookATutorOrSend")}
       emptyAction={{ label: t("common.findATutor"), route: "/search" as Href }}

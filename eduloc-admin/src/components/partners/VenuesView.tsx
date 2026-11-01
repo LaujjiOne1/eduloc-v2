@@ -36,12 +36,12 @@ export const VenuesView: React.FC<{ refreshKey: number; onChanged: () => void; o
             {venues.data.map((v) => {
               const st = venueStatus(v.status);
               return (
-                <tr key={v.id} className="hover:bg-white/5 cursor-pointer" onClick={() => setSelectedId(v.id)}>
-                  <td className="px-4 py-3.5"><p className="font-bold text-white">{v.name}</p><p className="text-[11px] text-slate-400">{venueType(v.type)}</p></td>
-                  <td className="px-4 py-3.5">{fullName(v.manager)}<span className="block text-[11px] font-mono text-slate-400">{v.manager.email}</span></td>
+                <tr key={v.id} className="hover:bg-paper-alt cursor-pointer" onClick={() => setSelectedId(v.id)}>
+                  <td className="px-4 py-3.5"><p className="font-bold text-ink">{v.name}</p><p className="text-[11px] text-ink-soft">{venueType(v.type)}</p></td>
+                  <td className="px-4 py-3.5">{fullName(v.manager)}<span className="block text-[11px] font-mono text-ink-soft">{v.manager.email}</span></td>
                   <td className="px-4 py-3.5">{v.roomsCount}</td>
                   <td className="px-4 py-3.5">{v.documentsCount}</td>
-                  <td className="px-4 py-3.5 text-slate-400">{formatDate(v.submittedAt)}</td>
+                  <td className="px-4 py-3.5 text-ink-soft">{formatDate(v.submittedAt)}</td>
                   <td className="px-4 py-3.5"><Badge tone={st.tone}>{st.label}</Badge></td>
                 </tr>
               );
@@ -84,11 +84,11 @@ const VenueDrawer: React.FC<{ id: string; onClose: () => void; onChanged: () => 
       onClose={onClose}
       subtitle={<><Badge tone={st.tone}>{st.label}</Badge><span>{venueType(v.type)}</span><span>· soumise le {formatDate(v.submittedAt)}</span></>}
     >
-      {v.reviewNote && <div className="p-3 rounded-xl bg-white/5 border border-white/10 text-sm text-slate-300"><strong>Dernière note :</strong> {v.reviewNote}</div>}
+      {v.reviewNote && <div className="p-3 rounded-xl bg-paper border border-line text-sm text-ink-soft"><strong>Dernière note :</strong> {v.reviewNote}</div>}
 
       <Section title="Décision">
         {v.status === 'UNDER_REVIEW' || v.status === 'SUBMITTED' ? (
-          missingFiscal && <p className="mb-3 text-xs text-amber-300">NIF et STAT obligatoires pour valider la structure comme « Partenaire vérifié » : demandez-les avant de valider.</p>
+          missingFiscal && <p className="mb-3 text-xs text-warning">NIF et STAT obligatoires pour valider la structure comme « Partenaire vérifié » : demandez-les avant de valider.</p>
         ) : null}
         <DecisionBar
           actions={VENUE_ACTIONS[v.status] ?? []}
@@ -110,31 +110,31 @@ const VenueDrawer: React.FC<{ id: string; onClose: () => void; onChanged: () => 
         <Row label="Téléphone">{v.contactPhone}</Row>
         <Row label="E-mail">{v.contactEmail}</Row>
         <Row label="Gestionnaire">{fullName(v.manager)} · {v.manager.email}{v.manager.phone ? ` · ${v.manager.phone}` : ''}</Row>
-        {v.description && <p className="mt-3 text-sm text-slate-300 whitespace-pre-line">{v.description}</p>}
+        {v.description && <p className="mt-3 text-sm text-ink-soft whitespace-pre-line">{v.description}</p>}
       </Section>
 
       <Section title={`Justificatifs (${v.documents.length})`}>
-        {v.documents.length === 0 ? <p className="text-sm text-slate-400">Aucun justificatif.</p> : (
+        {v.documents.length === 0 ? <p className="text-sm text-ink-soft">Aucun justificatif.</p> : (
           <ul className="space-y-2">
             {v.documents.map((d) => (
-              <li key={d.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/5 border border-white/10 text-sm">
-                <span className="min-w-0 truncate">{venueDocumentType(d.type)} <span className="text-xs text-slate-400">· {d.fileName ?? d.mimeType} · {formatDate(d.uploadedAt)}</span></span>
-                <a href={d.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-indigo-300 hover:text-indigo-200 shrink-0">
+              <li key={d.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-paper border border-line text-sm">
+                <span className="min-w-0 truncate">{venueDocumentType(d.type)} <span className="text-xs text-ink-soft">· {d.fileName ?? d.mimeType} · {formatDate(d.uploadedAt)}</span></span>
+                <a href={d.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs font-semibold text-brand hover:text-brand shrink-0">
                   Ouvrir <ExternalLink className="w-3.5 h-3.5" />
                 </a>
               </li>
             ))}
           </ul>
         )}
-        <p className="mt-2 text-[11px] text-slate-400">Liens temporaires (10 min) : rechargez la fiche s’ils expirent.</p>
+        <p className="mt-2 text-[11px] text-ink-soft">Liens temporaires (10 min) : rechargez la fiche s’ils expirent.</p>
       </Section>
 
       <Section title="Offre commerciale">
         <div className="flex flex-wrap items-center gap-2 mb-2">
           <Badge tone={sub.tone}>{sub.label}</Badge>
-          {v.subscription.plan && <span className="text-sm text-slate-200">{v.subscription.plan.name} · {formatMoney(v.subscription.plan.price.amount, v.subscription.plan.price.currency)} / {v.subscription.plan.durationDays} j</span>}
+          {v.subscription.plan && <span className="text-sm text-ink">{v.subscription.plan.name} · {formatMoney(v.subscription.plan.price.amount, v.subscription.plan.price.currency)} / {v.subscription.plan.durationDays} j</span>}
         </div>
-        {v.subscription.endsAt && <p className="text-xs text-slate-400 mb-2">Du {formatDate(v.subscription.startsAt)} au {formatDate(v.subscription.endsAt)}</p>}
+        {v.subscription.endsAt && <p className="text-xs text-ink-soft mb-2">Du {formatDate(v.subscription.startsAt)} au {formatDate(v.subscription.endsAt)}</p>}
         <div className="flex gap-2">
           {v.subscription.status === 'PENDING' && (
             <Btn small tone="success" disabled={busy} onClick={async () => { if (await run(() => adminApi.activateSubscription(v.id), 'Offre activée.')) { detail.reload(); onChanged(); } }}>
@@ -145,15 +145,15 @@ const VenueDrawer: React.FC<{ id: string; onClose: () => void; onChanged: () => 
             <Btn small tone="danger" disabled={busy} onClick={() => setCancelling(true)}>Annuler l’offre</Btn>
           )}
         </div>
-        {v.subscription.status === 'PENDING' && <p className="mt-2 text-[11px] text-slate-400">Pas de paiement en ligne : vous activez l’offre après réception du paiement.</p>}
+        {v.subscription.status === 'PENDING' && <p className="mt-2 text-[11px] text-ink-soft">Pas de paiement en ligne : vous activez l’offre après réception du paiement.</p>}
       </Section>
 
       <Section title={`Salles (${v.rooms.length})`}>
-        {v.rooms.length === 0 ? <p className="text-sm text-slate-400">Aucune salle.</p> : (
+        {v.rooms.length === 0 ? <p className="text-sm text-ink-soft">Aucune salle.</p> : (
           <ul className="space-y-2">
             {v.rooms.map((r) => (
-              <li key={r.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-white/5 border border-white/10 text-sm">
-                <span className="font-semibold text-white truncate">{r.name}</span>
+              <li key={r.id} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-paper border border-line text-sm">
+                <span className="font-semibold text-ink truncate">{r.name}</span>
                 <span className="flex items-center gap-2 shrink-0">
                   <Badge tone={roomStatusLabel(r.status).tone}>{roomStatusLabel(r.status).label}</Badge>
                   <Badge tone={publicationLabel(r.publication).tone}>{publicationLabel(r.publication).label}</Badge>

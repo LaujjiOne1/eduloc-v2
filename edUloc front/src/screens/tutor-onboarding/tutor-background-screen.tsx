@@ -198,7 +198,7 @@ export function TutorBackgroundScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{tr("tutorOnboarding.tutorBackground.whatIsYourBackground")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{tr("tutorOnboarding.tutorBackground.whatIsYourBackground")}</Text>
           <Text className="mb-6 text-[13.5px] text-ink-soft">
             {tr("tutorOnboarding.tutorBackground.enterYourEducationThenYour")}</Text>
         </FadeIn>
@@ -352,7 +352,7 @@ export function TutorBackgroundScreen() {
           >
             <View className="mb-4 flex-row items-center justify-between border-b border-line-soft pb-3">
               <View>
-                <Text className="text-[17px] font-bold text-ink">
+                <Text className="text-[17px] font-bold font-display text-ink">
                   {editingId ? tr("tutorOnboarding.tutorBackground.editTheExperience") : tr("tutorOnboarding.tutorBackground.addAnExperience")}
                 </Text>
                 <Text className="text-[12px] text-ink-soft">
@@ -541,14 +541,14 @@ function ExperienceCard({
           <PressableScale
             onPress={onEdit}
             accessibilityLabel={tr("common.edit2", { title: exp.title })}
-            className="h-7 w-7 items-center justify-center rounded-lg border border-line bg-surface"
+            className="h-7 w-7 items-center justify-center rounded-lg border border-line bg-surface shadow-card"
           >
             <PencilIcon size={13} color="#332E86" />
           </PressableScale>
           <PressableScale
             onPress={onRemove}
             accessibilityLabel={tr("tutorOnboarding.tutorBackground.delete", { title: exp.title })}
-            className="h-7 w-7 items-center justify-center rounded-lg border border-line bg-surface"
+            className="h-7 w-7 items-center justify-center rounded-lg border border-line bg-surface shadow-card"
           >
             <TrashIcon size={13} color="#AC4A40" />
           </PressableScale>

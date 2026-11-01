@@ -1,0 +1,68 @@
+# Odoo 19 Community + PostgreSQL pour le CRM EduLoc (cahier "odoo integration.md").
+#
+#   cp .env.example .env   # puis remplacer tous les mots de passe
+#   docker compose up -d                    # Odoo + PostgreSQL (dev / derrière un proxy existant)
+#   docker compose --profile prod up -d     # + Nginx (HTTPS) pour un VPS
+#
+# PostgreSQL n'est jamais publié sur l'hôte. Odoo n'est publié que sur 127.0.0.1 :
+# l'accès externe passe obligatoirement par Nginx + HTTPS.
+
+services:
+  db:
+    image: postgres:16
+    container_name: eduloc_odoo_db
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: odoo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?définir POSTGRES_PASSWORD dans .env}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U odoo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: always
+
+  odoo:
+    image: odoo:19.0
+    container_name: eduloc_odoo_web
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:${ODOO_HTTP_PORT:-8069}:8069"
+    environment:
+      HOST: db
+      USER: odoo
+      PASSWORD: ${POSTGRES_PASSWORD:?définir POSTGRES_PASSWORD dans .env}
+      # Secret partagé avec la passerelle Supabase (fonction odoo-sync). Jamais dans le dépôt.
+      EDULOC_API_TOKEN: ${EDULOC_API_TOKEN:?définir EDULOC_API_TOKEN dans .env}
+      # Secret du service de paiement (eduloc-pay-subscriptions) pour /eduloc/api/v1/payments. Distinct du précédent.
+      # Vide : l'endpoint des paiements répond 503 (module eduloc_payments inactif), rien d'autre ne change.
+      EDULOC_PAYMENTS_TOKEN: ${EDULOC_PAYMENTS_TOKEN:-}
+    volumes:
+      - odoo-data:/var/lib/odoo
+      - ./addons:/mnt/extra-addons:ro
+      - ./config:/etc/odoo
+    restart: always
+
+  nginx:
+    profiles: ["prod"]
+    image: nginx:1.27-alpine
+    container_name: eduloc_odoo_nginx
+    depends_on:
+      - odoo
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      ODOO_DOMAIN: ${ODOO_DOMAIN:?définir ODOO_DOMAIN dans .env}
+    volumes:
+      - ./nginx/odoo.conf.template:/etc/nginx/templates/odoo.conf.template:ro
+      - ${LETSENCRYPT_DIR:-./certs}:/etc/letsencrypt:ro
+    restart: always
+
+volumes:
+  db-data:
+  odoo-data:

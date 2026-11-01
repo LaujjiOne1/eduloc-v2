@@ -28,7 +28,7 @@ export function RequestConflictScreen() {
         <View className="mb-[22px] mt-3 h-[72px] w-[72px] items-center justify-center rounded-full bg-error-tint">
           <AlertTriangleIcon size={32} color="#AC4A40" />
         </View>
-        <Text className="mb-[10px] text-center text-[21px] font-bold text-ink">{t("tutorDashboard.requestConflict.unableToAccept")}</Text>
+        <Text className="mb-[10px] text-center text-[21px] font-bold font-display text-ink">{t("tutorDashboard.requestConflict.unableToAccept")}</Text>
         <Text className="mb-2 text-center text-[14.5px] leading-[22px] text-ink-soft">
           {t("tutorDashboard.requestConflict.thisSlotIsNoLonger")}</Text>
         <Text className="mb-6 text-center text-[13px] leading-[20px] text-ink-faint">

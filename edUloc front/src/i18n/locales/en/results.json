@@ -11,7 +11,19 @@
     "noTutorToShowOn": "No tutor to show on the map.",
     "km": "{{label}}, {{distanceKm}} km",
     "tryLoadingTheTutorsAgain": "Try loading the tutors again",
-    "searching": "Searching for tutors…"
+    "searching": "Searching for tutors…",
+    "noTutorTitle": "No tutor found nearby?",
+    "noTutorHint": "Try another level or subject, or look for an online lesson.",
+    "changeSearch": "Change my search",
+    "newTutor": "New tutor",
+    "book": "Book",
+    "onlineAndInPerson": "Online & in person",
+    "viewDetails": "View details",
+    "fullProfile": "View full profile",
+    "previous": "Previous tutor",
+    "next": "Next tutor",
+    "carouselHint": "Swipe to browse tutors",
+    "carouselPosition": "{{current}} of {{total}}"
   },
   "tutorProfile": {
     "verifiedTutor": "Verified tutor",

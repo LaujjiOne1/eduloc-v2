@@ -11,7 +11,19 @@
     "noTutorToShowOn": "Tsy misy mpampianatra aseho eo amin'ny sari-tany.",
     "km": "{{label}}, {{distanceKm}} km",
     "tryLoadingTheTutorsAgain": "Andramo indray ny fandraisana ireo mpampianatra",
-    "searching": "Mitady mpampianatra…"
+    "searching": "Mitady mpampianatra…",
+    "noTutorTitle": "Tsy nisy mpampianatra hita eo akaiky?",
+    "noTutorHint": "Andramo ny haingon-kevitra hafa na taranja hafa, na ny lesona an-tserasera.",
+    "changeSearch": "Hanova ny fikarohako",
+    "newTutor": "Mpampianatra vaovao",
+    "book": "Mandray fotoana",
+    "onlineAndInPerson": "An-tserasera & mivantana",
+    "viewDetails": "Hijery ny antsipiriany",
+    "fullProfile": "Hijery ny mombamomba feno",
+    "previous": "Mpampianatra teo aloha",
+    "next": "Mpampianatra manaraka",
+    "carouselHint": "Tsipiho hijery ny mpampianatra",
+    "carouselPosition": "{{current}} amin'ny {{total}}"
   },
   "tutorProfile": {
     "verifiedTutor": "Mpampianatra voamarina",

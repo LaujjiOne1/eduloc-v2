@@ -111,7 +111,7 @@ export function BirthDateSelectModal({
               <View className="flex-1 pr-3">
                 <Text className="text-[12px] font-semibold uppercase tracking-[0.04em] text-ink-soft">
                   {t("common.dateOfBirth")}</Text>
-                <Text className="mt-0.5 text-[19px] font-bold text-ink">{formatBirthDate(date)}</Text>
+                <Text className="mt-0.5 text-[19px] font-bold font-display text-ink">{formatBirthDate(date)}</Text>
               </View>
               <View className={["rounded-full border px-3 py-1", tooYoung ? "border-error bg-error-tint" : "border-primary/20 bg-primary-tint"].join(" ")}>
                 <Text className={["text-[12.5px] font-bold", tooYoung ? "text-error" : "text-primary"].join(" ")}>

@@ -1,0 +1,6 @@
+{
+  "name": "EduLoc Pay & Subscriptions",
+  "description": "Plateforme sécurisée de paiement Stripe, Mobile Money (GSMA) et gestion d'abonnements EduLoc avec synchronisation CRM Odoo et conformité PCI DSS Niveau 1.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

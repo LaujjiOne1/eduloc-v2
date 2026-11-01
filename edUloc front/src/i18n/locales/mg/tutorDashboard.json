@@ -68,7 +68,27 @@
     "viewAllAppointments": "Jereo ireo fihaonana rehetra",
     "openTheFullCalendar": "Sokafy ny kalandrie feno",
     "seeAllRequests": "Jereo ireo fangatahana rehetra",
-    "viewSRequest": "Jereo ny fangatahan'i {{firstName}}"
+    "viewSRequest": "Jereo ny fangatahan'i {{firstName}}",
+    "statusVisible": "Hita ny mombamomba",
+    "statusInReview": "Eo am-pandinihana",
+    "statusHidden": "Miafina ny mombamomba",
+    "statusRestricted": "Voafetra ny kaonty",
+    "readyTitle": "Vonona handray mpianatra ve ianao?",
+    "readyBody": "Ampio ny fotoana malalaka mba hiseho amin'ny fikarohana eo akaikinao.",
+    "readyCta": "Hanampy fotoana",
+    "requestsWaiting_one": "{{count}} fangatahana miandry",
+    "requestsWaiting_other": "{{count}} fangatahana miandry",
+    "noRequestsTitle": "Tsy misy fangatahana",
+    "boostProfile": "Hanatanjaka ny mombamomba",
+    "nextLesson": "Lesona manaraka",
+    "noNextLesson": "Tsy misy lesona ho avy",
+    "todayAt": "Anio amin'ny {{time}}",
+    "tomorrowAt": "Rahampitso amin'ny {{time}}",
+    "myStudents": "Ireo mpianatra ahy",
+    "shareProfile": "Hizara ny mombamomba",
+    "shareMessage": "Hitanao ao amin'ny edUloc aho ho an'ny lesona: {{link}}",
+    "openStudent": "Hijery ny fihaonana amin'i {{name}}",
+    "shortcuts": "Lalana fohy"
   },
   "manageOffer": {
     "otherDurationsOffered": "Faharetana hafa atolotra",
@@ -183,5 +203,8 @@
   "appointmentConversation": {
     "forNameConfirmed": "Ho an'i {{name}} • voamafy ny fihaonana",
     "forNamePending": "Ho an'i {{name}} • miandry fanamafisana"
+  },
+  "timetable": {
+    "pendingHint": "Miandry ny valinteninao i {{name}}. Ekeo na lavo ny fangatahana."
   }
 }

@@ -3,15 +3,17 @@ import { useState } from "react";
 import { ActivityIndicator, type LayoutChangeEvent, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { ArrowLeftIcon, ChevronRightIcon, ListIcon, MapIcon, SearchIcon } from "@/components/icons";
+import { ArrowLeftIcon, ListIcon, MapIcon, SearchIcon, SlidersIcon, StarIcon, VerifiedBadgeIcon } from "@/components/icons";
 import { MapLibreResultsMap } from "@/components/map/maplibre-results-map";
 import { FadeIn } from "@/components/motion/fade-in";
+import { EmptyState } from "@/components/ui/empty-state";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { DraggableSheet, type SheetSnap } from "@/components/ui/draggable-sheet";
 import { ResultsLoginGate } from "@/components/ui/results-login-gate";
 import { TutorAvatar } from "@/components/ui/tutor-avatar";
-import { TutorCard } from "@/components/ui/tutor-card";
+import { type Rect, TutorCarousel } from "@/components/ui/tutor-carousel";
+import { TutorDetailOverlay } from "@/components/ui/tutor-detail-overlay";
 import { type TutorsState, useTutorSearch } from "@/hooks/use-tutor-search";
 import { useAuthStore } from "@/store/auth.store";
 import { useSearchWizardStore } from "@/store/search-wizard.store";
@@ -20,6 +22,10 @@ import { useTranslation } from "react-i18next";
 
 function tutorRoute(id: string): Href {
   return `/results/tutor/${id}` as Href;
+}
+
+function offerRoute(id: string): Href {
+  return `/results/offer/${id}` as Href;
 }
 
 /** Hauteur de la barre flottante du haut (retour + résumé de la recherche), sous la zone sûre. */
@@ -47,13 +53,10 @@ export function ResultsScreen() {
   const criteria = useSearchWizardStore((s) => s.criteria);
   const { state, retry, origin, originLabel, locationNotice } = useTutorSearch(criteria);
 
-  // Visiteur non connecté : on annonce « N tuteurs disponibles près de vous », les résultats viennent après connexion.
+  // Visiteur non connecté : le SERVEUR ne lui renvoie que le nombre de tuteurs (état « restricted », seulement s'il y en a) ;
+  // on le lui annonce et on propose de se connecter pour les voir. Sans résultat, il voit l'écran habituel (« aucun tuteur »).
   const pathname = usePathname();
-  const hasHydrated = useAuthStore((s) => s.hasHydrated);
-  const isSignedIn = useAuthStore((s) => s.user !== null);
   const setReturnTo = useAuthStore((s) => s.setReturnTo);
-  const isGuest = hasHydrated && !isSignedIn;
-  const showGate = isGuest && state.status === "success";
   const goAuth = (route: string) => {
     setReturnTo(pathname as Href); // on revient sur les résultats après la connexion
     router.push(route as Href);
@@ -65,23 +68,26 @@ export function ResultsScreen() {
   const snap: SheetSnap = pickedSnap ?? (state.status !== "loading" && !origin ? "full" : "half");
   const [selectedMapTutorId, setSelectedMapTutorId] = useState<string | null>(null);
   const [containerHeight, setContainerHeight] = useState(0);
+  // Tuteur dont les détails sont déployés par-dessus la liste, et la carte d'où ils sont partis.
+  const [expanded, setExpanded] = useState<{ tutor: Tutor; from: Rect | null } | null>(null);
 
   const tutors = state.status === "success" ? state.tutors : [];
   const selectedMapTutor = tutors.find((t) => t.id === selectedMapTutorId) ?? null;
 
-  const breadcrumb = [criteria.subject?.label, criteria.level?.label, originLabel ?? tr("common.online")]
+  // Titre court (la matière) puis sous-titre discret (niveau • lieu) : la ligne ne tronque plus.
+  const summaryTitle = criteria.subject?.label ?? criteria.level?.label ?? "";
+  const summarySubtitle = [criteria.subject ? criteria.level?.label : null, originLabel ?? tr("common.online")]
     .filter(Boolean)
     .join(" • ");
   const count = state.status === "success" ? tr("common.resultCount", { count: state.tutors.length }) : null;
 
-  if (showGate && state.status === "success") {
+  if (state.status === "restricted") {
     return (
       <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
         <AuthHeader onBack={() => router.back()} />
         <ScrollView className="flex-1" contentContainerStyle={{ paddingBottom: Math.max(insets.bottom, 20) }} showsVerticalScrollIndicator={false}>
           <ResultsLoginGate
-            count={state.tutors.length}
-            genders={state.tutors.map((t) => t.gender)}
+            count={state.count}
             onLogin={() => goAuth("/login")}
             onSignup={() => goAuth("/signup")}
           />
@@ -132,11 +138,19 @@ export function ResultsScreen() {
         </PressableScale>
         <View className="flex-1">
           <PressableScale onPress={() => router.back()} accessibilityLabel={tr("search.summary.editACriterion")}>
-            <View className="h-12 flex-row items-center gap-[10px] rounded-full border border-line bg-surface px-4" style={FLOATING_SHADOW}>
-              <SearchIcon size={16} color="#14162B" />
-              <Text className="flex-1 text-[13.5px] font-semibold text-ink" numberOfLines={1}>
-                {breadcrumb}
-              </Text>
+            <View className="h-12 flex-row items-center gap-[10px] rounded-full border border-line-soft bg-surface pl-4 pr-2" style={FLOATING_SHADOW}>
+              <SearchIcon size={16} color="#332E86" />
+              <View className="min-w-0 flex-1">
+                <Text className="text-[14px] font-bold leading-[17px] text-ink" numberOfLines={1}>
+                  {summaryTitle}
+                </Text>
+                <Text className="text-[11.5px] leading-[14px] text-ink-soft" numberOfLines={1}>
+                  {summarySubtitle}
+                </Text>
+              </View>
+              <View className="h-8 w-8 items-center justify-center rounded-full bg-primary-tint">
+                <SlidersIcon size={16} color="#332E86" />
+              </View>
             </View>
           </PressableScale>
         </View>
@@ -170,7 +184,7 @@ export function ResultsScreen() {
             </PressableScale>
           </View>
         ) : null}
-        <TutorList state={state} onRetry={retry} onSelect={(tutor) => router.push(tutorRoute(tutor.id))} />
+        <TutorList state={state} onRetry={retry} onChangeSearch={() => router.back()} onExpand={(tutor, from) => setExpanded({ tutor, from })} />
       </DraggableSheet>
 
       {/* Bouton flottant : « Liste » ouvre la feuille à fond, « Carte » la réduit pour libérer la carte. */}
@@ -180,55 +194,78 @@ export function ResultsScreen() {
           accessibilityLabel={snap === "full" ? tr("results.results.map") : tr("results.results.list")}
         >
           <View
-            className="flex-row items-center gap-2 rounded-full bg-ink px-5 py-3"
-            style={{ shadowColor: "#14162B", shadowOpacity: 0.3, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 8 }}
+            className="flex-row items-center gap-2 rounded-full border border-line-soft bg-surface px-5 py-3"
+            style={{ shadowColor: "#1E1B4B", shadowOpacity: 0.28, shadowRadius: 18, shadowOffset: { width: 0, height: 8 }, elevation: 12 }}
           >
-            {snap === "full" ? <MapIcon size={16} color="#FFFFFF" /> : <ListIcon size={16} color="#FFFFFF" />}
-            <Text className="text-[14px] font-bold text-white">
+            {snap === "full" ? <MapIcon size={16} color="#332E86" /> : <ListIcon size={16} color="#332E86" />}
+            <Text className="text-[14px] font-bold text-ink">
               {snap === "full" ? tr("results.results.map") : tr("results.results.list")}
             </Text>
           </View>
         </PressableScale>
       </View>
+
+      {expanded ? (
+        <TutorDetailOverlay
+          tutor={expanded.tutor}
+          from={expanded.from}
+          onClose={() => setExpanded(null)}
+          onSelectOffer={(offerId) => router.push(offerRoute(offerId))}
+          onOpenProfile={() => router.push(tutorRoute(expanded.tutor.id))}
+        />
+      ) : null}
     </View>
   );
 }
 
 function MapTutorPreview({ tutor, onPress }: { tutor: Tutor; onPress: () => void }) {
   const { t: tr } = useTranslation();
+  const offer = tutor.offers[0];
   return (
     <PressableScale onPress={onPress} accessibilityLabel={`${tutor.firstName} ${tutor.lastName}`}>
       <View
-        className="flex-row items-center gap-3 rounded-2xl border border-line bg-surface p-4"
-        style={{ shadowColor: "#14162B", shadowOpacity: 0.16, shadowRadius: 18, shadowOffset: { width: 0, height: 6 }, elevation: 6 }}
+        className="rounded-3xl border border-line-soft bg-surface p-4"
+        style={{ shadowColor: "#1E1B4B", shadowOpacity: 0.2, shadowRadius: 22, shadowOffset: { width: 0, height: 8 }, elevation: 10 }}
       >
-        <TutorAvatar gender={tutor.gender} photoUrl={tutor.photoUrl} size={52} radius={14} />
-        <View className="flex-1">
-          <View className="flex-row items-center gap-2">
-            <Text className="text-[15px] font-bold text-ink" numberOfLines={1}>
-              {tutor.firstName} {tutor.lastName}
+        <View className="flex-row items-center gap-3">
+          <TutorAvatar gender={tutor.gender} photoUrl={tutor.photoUrl} name={`${tutor.firstName} ${tutor.lastName}`} size={56} radius={16} />
+          <View className="min-w-0 flex-1">
+            <View className="flex-row items-center gap-1.5">
+              <Text className="shrink text-[16px] font-bold font-display text-ink" numberOfLines={1}>
+                {tutor.firstName} {tutor.lastName}
+              </Text>
+              {tutor.isVerified ? <VerifiedBadgeIcon size={15} /> : null}
+            </View>
+            <Text className="text-[12.5px] text-ink-soft" numberOfLines={1}>
+              {tutor.subjects[0]}
+              {" • "}
+              {tutor.location.distanceKm != null
+                ? tr("results.results.km", { label: tutor.location.label, distanceKm: tutor.location.distanceKm })
+                : tutor.location.label}
             </Text>
-            {tutor.isVerified ? (
-              <View className="rounded-full bg-accent-tint px-2 py-0.5">
-                <Text className="text-[11px] font-semibold text-accent">{tr("results.results.verified")}</Text>
-              </View>
-            ) : null}
+            <View className="mt-1.5 flex-row items-center">
+              {tutor.reviewCount > 0 ? (
+                <View className="flex-row items-center gap-1">
+                  <StarIcon size={12} color="#D4890A" filled />
+                  <Text className="text-[12.5px] font-bold text-ink">{tutor.rating.toFixed(1)}</Text>
+                  <Text className="text-[12px] text-ink-soft">({tutor.reviewCount})</Text>
+                </View>
+              ) : (
+                <View className="rounded-full bg-accent-tint px-2.5 py-[3px]">
+                  <Text className="text-[11.5px] font-semibold text-accent">{tr("results.results.newTutor")}</Text>
+                </View>
+              )}
+            </View>
           </View>
-          <Text className="text-[12.5px] text-ink-soft" numberOfLines={1}>
-            {tutor.subjects[0]}
-            {" • "}
-            {tutor.location.distanceKm != null
-              ? tr("results.results.km", { label: tutor.location.label, distanceKm: tutor.location.distanceKm })
-              : tutor.location.label}
-          </Text>
-          {tutor.nextSlotLabel ? (
-            <Text className="mt-0.5 text-[11.5px] font-medium text-primary" numberOfLines={1}>
-              {tutor.nextSlotLabel}
-            </Text>
+          {offer ? (
+            <View className="items-end">
+              <Text className="text-[16px] font-bold font-display text-primary">{offer.priceLabel}</Text>
+              <Text className="text-[11.5px] text-ink-faint">{offer.durationLabel}</Text>
+            </View>
           ) : null}
         </View>
-        <View className="h-8 w-8 items-center justify-center rounded-full bg-paper-alt">
-          <ChevronRightIcon size={16} color="#332E86" />
+        <View className="mt-3.5 flex-row items-center justify-center rounded-full bg-primary py-3">
+          <Text className="text-[14.5px] font-bold text-white">{tr("results.results.book")}</Text>
         </View>
       </View>
     </PressableScale>
@@ -238,10 +275,12 @@ function MapTutorPreview({ tutor, onPress }: { tutor: Tutor; onPress: () => void
 type TutorListProps = {
   state: TutorsState;
   onRetry: () => void;
-  onSelect: (tutor: Tutor) => void;
+  /** Sortie de l'impasse « aucun résultat » : retour à la recherche pour la modifier. */
+  onChangeSearch: () => void;
+  onExpand: (tutor: Tutor, from: Rect | null) => void;
 };
 
-function TutorList({ state, onRetry, onSelect }: TutorListProps) {
+function TutorList({ state, onRetry, onChangeSearch, onExpand }: TutorListProps) {
   const { t: tr } = useTranslation();
   if (state.status === "loading") {
     return (
@@ -269,20 +308,19 @@ function TutorList({ state, onRetry, onSelect }: TutorListProps) {
 
   if (state.status === "empty") {
     return (
-      <View className="items-center py-10">
-        <Text className="text-center text-[14px] text-ink-soft">
-          {tr("results.results.noTutorMatchesYourSearch")}</Text>
-      </View>
+      <EmptyState
+        illustration="search"
+        title={tr("results.results.noTutorTitle")}
+        message={tr("results.results.noTutorHint")}
+        actionLabel={tr("results.results.changeSearch")}
+        onAction={onChangeSearch}
+      />
     );
   }
 
-  return (
-    <View>
-      {state.tutors.map((tutor, index) => (
-        <FadeIn key={tutor.id} delay={90 + index * 50}>
-          <TutorCard tutor={tutor} onPress={() => onSelect(tutor)} />
-        </FadeIn>
-      ))}
-    </View>
-  );
+  // Visiteur : l'écran de résultats n'est jamais affiché (la page « connectez-vous » le remplace) ; rien à lister.
+  if (state.status === "restricted") return null;
+
+  // Nouvelle liste (autre recherche, nouvelle position) : on remonte le carrousel pour repartir de la 1re carte.
+  return <TutorCarousel key={state.tutors.map((tutor) => tutor.id).join("|")} tutors={state.tutors} onExpand={onExpand} />;
 }

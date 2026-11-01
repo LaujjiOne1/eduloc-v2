@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { isApiError } from "@/api/errors";
 import { useRealtimeReload } from "@/realtime/use-realtime-event";
 import { ConversationService } from "@/services/conversation.service";
+import { useMessageBadgeStore } from "@/store/message-badge.store";
 import type { ConversationSummary } from "@/types/message";
 import { t } from "@/i18n";
 import { useLoadEffect } from "@/hooks/use-load-effect";
@@ -24,6 +25,7 @@ export function useConversations() {
     if (!silent) setState({ status: "loading" });
     try {
       const conversations = await ConversationService.getConversations();
+      useMessageBadgeStore.getState().setUnread(conversations.reduce((sum, c) => sum + c.unreadCount, 0));
       setState(conversations.length ? { status: "success", conversations } : { status: "empty" });
     } catch (error) {
       if (silent) return;

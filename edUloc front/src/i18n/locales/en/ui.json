@@ -159,5 +159,16 @@
     "chooseTheAppLanguage": "Choose the language of the app",
     "close": "Close",
     "currentLanguage": "Language: {{language}} — change"
+  },
+  "profilePhotoEditor": {
+    "changePhoto": "Change profile photo",
+    "addPhoto": "Add a profile photo",
+    "title": "Profile photo",
+    "subtitle": "It appears next to your name in the app.",
+    "takePhoto": "Take a photo",
+    "chooseFromLibrary": "Choose from library",
+    "removePhoto": "Remove photo",
+    "uploading": "Uploading…",
+    "removing": "Removing…"
   }
 }

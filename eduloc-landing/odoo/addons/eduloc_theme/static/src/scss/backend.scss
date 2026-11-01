@@ -1,0 +1,100 @@
+// Habillage du backend Odoo aux couleurs d'edUloc. Les couleurs viennent des variables
+// (primary_variables.scss) ; ce fichier ne règle que les formes : rayons, ombres, titres, boutons.
+
+$eduloc-glow: linear-gradient(90deg, #332E86 0%, #8D7FE3 49%, #0E9C82 100%);
+$eduloc-shadow-soft: 0 10px 30px -12px rgba(51, 46, 134, .18);
+
+// --- Titres : Space Grotesk 700, interlettrage serré (h1-h4 de la landing)
+h1, h2, h3, h4, .h1, .h2, .h3, .h4,
+.o_form_view .oe_title .o_field_widget,
+.o_kanban_view .o_kanban_group .o_column_title {
+    font-family: $o-headings-font-family;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+.o_main_navbar .o_menu_brand {
+    font-family: $o-headings-font-family;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: $eduloc-primary;
+}
+
+// --- Barre de navigation : filet dégradé de la marque sous la barre
+.o_main_navbar {
+    position: relative;
+    &::after {
+        content: "";
+        position: absolute;
+        left: 0; right: 0; bottom: -1px;
+        height: 2px;
+        background: $eduloc-glow;
+        opacity: .85;
+        pointer-events: none;
+    }
+}
+
+// --- Boutons : pilules, comme les appels à l'action de la landing.
+// Exclusions : éléments dont la forme est structurelle (flèches du statut, groupes soudés, boutons-icônes carrés).
+// :where() garde la spécificité d'un simple `.btn` : les règles plus précises d'Odoo (groupes de
+// boutons, champs avec bouton intégré) restent prioritaires.
+.btn:where(:not(.o_arrow_button, .btn-link, .o_switch_view, .o_kanban_quick_add, .btn-close)) {
+    border-radius: 9999px;
+}
+.btn-group > .btn:not(:first-child):not(:last-child) { border-radius: 0; }
+.btn-group > .btn:first-child:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+.btn-group > .btn:last-child:not(:first-child) { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+.input-group > .btn:not(:first-child) { border-radius: 0 $o-border-radius $o-border-radius 0; }
+.btn-primary { font-weight: 500; }
+
+// --- Panneau de contrôle (fil d'Ariane, recherche) : blanc, filet fin
+.o_control_panel {
+    background-color: #fff;
+    border-bottom: 1px solid $eduloc-line;
+}
+
+// --- Cartes kanban : 12px, filet chaud, ombre douce au survol
+.o_kanban_view .o_kanban_group .o_kanban_record { margin: 0 0 8px; }
+.o_kanban_view .o_kanban_record {
+    border-radius: 12px;
+    border-color: $eduloc-line;
+    overflow: hidden;
+    transition: box-shadow .2s ease, border-color .2s ease;
+    &:hover {
+        border-color: lighten($eduloc-primary, 40%);
+        box-shadow: $eduloc-shadow-soft;
+    }
+}
+
+// --- Fiche : feuille blanche arrondie 16px
+.o_form_view .o_form_sheet_bg { background-color: $eduloc-paper; border-color: $eduloc-line; }
+.o_form_view .o_form_sheet {
+    border-radius: 16px;
+    border: 1px solid $eduloc-line;
+    box-shadow: $eduloc-shadow-soft;
+}
+
+// --- Menus déroulants et fenêtres : 12px / 16px
+.dropdown-menu {
+    border-color: $eduloc-line;
+    border-radius: 12px;
+    box-shadow: $eduloc-shadow-soft;
+}
+.modal-content { border-radius: 16px; border-color: $eduloc-line; }
+
+// --- Éditeur de texte : Odoo code en dur son violet dans le sélecteur de tableau
+.o-we-tablepicker .o-we-cell.active { background-color: $eduloc-primary; }
+
+// --- Étiquettes : « teinte + encre de la même famille », comme les badges de la landing
+// (fond 16 % de la couleur, texte mêlé à l'encre). La formule d'Odoo sature trop nos teintes.
+.o_tag, .badge { border-radius: 9999px; font-weight: 600; }
+.o_tag {
+    @for $i from 1 through length($o-colors) {
+        &.o_tag_color_#{$i - 1} {
+            $-base: nth($o-colors, $i);
+            &, &::after {
+                background-color: mix($-base, #FFFFFF, 16%) !important;
+                color: mix($-base, #14162B, 62%) !important;
+            }
+        }
+    }
+}

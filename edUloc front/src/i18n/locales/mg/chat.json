@@ -12,7 +12,15 @@
     "noMessages": "Tsy misy hafatra",
     "conversationWith": "Resaka miaraka amin'i {{name}}",
     "conversationWithUnread_one": "Resaka miaraka amin'i {{name}}, {{count}} tsy mbola novakiana",
-    "conversationWithUnread_other": "Resaka miaraka amin'i {{name}}, {{count}} tsy mbola novakiana"
+    "conversationWithUnread_other": "Resaka miaraka amin'i {{name}}, {{count}} tsy mbola novakiana",
+    "searchPlaceholder": "Mitady olona na hafatra…",
+    "filterAll": "Rehetra",
+    "filterUnread": "Tsy vakiana",
+    "noMatchTitle": "Tsy misy valiny",
+    "noMatchBody": "Andramo anarana na teny hafa.",
+    "unreadBadge_one": "{{count}} hafatra tsy vakiana",
+    "unreadBadge_other": "{{count}} hafatra tsy vakiana",
+    "clearSearch": "Hamafa ny fikarohana"
   },
   "documentExchangeView": {
     "sharedDocuments": "Antontan-taratasy zaraina",
@@ -35,5 +43,9 @@
     "allowTheMicrophoneInYour": "Avelao ny mikrô ao amin'ny paramétran'ny fitaovanao (na ny navigateur) mba handefasana hafatra an-peo.",
     "preparingTheMicrophone": "Manomana ny mikrô...",
     "recordingInProgress": "Eo am-pandraisana feo"
+  },
+  "voicePill": {
+    "pause": "Hampiato",
+    "resume": "Hanohy ny fandraketana"
   }
 }

@@ -101,7 +101,8 @@ export class AuthService {
   async login(dto: LoginDto, ip: string) {
     await this.rateLimit.consume(`rl:login:${ip}:${dto.email.toLowerCase()}`, 5, 900);
     const user = await this.prisma.user.findUnique({ where: { email: dto.email.toLowerCase() } });
-    if (!user || !(await argon2.verify(user.password, dto.password).catch(() => false))) {
+    // Compte créé par connexion sociale : pas de mot de passe, donc jamais de connexion par mot de passe (même message qu'un mauvais mot de passe).
+    if (!user || !user.password || !(await argon2.verify(user.password, dto.password).catch(() => false))) {
       throw new UnauthorizedException('INVALID_CREDENTIALS');
     }
     if (user.deletedAt || user.status === 'SUSPENDED') throw new ForbiddenException('ACCOUNT_DISABLED');
@@ -195,7 +196,8 @@ export class AuthService {
     ]);
   }
 
-  private async openSession(user: SessionUser) {
+  /** Ouvre une session (jeton d'accès + jeton de rafraîchissement) : utilisé par la connexion, la vérification d'e-mail et la connexion sociale. */
+  async openSession(user: SessionUser) {
     const refresh = await this.tokens.issueRefreshToken(user.id);
     return {
       accessToken: this.tokens.accessToken(user.id, user.isAdmin),

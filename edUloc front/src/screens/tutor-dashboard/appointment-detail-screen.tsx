@@ -95,12 +95,12 @@ function AppointmentDetailContent({
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View className="mb-[6px] flex-row items-start justify-between">
-        <Text className="text-[24px] font-bold text-ink">{booking.offer.subjectLabel}</Text>
+        <Text className="text-[24px] font-bold font-display text-ink">{booking.offer.subjectLabel}</Text>
         <StatusBadge status={booking.status} />
       </View>
       <Text className="mb-5 text-[14px] text-ink-soft">{t("tutorDashboard.appointmentDetail.with", { firstName: booking.beneficiary.firstName })}</Text>
 
-      <View className="mb-4 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-4 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="mb-2 flex-row items-center gap-2">
           <CalendarIcon size={15} color="#585B78" />
           <Text className="text-[14px] font-semibold text-ink">{booking.slot.dateLabel}</Text>
@@ -159,7 +159,7 @@ function CompletedSection({ durationLabel, onOpenConversation }: { durationLabel
   const { t } = useTranslation();
   return (
     <FadeIn delay={30}>
-      <View className="mb-5 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-5 rounded-lg border border-line bg-surface shadow-card p-4">
         <Text className="text-[13.5px] text-ink-soft">{t("common.sessionCompleted", { value: durationLabel ? t("common.duration", { durationLabel }) : "" })}</Text>
       </View>
       <Button label={t("common.conversation")} variant="secondary" fullWidth onPress={onOpenConversation} />
@@ -171,7 +171,7 @@ function ClosedSection({ status }: { status: "cancelled" | "refused" }) {
   const { t } = useTranslation();
   return (
     <FadeIn delay={30}>
-      <View className="items-center rounded-lg border border-line bg-surface py-8">
+      <View className="items-center rounded-lg border border-line bg-surface shadow-card py-8">
         <Text className="text-center text-[13.5px] text-ink-soft">
           {status === "cancelled" ? t("common.thisAppointmentWasCancelled") : t("tutorDashboard.appointmentDetail.thisRequestWasDeclined")}
         </Text>

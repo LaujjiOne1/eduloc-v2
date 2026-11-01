@@ -1,0 +1,60 @@
+// Page de connexion : carte blanche 16px sur fond papier avec les halos violet/émeraude du hero de la landing.
+$eduloc-glow: linear-gradient(90deg, #332E86 0%, #8D7FE3 49%, #0E9C82 100%);
+
+body.bg-100 {
+    background-image:
+        radial-gradient(520px circle at 100% 0%, rgba(141, 127, 227, .20), transparent 70%),
+        radial-gradient(420px circle at 0% 100%, rgba(14, 156, 130, .12), transparent 70%);
+    background-attachment: fixed;
+    font-family: $o-font-family-sans-serif;
+}
+
+.o_database_list.card {
+    position: relative;
+    overflow: hidden;
+    background: #fff !important;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px -12px rgba(51, 46, 134, .18);
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0 0 auto 0;
+        height: 4px;
+        background: $eduloc-glow;
+    }
+    .card-body { padding: 2.25rem 2rem 2rem; }
+    .border-bottom { border-color: #F0EDE3 !important; }
+
+    .form-control {
+        border-radius: 10px;
+        padding: .6rem .8rem;
+        background: #fff;
+        &:focus { border-color: #332E86; box-shadow: 0 0 0 3px rgba(51, 46, 134, .15); }
+    }
+    .btn { border-radius: 9999px; padding: .6rem 1.25rem; font-weight: 500; }
+    // Champ mot de passe : l'œil fait corps avec le champ, il ne devient pas une pilule isolée
+    .input-group > .form-control:not(:last-child) { border-top-right-radius: 0; border-bottom-right-radius: 0; }
+    .input-group > .btn { border-radius: 0 10px 10px 0; padding: .6rem .8rem; }
+    // « Utiliser une clé d'accès » et autres connexions tierces
+    .o_login_auth a, .o_login_auth button { border-radius: 9999px; }
+    .btn-primary:hover { background-color: #211C5E; border-color: #211C5E; }
+    .form-label { font-weight: 500; color: #585B78; }
+    // « Mot de passe » et « Réinitialiser… » sur la même ligne de base
+    .o_caps_lock_warning > .d-flex { align-items: center !important; }
+}
+
+.eduloc-baseline {
+    margin: .75rem 0 0;
+    font-family: $o-headings-font-family;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-size: 1.05rem;
+    color: #14162B;
+    span {
+        background: $eduloc-glow;
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+    }
+}

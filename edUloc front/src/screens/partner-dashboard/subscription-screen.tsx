@@ -58,7 +58,7 @@ export function PartnerSubscriptionScreen() {
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 28 }} showsVerticalScrollIndicator={false}>
-        <Text className="mb-1 text-[24px] font-bold text-ink">{t("common.commercialPlan")}</Text>
+        <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("common.commercialPlan")}</Text>
         <Text className="mb-5 text-[13.5px] leading-[20px] text-ink-soft">
           {t("partnerDashboard.subscription.thePlanCoversAllThe")}</Text>
 
@@ -84,7 +84,7 @@ export function PartnerSubscriptionScreen() {
         ) : (
           <>
             <FadeIn delay={30}>
-              <View className="rounded-lg border border-line bg-surface p-4">
+              <View className="rounded-lg border border-line bg-surface shadow-card p-4">
                 <View className="flex-row items-start justify-between gap-3">
                   <Text className="flex-1 text-[15px] font-bold text-ink">{state.subscription.plan?.name ?? t("partnerDashboard.subscription.noPlanChosen")}</Text>
                   <ToneBadge label={SUBSCRIPTION_LABELS[state.subscription.status]} tone={STATUS_TONE[state.subscription.status]} />
@@ -130,7 +130,7 @@ export function PartnerSubscriptionScreen() {
                   <Text className="text-[13.5px] text-ink-soft">{t("partnerDashboard.subscription.noPlanIsOfferedAt")}</Text>
                 ) : (
                   state.plans.map((plan) => (
-                    <View key={plan.id} className="mb-3 rounded-lg border border-line bg-surface p-4">
+                    <View key={plan.id} className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
                       <Text className="text-[15px] font-bold text-ink">{plan.name}</Text>
                       <Text className="mt-[2px] text-[13px] text-ink-soft">
                         {plan.priceLabel} · {plan.durationLabel}

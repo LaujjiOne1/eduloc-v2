@@ -1,0 +1,194 @@
+<!-- securite-paiement.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sécurité des Paiements - edUloc</title>
+</head>
+<body>
+    <main class="security-page">
+        <section class="hero-security">
+            <h1>Sécurité de vos paiements</h1>
+            <p class="lead">edUloc met en œuvre les standards internationaux les plus stricts pour protéger vos transactions.</p>
+        </section>
+
+        <!-- PCI DSS Section -->
+        <section class="compliance-section">
+            <h2>🔒 Paiements par Carte Bancaire (PCI DSS)</h2>
+            
+            <div class="compliance-card">
+                <h3>Norme PCI DSS Niveau 1</h3>
+                <p>Nous respectons la norme <strong>Payment Card Industry Data Security Standard (PCI DSS)</strong> qui impose des exigences strictes pour la protection des données de cartes bancaires.</p>
+                
+                <div class="security-measures">
+                    <div class="measure">
+                        <h4>VISA-01 : Externalisation sécurisée</h4>
+                        <p>La saisie des cartes est confiée à un prestataire certifié PCI DSS. edUloc ne manipule jamais directement les numéros de carte complets.</p>
+                        <a href="https://www.pcisecuritystandards.org/faqs/does-pci-dss-apply-to-merchants-who-outsource-all-payment-processing-operations-and-never-store-process-or-transmit-cardholder-data/" target="_blank" class="learn-more">En savoir plus sur PCI DSS →</a>
+                    </div>
+                    
+                    <div class="measure">
+                        <h4>VISA-02 : Interdiction de stockage du CVV</h4>
+                        <p>Le code de sécurité CVV <strong>n'est jamais enregistré</strong> dans nos systèmes, même de manière chiffrée. Cette interdiction est absolue selon PCI DSS.</p>
+                        <a href="https://www.pcisecuritystandards.org/faqs/1280/" target="_blank" class="learn-more">Pourquoi le CVV ne peut pas être stocké →</a>
+                    </div>
+                    
+                    <div class="measure">
+                        <h4>VISA-03 : Authentification 3D Secure</h4>
+                        <p>Tous les paiements sont protégés par <strong>Visa Secure (EMV 3-D Secure)</strong>. Votre banque peut vous demander une authentification supplémentaire (code SMS, notification, biométrie).</p>
+                        <a href="https://www.visa.com/en-us/products/visa-secure" target="_blank" class="learn-more">Comprendre Visa Secure →</a>
+                    </div>
+                    
+                    <div class="measure">
+                        <h4>VISA-04 : Vérification serveur</h4>
+                        <p>Une authentification 3D Secure réussie ne suffit pas. Nous vérifions systématiquement le statut financier de la transaction auprès du prestataire avant de confirmer votre réservation.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile Money Section -->
+        <section class="compliance-section">
+            <h2>📱 Mobile Money (GSMA)</h2>
+            
+            <div class="compliance-card">
+                <h3>Conformité GSMA Mobile Money API</h3>
+                <p>Nous suivons les spécifications de la <strong>GSMA Mobile Money API</strong> pour garantir des intégrations sécurisées avec les opérateurs (Orange Money, MVola, Airtel Money).</p>
+                
+                <div class="security-measures">
+                    <div class="measure">
+                        <h4>MM-01 : Protection de votre PIN</h4>
+                        <p><strong>edUloc ne vous demandera jamais votre code PIN Mobile Money.</strong> La saisie du PIN se fait exclusivement dans le canal officiel de l'opérateur (USSD ou application).</p>
+                        <ul>
+                            <li>Aucun agent edUloc ne peut vous demander votre PIN</li>
+                            <li>Aucun PIN n'est enregistré dans nos systèmes ou dans Odoo</li>
+                            <li>L'authentification reste dans le dispositif de l'opérateur</li>
+                        </ul>
+                        <a href="https://www.gsma.com/solutions-and-impact/connectivity-for-good/mobile-for-development/programme/mobile-money/compliance-technical-launch-blog/" target="_blank" class="learn-more">Spécifications GSMA →</a>
+                    </div>
+                    
+                    <div class="measure">
+                        <h4>MM-02 : Distinction des statuts</h4>
+                        <p>Une réponse "202 Accepted" signifie que la demande est en traitement, <strong>pas que le paiement est réussi</strong>. Nous attendons la confirmation finale avant de valider votre réservation.</p>
+                        <p><strong>États internes :</strong></p>
+                        <ul>
+                            <li><code>PENDING</code> - Paiement en cours</li>
+                            <li><code>SUCCEEDED</code> - Réussite confirmée</li>
+                            <li><code>FAILED</code> - Échec confirmé</li>
+                            <li><code>CANCELLED</code> - Annulation confirmée</li>
+                            <li><code>EXPIRED</code> - Expiration confirmée</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="measure">
+                        <h4>MM-03 : Vérification serveur obligatoire</h4>
+                        <p>Avant toute confirmation, notre backend vérifie la transaction auprès de l'opérateur en contrôlant :</p>
+                        <ul>
+                            <li>Référence interne et référence opérateur</li>
+                            <li>Montant et devise</li>
+                            <li>Compte marchand bénéficiaire</li>
+                            <li>Statut final</li>
+                            <li>Correspondance avec la réservation</li>
+                        </ul>
+                        <p>Nous utilisons l'API de consultation de statut pour couvrir les cas où le callback ne serait pas reçu.</p>
+                        <a href="https://momodeveloper.mtn.com/api-documentation/callback" target="_blank" class="learn-more">Documentation API de statut →</a>
+                    </div>
+                    
+                    <div class="measure">
+                        <h4>MM-04 : Preuves clients non suffisantes</h4>
+                        <p>Un SMS de confirmation ou une capture d'écran fournie par le client <strong>ne suffit pas</strong> à valider automatiquement une réservation. La confirmation doit provenir des interfaces officielles du prestataire.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Technical Security Measures -->
+        <section class="compliance-section">
+            <h2>🛡️ Mesures Techniques Communes</h2>
+            
+            <div class="security-grid">
+                <div class="security-item">
+                    <h4>SEC-01 : HTTPS Obligatoire</h4>
+                    <p>Tous les échanges sont chiffrés via HTTPS/TLS en production.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-02 : Protection des Clés API</h4>
+                    <p>Les secrets API sont stockés uniquement côté serveur dans un gestionnaire de secrets. Jamais dans le frontend ou Git.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-03 : Calcul Serveur des Montants</h4>
+                    <p>Le montant à payer est calculé côté serveur à partir de la réservation, sans faire confiance au navigateur.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-04 : Contrôle d'Accès</h4>
+                    <p>Vérification systématique des autorisations avant toute opération de paiement.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-05 : Authentification des Notifications</h4>
+                    <p>Les webhooks sont vérifiés via signature cryptographique ou certificat.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-06 : Page de Retour Non Fiable</h4>
+                    <p>Une page de retour "succès" n'est jamais considérée comme preuve suffisante.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-07 : Idempotence</h4>
+                    <p>Les requêtes répétées ne produisent pas plusieurs validations ou remboursements.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-08 : Limitation des Tentatives</h4>
+                    <p>Surveillance des comportements anormaux et limitation des tentatives.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-09 : Séparation des Environnements</h4>
+                    <p>Environnements test et production strictement séparés avec identifiants différents.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-10 : Journalisation Sécurisée</h4>
+                    <p>Logs complets sans jamais enregistrer de codes secrets ou données sensibles.</p>
+                </div>
+                
+                <div class="security-item">
+                    <h4>SEC-11 : Rapprochement Régulier</h4>
+                    <p>Réconciliation régulière des transactions internes avec les relevés du prestataire.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Odoo CRM Integration -->
+        <section class="compliance-section">
+            <h2> Intégration Odoo CRM</h2>
+            
+            <div class="integration-info">
+                <h3>Données visibles dans Odoo</h3>
+                <ul>
+                    <li>Référence client et réservation</li>
+                    <li>Moyen de paiement et prestataire</li>
+                    <li>Montant et devise</li>
+                    <li>Référence de transaction</li>
+                    <li>Statut du paiement et date de dernière vérification</li>
+                    <li>Historique des actions</li>
+                </ul>
+                
+                <h3>Restrictions imposées</h3>
+                <ul>
+                    <li>❌ Un agent ne peut pas transformer manuellement un échec en succès</li>
+                    <li>❌ Les secrets API, PIN et codes d'authentification ne figurent jamais dans le CRM</li>
+                    <li>❌ Le CVV n'est jamais conservé dans Odoo</li>
+                    <li>✅ Les régularisations exceptionnelles nécessitent une procédure distincte avec justificatif</li>
+                    <li>✅ Les remboursements sont réservés aux rôles autorisés</li>
+                </ul>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

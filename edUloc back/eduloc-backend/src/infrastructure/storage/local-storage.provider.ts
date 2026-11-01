@@ -41,6 +41,11 @@ export class LocalStorageProvider implements StorageProvider {
     return `${this.cfg.apiUrl}/api/dev-storage/object/${token}`;
   }
 
+  /** Dev : servi par DevStorageController (`public/:bucket/:owner/:file`), réservé au bucket des photos de profil. */
+  publicUrl(bucket: string, storagePath: string): string {
+    return `${this.cfg.apiUrl}/api/dev-storage/public/${bucket}/${storagePath}`;
+  }
+
   async getObjectInfo(bucket: string, storagePath: string): Promise<StoredObjectInfo> {
     try {
       const file = this.pathFor(bucket, storagePath);
@@ -71,6 +76,11 @@ export class LocalStorageProvider implements StorageProvider {
       throw new Error('INVALID_STORAGE_TOKEN');
     }
     return { file: this.pathFor(claims.b, claims.p), bucket: claims.b, storagePath: claims.p };
+  }
+
+  /** Chemin disque d'un objet (refuse toute sortie du répertoire racine). */
+  fileFor(bucket: string, storagePath: string): string {
+    return this.pathFor(bucket, storagePath);
   }
 
   async prepareWrite(file: string): Promise<void> {

@@ -71,3 +71,19 @@ export function isFunnelComplete(criteria: { level: EducationLevel | null; track
   if (!criteria.level || !criteria.subject) return false;
   return !criteria.level.trackKind || !!criteria.track;
 }
+
+/** Famille d'une série du lycée, pour lui donner une icône reconnaissable d'un coup d'œil. */
+export type TrackFamily = "science" | "literature" | "society" | "other";
+
+/**
+ * Série d'après son code : S et C (maths, physique) → science ; D (sciences naturelles) → science ; L, A1, A2 (lettres,
+ * langues) → littérature ; OSE (organisation sociale et économique) → société. Les autres séries n'ont pas d'icône propre.
+ */
+export function trackFamilyOf(code: string): TrackFamily {
+  // Le code porte le niveau en préfixe (PS ↔ TS, POSE ↔ TOSE, PL ↔ TL) : on le retire.
+  const c = code.trim().toUpperCase().replace(/^[PT](?=S$|C$|D$|L$|A1$|A2$|OSE$)/, "");
+  if (/^(S|C|D)$/.test(c)) return "science";
+  if (/^(L|A1|A2|A)$/.test(c)) return "literature";
+  if (/^(OSE|ES|G)$/.test(c)) return "society";
+  return "other";
+}

@@ -9,6 +9,7 @@ import { FadeIn } from "@/components/motion/fade-in";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { Button } from "@/components/ui/button";
+import { PaymentCard } from "@/components/payment/payment-card";
 import { CancelBookingModal } from "@/components/ui/cancel-booking-modal";
 import { FormError } from "@/components/ui/form-error";
 import { StatusBadge } from "@/components/ui/status-badge";
@@ -137,14 +138,14 @@ function BookingDetailContent({
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View className="mb-[6px] flex-row items-start justify-between">
-        <Text className="text-[24px] font-bold text-ink">{booking.offer.subjectLabel}</Text>
+        <Text className="text-[24px] font-bold font-display text-ink">{booking.offer.subjectLabel}</Text>
         <StatusBadge status={booking.status} />
       </View>
       <Text className="mb-5 text-[14px] text-ink-soft">{t("common.with", { tutorName: booking.offer.tutorName })}</Text>
 
       {formError ? <FormError message={formError} /> : null}
 
-      <View className="mb-4 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-4 rounded-lg border border-line bg-surface shadow-card p-4">
         <View className="mb-2 flex-row items-center gap-2">
           <CalendarIcon size={15} color="#585B78" />
           <Text className="text-[14px] font-semibold text-ink">{booking.slot.dateLabel}</Text>
@@ -164,6 +165,10 @@ function BookingDetailContent({
       </View>
 
       <RoomLocationBlock booking={booking} />
+
+      {booking.status === "confirmed" || booking.status === "in_progress" || booking.status === "completed" ? (
+        <PaymentCard bookingId={booking.id} totalLabel={booking.pricing?.totalLabel ?? null} />
+      ) : null}
 
       {booking.status === "pending" ? <PendingSection tutorName={booking.offer.tutorName} onOpenConversation={onOpenConversation} /> : null}
       {booking.status === "confirmed" ? (
@@ -224,7 +229,7 @@ function ConfirmedSection({
             ) : state.status === "error" ? (
               <Text className="text-[13px] text-error">{state.message}</Text>
             ) : (
-              <Text className="text-[30px] font-bold tracking-[0.1em] text-primary-dark">{state.code}</Text>
+              <Text className="text-[30px] font-bold font-display tracking-[0.1em] text-primary-dark">{state.code}</Text>
             )}
             <Text className="mt-2 text-[12px] text-ink-soft">{t("apprentiDashboard.bookingDetail.toBeGivenToThe")}</Text>
           </View>
@@ -265,7 +270,7 @@ function CompletedSection({
   const { t } = useTranslation();
   return (
     <FadeIn delay={30}>
-      <View className="mb-5 rounded-lg border border-line bg-surface p-4">
+      <View className="mb-5 rounded-lg border border-line bg-surface shadow-card p-4">
         <Text className="text-[13.5px] text-ink-soft">{t("common.sessionCompleted", { value: durationLabel ? t("common.duration", { durationLabel }) : "" })}</Text>
       </View>
       <View className="flex-row gap-[10px]">
@@ -280,7 +285,7 @@ function ClosedSection({ status }: { status: "cancelled" | "refused" }) {
   const { t } = useTranslation();
   return (
     <FadeIn delay={30}>
-      <View className="items-center rounded-lg border border-line bg-surface py-8">
+      <View className="items-center rounded-lg border border-line bg-surface shadow-card py-8">
         <Text className="text-center text-[13.5px] text-ink-soft">
           {status === "cancelled" ? t("common.thisAppointmentWasCancelled") : t("apprentiDashboard.bookingDetail.thisRequestWasDeclinedBy")}
         </Text>

@@ -112,7 +112,7 @@ export function TutorLocationsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorLocations.yourTeachingLocations")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorLocations.yourTeachingLocations")}</Text>
           <Text className="mb-4 text-[13.5px] text-ink-soft">
             {inPersonModes.length === 0
               ? t("tutorOnboarding.tutorLocations.youOnlyTeachOnlineNo")
@@ -235,7 +235,7 @@ export function TutorLocationsScreen() {
             ) : (
               <View className="mb-3 gap-2.5">
                 {meetingPlaces.map((loc) => (
-                  <View key={loc.id} className="flex-row items-center gap-3 rounded-lg border border-line bg-surface p-3.5">
+                  <View key={loc.id} className="flex-row items-center gap-3 rounded-lg border border-line bg-surface shadow-card p-3.5">
                     <View className="h-9 w-9 items-center justify-center rounded-md bg-paper-alt">
                       <LocationIcon size={16} color="#585B78" />
                     </View>
@@ -268,7 +268,7 @@ export function TutorLocationsScreen() {
         <View className="flex-1 justify-end bg-black/50">
           <View className="rounded-t-2xl bg-surface p-5" style={{ paddingBottom: Math.max(insets.bottom, 24) }}>
             <View className="mb-4 flex-row items-center justify-between">
-              <Text className="text-[18px] font-bold text-ink">{t("tutorOnboarding.tutorLocations.newPublicPlace")}</Text>
+              <Text className="text-[18px] font-bold font-display text-ink">{t("tutorOnboarding.tutorLocations.newPublicPlace")}</Text>
               <PressableScale onPress={closeModal} accessibilityLabel={t("common.close")}>
                 <View className="h-8 w-8 items-center justify-center rounded-full bg-paper">
                   <XIcon size={16} color="#585B78" />

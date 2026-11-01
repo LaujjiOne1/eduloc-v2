@@ -80,7 +80,8 @@
     "goToTheNextAvailability": "Go to the next availability",
     "choosingARoomDoesNot": " Choosing a room does not reserve it: it is only taken when the tutor accepts the request.",
     "bookThisSlot": "Book this slot",
-    "slotTaken": "{{range}}, slot taken"
+    "slotTaken": "{{range}}, slot taken",
+    "noSlotsTitle": "No slots this day"
   },
   "bookingPending": {
     "requestSent": "Request sent",

@@ -35,7 +35,8 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
-      {userId ? <RealtimeEffects /> : null}
+      {/* key : un changement de compte sans déconnexion remonte les effets, donc réenregistre les notifications push du nouveau compte. */}
+      {userId ? <RealtimeEffects key={userId} /> : null}
       {userId ? <IncomingCallBanner /> : null}
       {userId ? <LessonAlarmBanner /> : null}
     </>

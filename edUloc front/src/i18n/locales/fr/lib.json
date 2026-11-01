@@ -13,7 +13,9 @@
     "lessonsForTheLevel": "Cours de {{label}} pour le niveau {{offerLevelLabel}}."
   },
   "push": {
-    "incomingCalls": "Appels entrants"
+    "incomingCalls": "Appels entrants",
+    "lessonReminders": "Rappels de cours",
+    "messages": "Messages"
   },
   "experienceTypes": {
     "teachingTutoring": "Enseignement / Soutien scolaire",
@@ -59,5 +61,12 @@
   "call": {
     "requiresDevBuild": "Les appels nécessitent l'application EduLoc compilée (build de développement), pas Expo Go.",
     "requiresNativeOrWeb": "Les appels nécessitent l'application EduLoc native compilée (dev build) ou la version web."
+  },
+  "lessonReminders": {
+    "title": "Cours dans {{lead}}",
+    "leadMinutes": "{{count}} min",
+    "leadHour": "1 h",
+    "bodyRequester": "{{subject}} à {{time}}. Préparez-vous.",
+    "bodyTutor": "{{student}} · {{subject}} à {{time}}."
   }
 }

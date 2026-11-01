@@ -203,5 +203,6 @@
   "supportingDocumentCount_one": "antontan-taratasy fanamarinana {{count}}",
   "supportingDocumentCount_other": "antontan-taratasy fanamarinana {{count}}",
   "resultCount_one": "valiny {{count}}",
-  "resultCount_other": "valiny {{count}}"
+  "resultCount_other": "valiny {{count}}",
+  "appointments": "Fihaonana"
 }

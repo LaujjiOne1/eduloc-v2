@@ -70,7 +70,7 @@ export function TutorDocumentsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorDocuments.supportingDocuments")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorDocuments.supportingDocuments")}</Text>
           <Text className="mb-4 text-[13.5px] text-ink-soft">
             {t("tutorOnboarding.tutorDocuments.selectYourFilesFromYour")}</Text>
         </FadeIn>

@@ -15,6 +15,11 @@
         "UIBackgroundModes": [
           "audio",
           "voip"
+        ],
+        "CFBundleLocalizations": [
+          "fr",
+          "en",
+          "mg"
         ]
       },
       "bundleIdentifier": "mg.eduloc.app"
@@ -22,11 +27,17 @@
     "android": {
       "permissions": [
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS",
         "android.permission.ACCESS_NETWORK_STATE",
         "android.permission.BLUETOOTH",
-        "android.permission.BLUETOOTH_CONNECT"
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.VIBRATE",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.RECORD_AUDIO"
       ],
       "adaptiveIcon": {
         "backgroundColor": "#E6F4FE",
@@ -48,16 +59,15 @@
       [
         "expo-image-picker",
         {
-          "photosPermission": "EduLoc accède à votre photothèque pour sélectionner votre vidéo de présentation.",
+          "photosPermission": "EduLoc accède à votre photothèque pour sélectionner votre photo de profil ou votre vidéo de présentation.",
+          "cameraPermission": "EduLoc utilise l'appareil photo pour prendre votre photo de profil.",
           "microphonePermission": false
         }
       ],
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
-          "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "backgroundColor": "#211C5E"
         }
       ],
       [
@@ -69,8 +79,12 @@
       [
         "expo-notifications",
         {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#332E86",
+          "defaultChannel": "default",
           "sounds": [
-            "./assets/sounds/ringtone.wav"
+            "./assets/sounds/ringtone.wav",
+            "./assets/sounds/ringtone-call.wav"
           ]
         }
       ],
@@ -96,6 +110,14 @@
             ]
           }
         }
+      ],
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "EduLoc utilise Face ID pour déverrouiller votre mot de passe ou votre session enregistrés."
+        }
       ]
     ],
     "experiments": {
@@ -106,6 +128,13 @@
       "fr": "./locales/fr.json",
       "en": "./locales/en.json",
       "mg": "./locales/mg.json"
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c196eba1-cc0f-4d57-9755-de64e2490861"
+      }
+    },
+    "owner": "laujjione"
   }
 }

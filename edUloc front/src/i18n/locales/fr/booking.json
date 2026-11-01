@@ -80,7 +80,8 @@
     "goToTheNextAvailability": "Aller à la prochaine disponibilité",
     "choosingARoomDoesNot": " Choisir une salle ne la réserve pas : elle n’est prise que lorsque le tuteur accepte la demande.",
     "bookThisSlot": "Réserver ce créneau",
-    "slotTaken": "{{range}}, créneau pris"
+    "slotTaken": "{{range}}, créneau pris",
+    "noSlotsTitle": "Aucun créneau ce jour-là"
   },
   "bookingPending": {
     "requestSent": "Demande envoyée",

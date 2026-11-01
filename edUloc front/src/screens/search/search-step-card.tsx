@@ -29,7 +29,8 @@ export function SearchStepCard({ label, question, value, open, locked, onOpen, c
   return (
     <View pointerEvents={locked ? "none" : "auto"} style={{ opacity: locked ? 0.55 : 1 }}>
       <ExpandableCard
-        style={{ borderRadius: 22, borderWidth: 1, borderColor: "#E6E7EE", backgroundColor: "#FFFFFF" }}
+        // Carte en verre : blanc translucide et liseré clair, posée sur la feuille dépolie.
+        style={{ borderRadius: 22, borderWidth: 1, borderColor: "rgba(255,255,255,0.85)", backgroundColor: "rgba(255,255,255,0.72)", shadowColor: "#1E1B4B", shadowOpacity: 0.08, shadowRadius: 18, shadowOffset: { width: 0, height: 6 } }}
       >
         {open ? null : (
           <PressableScale
@@ -47,7 +48,7 @@ export function SearchStepCard({ label, question, value, open, locked, onOpen, c
 
         <Collapsible open={open}>
           <View className="px-5 pb-5 pt-5">
-            <Text className="mb-4 text-[22px] font-bold text-ink">{question}</Text>
+            <Text className="mb-4 text-[22px] font-bold font-display text-ink">{question}</Text>
             {children}
           </View>
         </Collapsible>

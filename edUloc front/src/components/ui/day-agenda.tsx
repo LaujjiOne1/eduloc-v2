@@ -1,6 +1,6 @@
 import { Text, View } from "react-native";
 
-import { PlusIcon } from "@/components/icons";
+import { ChevronRightIcon, PlusIcon } from "@/components/icons";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { Button } from "@/components/ui/button";
 import type { DayMarkers } from "@/components/ui/habit-calendar";
@@ -53,7 +53,7 @@ export function DayAgenda({ dateLabel, items, onEditAvailability, onAdd, loading
       {loading ? (
         <View className="h-[88px] rounded-2xl bg-line-soft" />
       ) : items.length === 0 ? (
-        <View className="items-center rounded-2xl border border-line bg-surface p-5">
+        <View className="items-center rounded-2xl border border-line bg-surface shadow-card p-5">
           <Text className="text-[14.5px] font-bold text-ink">{t("ui.dayAgenda.noSlotsOnThisDay")}</Text>
           <Text className="mt-1 max-w-[280px] text-center text-[13px] text-ink-soft">
             {t("ui.dayAgenda.youHaveNoAvailabilityOr")}</Text>
@@ -64,11 +64,9 @@ export function DayAgenda({ dateLabel, items, onEditAvailability, onAdd, loading
           ) : null}
         </View>
       ) : (
-        <View className="rounded-2xl border border-line bg-surface px-4 py-1.5">
+        <View className="gap-2.5">
           {items.map((item, index) => (
-            <View key={`${item.kind}-${item.availabilityId ?? item.bookingId}-${item.startTime}-${index}`} className={index > 0 ? "border-t border-line-soft" : ""}>
-              <AgendaRow item={item} onEditAvailability={onEditAvailability} />
-            </View>
+            <AgendaRow key={`${item.kind}-${item.availabilityId ?? item.bookingId}-${item.startTime}-${index}`} item={item} onEditAvailability={onEditAvailability} />
           ))}
         </View>
       )}
@@ -80,17 +78,17 @@ function AgendaRow({ item, onEditAvailability }: { item: CalendarOccurrence; onE
   const { t } = useTranslation();
   if (item.kind === "booking") {
     return (
-      <View className="flex-row items-center gap-[10px] py-3">
-        <View className="w-[96px] rounded-md bg-accent-tint px-2 py-1 items-center">
-          <Text className="text-[12.5px] font-bold text-accent">
+      <View className="flex-row items-center gap-3 rounded-2xl border border-line-soft bg-surface p-3.5 shadow-card">
+        <View className="rounded-xl bg-accent-tint px-3 py-2">
+          <Text className="text-[13px] font-bold text-accent">
             {item.startTime} – {item.endTime}
           </Text>
         </View>
-        <View className="flex-1">
-          <Text className="text-[13.5px] font-bold text-ink" numberOfLines={1}>
+        <View className="min-w-0 flex-1">
+          <Text className="text-[14px] font-bold text-ink" numberOfLines={1}>
             {item.label}
           </Text>
-          <Text className="text-[11.5px] text-ink-faint">{t("common.confirmedAppointment")}</Text>
+          <Text className="text-[12px] text-ink-faint">{t("common.confirmedAppointment")}</Text>
         </View>
         <StatusBadge status="confirmed" />
       </View>
@@ -102,26 +100,31 @@ function AgendaRow({ item, onEditAvailability }: { item: CalendarOccurrence; onE
       onPress={() => item.availabilityId && onEditAvailability(item.availabilityId)}
       accessibilityLabel={t("ui.dayAgenda.editTheAvailabilityFrom", { startTime: item.startTime })}
     >
-      <View className="flex-row items-center gap-[10px] py-3">
-        <View className="w-[96px] rounded-md bg-primary-tint px-2 py-1 items-center">
-          <Text className="text-[12.5px] font-bold text-primary">
+      <View className="flex-row items-center gap-3 rounded-2xl border border-line-soft bg-surface p-3.5 shadow-card">
+        {/* Plage horaire en badge lavande ; format et lieu en étiquette discrète. */}
+        <View className="rounded-xl bg-primary-tint px-3 py-2">
+          <Text className="text-[13px] font-bold text-primary">
             {item.startTime} – {item.endTime}
           </Text>
         </View>
-        <View className="flex-1">
-          <View className="flex-row flex-wrap items-center gap-1.5">
-            <Text className="text-[13.5px] font-semibold text-ink">{t("ui.dayAgenda.availableSlot")}</Text>
-            <View className={["rounded px-1.5 py-0.5", item.recurring ? "bg-primary-tint" : "bg-warning-tint"].join(" ")}>
-              <Text className={["text-[10.5px] font-bold", item.recurring ? "text-primary" : "text-warning"].join(" ")}>
+        <View className="min-w-0 flex-1">
+          <Text className="text-[14px] font-semibold text-ink" numberOfLines={1}>
+            {t("ui.dayAgenda.availableSlot")}
+          </Text>
+          <View className="mt-1 flex-row flex-wrap items-center gap-1.5">
+            <View className="rounded-full bg-paper-alt px-2 py-[2px]">
+              <Text className="text-[11px] font-semibold text-ink-soft" numberOfLines={1}>
+                {item.label || t("ui.dayAgenda.available")}
+              </Text>
+            </View>
+            <View className={["rounded-full px-2 py-[2px]", item.recurring ? "bg-primary-tint" : "bg-warning-tint"].join(" ")}>
+              <Text className={["text-[11px] font-semibold", item.recurring ? "text-primary" : "text-warning"].join(" ")}>
                 {item.recurring ? t("ui.dayAgenda.everyWeek") : t("ui.dayAgenda.oneTimeOnly")}
               </Text>
             </View>
           </View>
-          <Text className="text-[11.5px] text-ink-faint" numberOfLines={1}>
-            {item.label || t("ui.dayAgenda.available")}
-          </Text>
         </View>
-        <Text className="text-[12px] font-bold text-primary">{t("ui.dayAgenda.edit")}</Text>
+        <ChevronRightIcon size={16} color="#9799AF" />
       </View>
     </PressableScale>
   );

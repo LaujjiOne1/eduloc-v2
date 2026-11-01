@@ -203,5 +203,6 @@
   "supportingDocumentCount_one": "{{count}} supporting document",
   "supportingDocumentCount_other": "{{count}} supporting documents",
   "resultCount_one": "{{count}} result",
-  "resultCount_other": "{{count}} results"
+  "resultCount_other": "{{count}} results",
+  "appointments": "Appointments"
 }

@@ -6,7 +6,8 @@
     "personalInformationComingSoon": "Personal information (coming soon)",
     "myStudyVenuesPartner": "My study venues (partner)",
     "manageMyPartnerStudyVenues": "Manage my partner study venues",
-    "switchModeLabel": "{{value}} mode — switch mode"
+    "switchModeLabel": "{{value}} mode — switch mode",
+    "learningSpace": "Learning space"
   },
   "forgotPassword": {
     "enterYourAccountEmailWe": "Enter your account email: we will send you a 6-digit code.",
@@ -26,6 +27,7 @@
     "location": "Location",
     "popularSearches": "Popular searches",
     "doYouTeach": "Do you teach?",
+    "becomeATutor": "Become a tutor",
     "becomeAVerifiedTutorOn": "Become a verified tutor on EduLoc",
     "noPopularSearchesAtThe": "No popular searches at the moment.",
     "search": "Search",
@@ -50,7 +52,27 @@
     "serviceRoomsTitle": "Study venues",
     "serviceRoomsDescription": "Book a partner room for your in-person lessons.",
     "serviceVerifiedTitle": "Verified tutors",
-    "serviceVerifiedDescription": "Profiles are validated by EduLoc before they appear in the results."
+    "serviceVerifiedDescription": "Profiles are validated by EduLoc before they appear in the results.",
+    "heroTitle": "Find the right tutor near you",
+    "tutorsToDiscover": "Tutors to discover",
+    "carouselHint": "Swipe the cards to discover edUloc",
+    "carouselPrevious": "Previous card",
+    "carouselNext": "Next card",
+    "alreadyHaveAnAccount": "Already have an account?",
+    "carouselEyebrow": "Discover the experience",
+    "carouselTitle": "Everything to succeed in your studies",
+    "carouselSubtitle": "Qualified tutors, near you or online.",
+    "badgeSupport": "Support",
+    "badgeSecurity": "Security",
+    "badgeFlexibility": "Flexibility",
+    "badgeTeachers": "Teachers",
+    "searchCta": "Search",
+    "headlinePrefix": "Find the right tutor",
+    "headlineNear": "near you",
+    "headlineOnline": "online, wherever you are",
+    "headlineRooms": "in a study room",
+    "headlineVerified": "verified and trusted",
+    "headlineLevels": "from primary to doctorate"
   },
   "login": {
     "signInToContinue": "Sign in to continue",
@@ -62,7 +84,32 @@
     "signInOrCreateAn": "Sign in or create an account: you will go straight to the Partner venues area.",
     "continueWithGoogle": "Continue with Google",
     "signingIn": "Signing in...",
-    "continueWithApple": "Continue with Apple"
+    "continueWithApple": "Continue with Apple",
+    "accountsOnDevice": "Accounts on this device",
+    "rememberMe": "Stay signed in",
+    "forgetAccount": "Forget {{email}} on this device",
+    "quickSignIn": "Quick sign-in",
+    "unlockReason": "Unlock to sign in to EduLoc",
+    "savedPasswordNoLongerValid": "The saved password is no longer valid. Please enter it again.",
+    "savePassword": "Save my password",
+    "savePasswordHint": "Encrypted on this device and unlocked by your fingerprint, face or device passcode.",
+    "continueWithFacebook": "Continue with Facebook"
+  },
+  "signOutPrompt": {
+    "title": "Sign out?",
+    "intro": "What should happen to your account on this device?",
+    "keepTitle": "Keep my account on this device",
+    "keepHint": "Your email will be suggested next time you sign in, so you can get back in faster.",
+    "forgetTitle": "Forget this account on this device",
+    "forgetHint": "Your email will no longer be suggested. Best if the device is shared or lent.",
+    "passwordTip": "EduLoc never keeps your password. To avoid retyping it, let your phone's password manager save it when it offers to at sign-in.",
+    "oneTapTitle": "Sign me back in with one tap",
+    "oneTapHint": "No need to retype your password: fingerprint, face or device passcode.",
+    "keepPasswordTitle": "Keep my saved password",
+    "keepPasswordHint": "Untick to delete it from this device.",
+    "vaultTip": "Your secrets are encrypted on this device and only open after unlocking. “Forget this account” deletes them and ends the session.",
+    "vaultTipNoPassword": "To save your password too, tick “Save my password” next time you sign in.",
+    "confirm": "Sign out"
   },
   "modeChoice": {
     "howWouldYouLikeTo": "How would you like to use EduLoc?",
@@ -95,6 +142,22 @@
   "splash": {
     "theRightSupportInThe": "The right support, in the right place.",
     "continueToTheEdulocHome": "Continue to the edUloc home",
-    "tapToContinue": "Tap to continue"
+    "tapToContinue": "Tap to continue",
+    "start": "Open"
+  },
+  "switchAccount": {
+    "title": "Switch account",
+    "intro": "Move between accounts without signing out. Kept accounts reopen with one tap, after unlocking the device.",
+    "active": "Active account",
+    "passwordRequired": "Password required",
+    "needsPassword": "This account needs its password. Use “Add an account” to sign in to it.",
+    "cannotKeepCurrent": "The current account could not be kept safely: the switch is cancelled and you stay signed in.",
+    "addAccount": "Add an account",
+    "lockRequired": "To switch accounts without signing out, turn on a lock on this device (fingerprint, face or passcode). Without it, nothing can be kept safely.",
+    "revokeAllTitle": "Revoke all quick sign-ins",
+    "revokeAllBody": "Kept sign-ins and saved passwords on this device will be deleted and revoked. Accounts stay in the list, but the password will be required.",
+    "revokeAllConfirm": "Revoke all",
+    "revokedCount_one": "{{count}} quick sign-in revoked.",
+    "revokedCount_other": "{{count}} quick sign-ins revoked."
   }
 }

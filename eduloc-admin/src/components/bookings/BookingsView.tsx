@@ -40,23 +40,23 @@ export const BookingsView: React.FC<{ refreshKey: number }> = ({ refreshKey }) =
                 {bookings.data.map((b) => {
                   const st = bookingStatus(b.status);
                   return (
-                    <tr key={b.id} className="hover:bg-white/5">
+                    <tr key={b.id} className="hover:bg-paper-alt">
                       <td className="px-4 py-3.5">
-                        <p className="font-bold text-white">{b.offerTitle}</p>
-                        <p className="text-[11px] text-slate-400">{formatDate(b.startAt, true)} → {new Date(b.endAt).toLocaleTimeString('fr-FR', { timeStyle: 'short' })}</p>
+                        <p className="font-bold text-ink">{b.offerTitle}</p>
+                        <p className="text-[11px] text-ink-soft">{formatDate(b.startAt, true)} → {new Date(b.endAt).toLocaleTimeString('fr-FR', { timeStyle: 'short' })}</p>
                       </td>
                       <td className="px-4 py-3.5">
                         {fullName(b.requester)}
-                        <span className="block text-[11px] text-slate-400">pour {b.beneficiary.firstName}</span>
+                        <span className="block text-[11px] text-ink-soft">pour {b.beneficiary.firstName}</span>
                       </td>
                       <td className="px-4 py-3.5">{b.tutorProfile.displayName || fullName(b.tutorProfile.user)}</td>
                       <td className="px-4 py-3.5">
                         {teachingMode(b.teachingMode)}
-                        {b.room && <span className="block text-[11px] text-slate-400">{b.room.name} · {b.room.venue.name}</span>}
+                        {b.room && <span className="block text-[11px] text-ink-soft">{b.room.name} · {b.room.venue.name}</span>}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap">
                         {formatMoney(b.totalAmount, b.currency)}
-                        <span className="block text-[11px] text-slate-400">dont frais EduLoc {formatMoney(b.serviceFee, b.currency)}</span>
+                        <span className="block text-[11px] text-ink-soft">dont frais EduLoc {formatMoney(b.serviceFee, b.currency)}</span>
                       </td>
                       <td className="px-4 py-3.5">
                         <div className="flex flex-wrap gap-1">
@@ -83,9 +83,9 @@ export const BookingsView: React.FC<{ refreshKey: number }> = ({ refreshKey }) =
                 {rooms.data.map((r) => {
                   const st = bookingStatus(r.status);
                   return (
-                    <tr key={r.id} className="hover:bg-white/5">
-                      <td className="px-4 py-3.5"><p className="font-bold text-white">{r.room?.name ?? '—'}</p><p className="text-[11px] text-slate-400">{r.room?.venue.name}</p></td>
-                      <td className="px-4 py-3.5 text-slate-300">{formatDate(r.startAt, true)}</td>
+                    <tr key={r.id} className="hover:bg-paper-alt">
+                      <td className="px-4 py-3.5"><p className="font-bold text-ink">{r.room?.name ?? '—'}</p><p className="text-[11px] text-ink-soft">{r.room?.venue.name}</p></td>
+                      <td className="px-4 py-3.5 text-ink-soft">{formatDate(r.startAt, true)}</td>
                       <td className="px-4 py-3.5">{r.tutorProfile.displayName ?? '—'}</td>
                       <td className="px-4 py-3.5">{r.participantsCount}</td>
                       <td className="px-4 py-3.5">

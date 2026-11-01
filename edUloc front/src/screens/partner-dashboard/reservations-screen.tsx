@@ -23,7 +23,7 @@ export function PartnerReservationsScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <AuthHeader onBack={() => router.back()} />
-      <Text className="px-5 pb-4 text-[24px] font-bold text-ink">{t("common.reservations")}</Text>
+      <Text className="px-5 pb-4 text-[24px] font-bold font-display text-ink">{t("common.reservations")}</Text>
 
       <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 28 }} showsVerticalScrollIndicator={false}>
         {state.status === "loading" ? (
@@ -47,7 +47,7 @@ export function PartnerReservationsScreen() {
         ) : (
           state.reservations.map((r, index) => (
             <FadeIn key={r.id} delay={30 + index * 30}>
-              <View className="mb-3 rounded-lg border border-line bg-surface p-4">
+              <View className="mb-3 rounded-lg border border-line bg-surface shadow-card p-4">
                 <View className="flex-row items-start justify-between gap-3">
                   <View className="flex-1">
                     <Text className="text-[15px] font-bold text-ink">{r.roomName}</Text>

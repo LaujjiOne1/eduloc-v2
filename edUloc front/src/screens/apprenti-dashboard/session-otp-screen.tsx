@@ -67,7 +67,7 @@ export function SessionOtpScreen() {
         <View className="mb-[18px] h-16 w-16 items-center justify-center rounded-full bg-primary-tint">
           <LockIcon size={28} color="#332E86" />
         </View>
-        <Text className="mb-2 text-[22px] font-bold text-ink">{t("common.sessionCode")}</Text>
+        <Text className="mb-2 text-[22px] font-bold font-display text-ink">{t("common.sessionCode")}</Text>
         <Text className="mb-[22px] text-center text-[14px] leading-[21px] text-ink-soft">
           {t("apprentiDashboard.sessionOtp.giveThisCodeToWhen", { value: booking.offer.tutorName.split(" ")[0], subjectLabel: booking.offer.subjectLabel })}</Text>
 
@@ -77,7 +77,7 @@ export function SessionOtpScreen() {
           ) : codeState.status === "error" ? (
             <FormError message={codeState.message} />
           ) : (
-            <Text className="text-[34px] font-bold tracking-[0.12em] text-primary-dark">{codeState.code}</Text>
+            <Text className="text-[34px] font-bold font-display tracking-[0.12em] text-primary-dark">{codeState.code}</Text>
           )}
         </View>
 

@@ -89,7 +89,7 @@ export function RoomOpeningsEditor({ roomId, initial, disabled, onSaved }: RoomO
       {sorted.length === 0 ? (
         <Text className="mb-3 text-[13.5px] text-ink-soft">{t("partner.roomOpeningsEditor.noOpeningHoursTheRoom")}</Text>
       ) : (
-        <View className="mb-3 rounded-lg border border-line bg-surface px-4">
+        <View className="mb-3 rounded-lg border border-line bg-surface shadow-card px-4">
           {sorted.map((d, i) => (
             <View key={`${d.dayOfWeek}-${d.startTime}-${d.index}`} className={["flex-row items-center py-3", i > 0 ? "border-t border-line-soft" : ""].join(" ")}>
               <Text className="flex-1 text-[14px] font-semibold text-ink">

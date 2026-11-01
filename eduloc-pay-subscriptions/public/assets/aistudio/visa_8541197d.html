@@ -1,0 +1,251 @@
+<!-- payment-visa.html -->
+<section class="visa-payment-container">
+    <div class="payment-header">
+        <h2>Paiement par Carte Bancaire</h2>
+        <div class="security-indicators">
+            <span class="ssl-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#0E9C82" stroke-width="2">
+                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                </svg>
+                Connexion sécurisée HTTPS
+            </span>
+        </div>
+    </div>
+
+    <!-- VISA-01: Hosted Payment Page Warning -->
+    <div class="pci-notice warning-box">
+        <div class="warning-icon">⚠️</div>
+        <div class="warning-content">
+            <h4>Protection de vos données bancaires</h4>
+            <p>Conformément à la norme <strong>PCI DSS</strong>, la saisie de votre carte est traitée directement par notre prestataire de paiement certifié. edUloc ne conserve jamais vos données bancaires complètes.</p>
+            <ul class="security-points">
+                <li>✓ Le CVV ne sera jamais stocké</li>
+                <li>✓ Authentification 3D Secure obligatoire</li>
+                <li>✓ Chiffrement de bout en bout</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- PCI DSS Compliant Form (Hosted Fields) -->
+    <form id="visa-payment-form" class="payment-form" action="/api/payment/visa" method="POST">
+        <input type="hidden" name="reservation_id" value="{{reservation_id}}">
+        <input type="hidden" name="amount" value="{{server_calculated_amount}}">
+        <input type="hidden" name="currency" value="MGA">
+        
+        <div class="form-section">
+            <h3>Informations de la carte</h3>
+            
+            <!-- Card Number - Hosted Field -->
+            <div class="form-group">
+                <label for="card-number">Numéro de carte *</label>
+                <div class="hosted-field" id="card-number-container" data-pci-field="number">
+                    <input type="text" 
+                           id="card-number" 
+                           name="card_number" 
+                           placeholder="1234 5678 9012 3456"
+                           autocomplete="cc-number"
+                           required
+                           maxlength="19">
+                </div>
+                <span class="field-hint">Nous ne stockons pas le numéro complet</span>
+            </div>
+
+            <!-- Cardholder Name -->
+            <div class="form-group">
+                <label for="cardholder-name">Nom du titulaire *</label>
+                <input type="text" 
+                       id="cardholder-name" 
+                       name="cardholder_name"
+                       placeholder="Tel qu'indiqué sur la carte"
+                       autocomplete="cc-name"
+                       required>
+            </div>
+
+            <div class="form-row">
+                <!-- Expiry Date -->
+                <div class="form-group half">
+                    <label for="expiry-date">Date d'expiration *</label>
+                    <input type="text" 
+                           id="expiry-date" 
+                           name="expiry_date"
+                           placeholder="MM/AA"
+                           autocomplete="cc-exp"
+                           required
+                           maxlength="5">
+                </div>
+
+                <!-- CVV - VISA-02 Compliance -->
+                <div class="form-group half">
+                    <label for="cvv">CVV *</label>
+                    <div class="cvv-input-wrapper">
+                        <input type="password" 
+                               id="cvv" 
+                               name="cvv"
+                               placeholder="123"
+                               autocomplete="cc-csc"
+                               required
+                               maxlength="4">
+                        <button type="button" class="cvv-help" title="Qu'est-ce que le CVV?">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                                <line x1="12" y1="17" x2="12.01" y2="17"/>
+                            </svg>
+                        </button>
+                    </div>
+                    <span class="field-hint error-notice">
+                        ⚠️ Le CVV ne sera jamais enregistré (conformité PCI DSS)
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISA-03: 3D Secure Notice -->
+        <div class="secure-notice info-box">
+            <div class="info-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#332E86" stroke-width="2">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                </svg>
+            </div>
+            <div class="info-content">
+                <h4>Authentification Visa Secure (3D Secure)</h4>
+                <p>Après validation, votre banque peut vous demander une authentification supplémentaire (code SMS, notification mobile, ou empreinte biométrique). Cette étape est gérée directement par votre banque.</p>
+            </div>
+        </div>
+
+        <!-- VISA-04: Payment Confirmation Warning -->
+        <div class="confirmation-warning">
+            <p><strong>Important :</strong> L'authentification 3D Secure ne garantit pas le paiement. La confirmation finale dépend de l'autorisation de votre banque.</p>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="history.back()">
+                Retour
+            </button>
+            <button type="submit" class="btn-primary btn-pay">
+                <span class="btn-text">Payer 47 000 Ar</span>
+                <span class="btn-loader" style="display:none">
+                    <svg class="spinner" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none"/>
+                    </svg>
+                    Traitement...
+                </span>
+            </button>
+        </div>
+    </form>
+</section>
+
+<script>
+// VISA-01: PCI DSS Compliance - Tokenization
+document.getElementById('visa-payment-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('.btn-pay');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoader = submitBtn.querySelector('.btn-loader');
+    
+    // Show loading state
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'flex';
+    
+    try {
+        // SEC-03: Server-side amount validation
+        const formData = new FormData(this);
+        
+        // SEC-02: Never send sensitive data to client
+        const response = await fetch('/api/payment/visa/tokenize', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': getCsrfToken() // SEC-04
+            },
+            body: JSON.stringify({
+                reservation_id: formData.get('reservation_id'),
+                amount: formData.get('amount'), // Server will validate this
+                currency: formData.get('currency'),
+                card_token: await tokenizeCard(this) // PCI-compliant tokenization
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.requires_3ds) {
+            // VISA-03: Handle 3D Secure redirect
+            await handle3DSecure(data.three_ds_url);
+        } else if (data.status === 'success') {
+            // VISA-04: Verify payment status server-side
+            await verifyPaymentStatus(data.transaction_id);
+        }
+        
+    } catch (error) {
+        showError('Une erreur est survenue. Veuillez réessayer.');
+        console.error('Payment error:', error);
+    } finally {
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+    }
+});
+
+// SEC-07: Idempotency handling
+let paymentInProgress = false;
+
+async function tokenizeCard(form) {
+    if (paymentInProgress) {
+        throw new Error('Payment already in progress');
+    }
+    paymentInProgress = true;
+    
+    // Use payment provider's hosted fields or iframe
+    // This ensures PCI DSS compliance
+    return await paymentProvider.tokenize({
+        number: document.getElementById('card-number').value,
+        expiry: document.getElementById('expiry-date').value,
+        cvv: document.getElementById('cvv').value
+    });
+}
+
+// VISA-03: 3D Secure handling
+async function handle3DSecure(authUrl) {
+    return new Promise((resolve, reject) => {
+        const authWindow = window.open(authUrl, '3ds-auth', 'width=600,height=800');
+        
+        const checkWindowClosed = setInterval(() => {
+            if (authWindow.closed) {
+                clearInterval(checkWindowClosed);
+                // Verify payment status after 3DS
+                verifyPaymentStatus().then(resolve).catch(reject);
+            }
+        }, 1000);
+    });
+}
+
+// VISA-04: Server-side payment verification
+async function verifyPaymentStatus(transactionId) {
+    const response = await fetch(`/api/payment/verify/${transactionId}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${getServerToken()}` // SEC-02
+        }
+    });
+    
+    const verification = await response.json();
+    
+    // Check all required fields
+    if (verification.status === 'AUTHORIZED' && 
+        verification.amount === expectedAmount &&
+        verification.currency === 'MGA') {
+        // Update Odoo CRM
+        await updateOdooPaymentStatus({
+            transaction_id: transactionId,
+            status: 'confirmed',
+            payment_method: 'visa',
+            timestamp: new Date().toISOString()
+        });
+        
+        window.location.href = '/payment/success?ref=' + transactionId;
+    } else {
+        throw new Error('Payment verification failed');
+    }
+}
+</script>

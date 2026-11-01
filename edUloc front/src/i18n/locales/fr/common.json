@@ -203,5 +203,6 @@
   "supportingDocumentCount_one": "{{count}} justificatif",
   "supportingDocumentCount_other": "{{count}} justificatifs",
   "resultCount_one": "{{count}} résultat",
-  "resultCount_other": "{{count}} résultats"
+  "resultCount_other": "{{count}} résultats",
+  "appointments": "Rendez-vous"
 }

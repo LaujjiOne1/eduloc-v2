@@ -1,0 +1,280 @@
+<!-- payment-mobile-money.html -->
+<section class="mobile-money-container">
+    <div class="payment-header">
+        <h2>Paiement Mobile Money</h2>
+        <div class="operator-logos">
+            <img src="/images/orange-money.png" alt="Orange Money">
+            <img src="/images/mvola.png" alt="MVola">
+            <img src="/images/airtel-money.png" alt="Airtel Money">
+        </div>
+    </div>
+
+    <!-- MM-01: Security Warning - Never Share PIN -->
+    <div class="security-warning critical-box">
+        <div class="warning-icon">🚨</div>
+        <div class="warning-content">
+            <h4>⚠️ Ne communiquez JAMAIS votre code PIN</h4>
+            <p><strong>edUloc ne vous demandera jamais votre code secret Mobile Money.</strong> La confirmation du paiement se fait uniquement sur votre téléphone via USSD ou application officielle.</p>
+            <ul class="security-rules">
+                <li> Ne donnez jamais votre PIN à un agent edUloc</li>
+                <li>❌ Ne saisissez jamais votre PIN sur ce site</li>
+                <li>✅ Confirmez uniquement sur votre mobile</li>
+                <li>✅ Vérifiez que le numéro affiché correspond à votre numéro</li>
+            </ul>
+        </div>
+    </div>
+
+    <form id="mobile-money-form" class="payment-form" action="/api/payment/mobile-money" method="POST">
+        <input type="hidden" name="reservation_id" value="{{reservation_id}}">
+        <input type="hidden" name="amount" value="{{server_calculated_amount}}">
+        
+        <div class="form-section">
+            <h3>Informations de paiement</h3>
+            
+            <!-- Operator Selection -->
+            <div class="form-group">
+                <label for="operator">Opérateur Mobile Money *</label>
+                <select id="operator" name="operator" required onchange="detectOperatorFromPhone()">
+                    <option value="">Sélectionnez votre opérateur</option>
+                    <option value="orange-money">Orange Money</option>
+                    <option value="mvola">MVola (Telma)</option>
+                    <option value="airtel-money">Airtel Money</option>
+                </select>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label for="phone-number">Numéro de mobile *</label>
+                <div class="phone-input-wrapper">
+                    <select id="country-code" name="country_code" class="country-code">
+                        <option value="+261">🇲🇬 +261</option>
+                    </select>
+                    <input type="tel" 
+                           id="phone-number" 
+                           name="phone_number"
+                           placeholder="34 12 345 67"
+                           autocomplete="tel"
+                           required
+                           maxlength="10"
+                           oninput="autoDetectOperator()">
+                </div>
+                <span class="field-hint">Le numéro doit être associé à un compte Mobile Money actif</span>
+            </div>
+
+            <!-- MM-02: Payment Process Explanation -->
+            <div class="process-info info-box">
+                <h4>Comment ça marche ?</h4>
+                <ol class="process-steps">
+                    <li>
+                        <strong>Étape 1 :</strong> Entrez votre numéro de mobile ci-dessus
+                    </li>
+                    <li>
+                        <strong>Étape 2 :</strong> Cliquez sur "Payer"
+                    </li>
+                    <li>
+                        <strong>Étape 3 :</strong> Vous recevrez une demande de paiement USSD sur votre téléphone
+                    </li>
+                    <li>
+                        <strong>Étape 4 :</strong> Saisissez votre <strong>code PIN confidentiel</strong> uniquement sur votre mobile
+                    </li>
+                    <li>
+                        <strong>Étape 5 :</strong> Confirmez le paiement dans l'USSD
+                    </li>
+                </ol>
+            </div>
+
+            <!-- MM-02: Status States Explanation -->
+            <div class="status-info">
+                <h4>Statuts de paiement</h4>
+                <div class="status-grid">
+                    <div class="status-item pending">
+                        <span class="status-icon">⏳</span>
+                        <div>
+                            <strong>En attente</strong>
+                            <p>La demande a été envoyée. Attendez la confirmation.</p>
+                        </div>
+                    </div>
+                    <div class="status-item success">
+                        <span class="status-icon">✓</span>
+                        <div>
+                            <strong>Confirmé</strong>
+                            <p>Paiement réussi et vérifié côté serveur.</p>
+                        </div>
+                    </div>
+                    <div class="status-item failed">
+                        <span class="status-icon">✗</span>
+                        <div>
+                            <strong>Échoué</strong>
+                            <p>Le paiement a été refusé ou annulé.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MM-03: Server Verification Notice -->
+        <div class="verification-notice warning-box">
+            <div class="warning-icon">⏱️</div>
+            <div class="warning-content">
+                <h4>Vérification automatique</h4>
+                <p>Après confirmation USSD, notre système vérifie automatiquement le statut du paiement auprès de l'opérateur. Cette vérification peut prendre jusqu'à 2 minutes.</p>
+                <p><strong>Ne fermez pas cette page avant la confirmation finale.</strong></p>
+            </div>
+        </div>
+
+        <!-- MM-04: No Client Proof Warning -->
+        <div class="proof-warning alert-box">
+            <div class="alert-icon">📱</div>
+            <div class="alert-content">
+                <h4>Important concernant les preuves de paiement</h4>
+                <p>Un SMS de confirmation ou une capture d'écran <strong>ne suffit pas</strong> à valider votre réservation. Seul le statut confirmé par l'API de l'opérateur fait foi.</p>
+                <p>En cas de problème, contactez notre support avec la référence de transaction.</p>
+            </div>
+        </div>
+
+        <div class="form-actions">
+            <button type="button" class="btn-secondary" onclick="history.back()">
+                Retour
+            </button>
+            <button type="submit" class="btn-primary btn-pay">
+                <span class="btn-text">Payer 47 000 Ar</span>
+                <span class="btn-loader" style="display:none">
+                    <svg class="spinner" viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" fill="none"/>
+                    </svg>
+                    Envoi de la demande...
+                </span>
+            </button>
+        </div>
+    </form>
+</section>
+
+<script>
+// MM-01: Auto-detect operator from phone prefix
+function autoDetectOperator() {
+    const phone = document.getElementById('phone-number').value;
+    const operatorSelect = document.getElementById('operator');
+    
+    if (phone.startsWith('032') || phone.startsWith('033')) {
+        operatorSelect.value = 'mvola';
+    } else if (phone.startsWith('034')) {
+        operatorSelect.value = 'orange-money';
+    } else if (phone.startsWith('031')) {
+        operatorSelect.value = 'airtel-money';
+    }
+}
+
+// MM-02 & MM-03: Payment submission with status polling
+document.getElementById('mobile-money-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const submitBtn = this.querySelector('.btn-pay');
+    const btnText = submitBtn.querySelector('.btn-text');
+    const btnLoader = submitBtn.querySelector('.btn-loader');
+    
+    btnText.style.display = 'none';
+    btnLoader.style.display = 'flex';
+    
+    try {
+        // SEC-03: Server-side validation
+        const formData = new FormData(this);
+        
+        // MM-02: Initiate payment (returns 202 Accepted)
+        const response = await fetch('/api/payment/mobile-money/initiate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-Token': getCsrfToken()
+            },
+            body: JSON.stringify({
+                reservation_id: formData.get('reservation_id'),
+                amount: formData.get('amount'),
+                operator: formData.get('operator'),
+                phone_number: formData.get('phone_number'),
+                country_code: formData.get('country_code')
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'PENDING' || response.status === 202) {
+            // MM-02: Show pending state
+            showPendingState(data.transaction_id);
+            
+            // MM-03: Poll for status
+            await pollPaymentStatus(data.transaction_id);
+        }
+        
+    } catch (error) {
+        showError('Une erreur est survenue. Veuillez réessayer.');
+        console.error('Mobile money error:', error);
+    } finally {
+        btnText.style.display = 'inline';
+        btnLoader.style.display = 'none';
+    }
+});
+
+// MM-03: Server-side status verification
+async function pollPaymentStatus(transactionId) {
+    const maxAttempts = 30; // 5 minutes with 10s polling
+    let attempts = 0;
+    
+    const pollInterval = setInterval(async () => {
+        attempts++;
+        
+        try {
+            const response = await fetch(`/api/payment/mobile-money/status/${transactionId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${getServerToken()}` // SEC-02
+                }
+            });
+            
+            const status = await response.json();
+            
+            switch(status.state) {
+                case 'SUCCEEDED':
+                    clearInterval(pollInterval);
+                    // Update Odoo CRM
+                    await updateOdooPaymentStatus({
+                        transaction_id: transactionId,
+                        status: 'confirmed',
+                        payment_method: status.operator,
+                        phone_number: maskPhoneNumber(status.phone_number),
+                        timestamp: new Date().toISOString()
+                    });
+                    window.location.href = '/payment/success?ref=' + transactionId;
+                    break;
+                    
+                case 'FAILED':
+                case 'CANCELLED':
+                case 'EXPIRED':
+                    clearInterval(pollInterval);
+                    showPaymentFailed(status.state, status.reason);
+                    break;
+                    
+                case 'PENDING':
+                    // Continue polling
+                    updateStatusMessage('En attente de confirmation... (' + attempts + '/' + maxAttempts + ')');
+                    break;
+            }
+            
+        } catch (error) {
+            console.error('Status check error:', error);
+        }
+        
+        if (attempts >= maxAttempts) {
+            clearInterval(pollInterval);
+            showPaymentTimeout();
+        }
+        
+    }, 10000); // Poll every 10 seconds
+}
+
+// SEC-07: Idempotency protection
+let paymentRequestInProgress = false;
+
+function maskPhoneNumber(phone) {
+    return phone.replace(/(\d{2})\d{4}(\d{2})/, '$1****$2');
+}
+</script>

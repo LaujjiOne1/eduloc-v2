@@ -102,7 +102,7 @@ export function TutorAvailabilityScreen() {
 
       <View className="px-5 pb-3">
         <FadeIn delay={40}>
-          <Text className="mb-1 text-[24px] font-bold text-ink">{t("tutorOnboarding.tutorAvailability.yourAvailabilities")}</Text>
+          <Text className="mb-1 text-[24px] font-bold font-display text-ink">{t("tutorOnboarding.tutorAvailability.yourAvailabilities")}</Text>
           <Text className="mb-3 text-[13.5px] text-ink-soft">
             {t("tutorOnboarding.tutorAvailability.chooseWhetherYourHoursRepeat")}</Text>
         </FadeIn>

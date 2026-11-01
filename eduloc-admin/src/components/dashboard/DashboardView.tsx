@@ -36,17 +36,17 @@ export const DashboardView: React.FC<Props> = ({ refreshKey, todo, onNavigate })
   return (
     <div className="space-y-8">
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">À traiter</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-ink-soft mb-3">À traiter</h2>
         <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-4">
           {QUEUES.map((q) => {
             const n = todo[q.section] ?? 0;
             return (
               <button key={q.section} onClick={() => onNavigate(q.section)} className="text-left group">
-                <Card className={`p-5 h-full transition-all group-hover:bg-white/10 ${n > 0 ? 'border-rose-500/30' : ''}`}>
-                  <p className={`text-4xl font-bold tracking-tight ${n > 0 ? 'text-white' : 'text-slate-500'}`}>{n}</p>
-                  <p className="mt-2 text-sm font-semibold text-slate-100">{q.label}</p>
-                  <p className="text-[11px] text-slate-400 mt-0.5">{q.hint}</p>
-                  <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-indigo-300">Ouvrir <ArrowRight className="w-3 h-3" /></span>
+                <Card className={`p-5 h-full transition-all group-hover:bg-paper-alt ${n > 0 ? 'border-error/30' : ''}`}>
+                  <p className={`text-4xl font-bold tracking-tight ${n > 0 ? 'text-ink' : 'text-ink-faint'}`}>{n}</p>
+                  <p className="mt-2 text-sm font-semibold text-ink">{q.label}</p>
+                  <p className="text-[11px] text-ink-soft mt-0.5">{q.hint}</p>
+                  <span className="mt-3 inline-flex items-center gap-1 text-[11px] font-semibold text-brand">Ouvrir <ArrowRight className="w-3 h-3" /></span>
                 </Card>
               </button>
             );
@@ -55,27 +55,27 @@ export const DashboardView: React.FC<Props> = ({ refreshKey, todo, onNavigate })
       </section>
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Plateforme</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-ink-soft mb-3">Plateforme</h2>
         {counts.error && <ErrorBox message={counts.error} onRetry={counts.reload} />}
         {counts.loading && !stats ? <Loading /> : stats && (
           <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
             {stats.map((s) => (
               <Card key={s.label} className="p-4">
-                <p className="text-2xl font-bold text-white">{s.value.toLocaleString('fr-FR')}</p>
-                <p className="text-[11px] text-slate-400 mt-1">{s.label}</p>
+                <p className="text-2xl font-bold text-ink">{s.value.toLocaleString('fr-FR')}</p>
+                <p className="text-[11px] text-ink-soft mt-1">{s.label}</p>
               </Card>
             ))}
           </div>
         )}
-        <p className="mt-2 text-[11px] text-slate-500">Compteurs mis en cache 60 secondes côté serveur.</p>
+        <p className="mt-2 text-[11px] text-ink-faint">Compteurs mis en cache 60 secondes côté serveur.</p>
       </section>
 
       <section>
-        <h2 className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">Maintenance</h2>
+        <h2 className="text-xs font-bold uppercase tracking-widest text-ink-soft mb-3">Maintenance</h2>
         <Card className="p-5 flex flex-wrap items-center justify-between gap-4">
           <div className="max-w-xl">
-            <p className="text-sm font-semibold text-slate-100">Réindexer la recherche sémantique</p>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-sm font-semibold text-ink">Réindexer la recherche sémantique</p>
+            <p className="text-xs text-ink-soft mt-1">
               Recalcule l’index de tous les tuteurs approuvés, en tâche de fond. À lancer après un changement de modèle d’embedding,
               ou pour des tuteurs approuvés avant l’indexation. Un tuteur seul se réindexe depuis sa fiche.
             </p>

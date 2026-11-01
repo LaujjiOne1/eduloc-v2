@@ -15,6 +15,7 @@ import { useTutorApplicationStore } from "@/store/tutor-application.store";
 import type { TutorApplication } from "@/types/tutor-application";
 import { useTranslation } from "react-i18next";
 import { useLoadEffect } from "@/hooks/use-load-effect";
+import { Logo } from "@/components/ui/logo";
 
 const HOME_ROUTE = "/home" as Href;
 const TUTOR_DASHBOARD_ROUTE = "/tutor-dashboard" as Href;
@@ -76,9 +77,7 @@ export function TutorApplicationPendingScreen() {
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>
       <View className="flex-row items-center justify-between px-5 pb-[14px] pt-5">
-        <Text className="text-[21px] font-bold text-ink">
-          edU<Text className="text-primary">loc</Text>
-        </Text>
+        <Logo size={32} />
       </View>
 
       <ScrollView
@@ -98,13 +97,13 @@ export function TutorApplicationPendingScreen() {
             ) : rejected ? (
               <XCircleIcon size={32} color="#E04F5F" />
             ) : (
-              <ClockIcon size={32} color="#BD7E28" />
+              <ClockIcon size={32} color="#D4890A" />
             )}
           </View>
         </ScaleIn>
 
         <FadeIn delay={90}>
-          <Text className="mb-[10px] text-center text-[22px] font-bold text-ink">
+          <Text className="mb-[10px] text-center text-[22px] font-bold font-display text-ink">
             {approved ? t("tutorOnboarding.tutorApplicationPending.fileApproved") : rejected ? t("tutorOnboarding.tutorApplicationPending.fileRejected") : t("tutorOnboarding.tutorApplicationPending.fileSubmitted")}
           </Text>
         </FadeIn>
@@ -121,7 +120,7 @@ export function TutorApplicationPendingScreen() {
 
         {rejected && application?.rejectionReason ? (
           <FadeIn delay={150}>
-            <View className="mb-6 w-full rounded-lg border border-line bg-surface p-4">
+            <View className="mb-6 w-full rounded-lg border border-line bg-surface shadow-card p-4">
               <Text className="mb-1 text-[12px] font-bold uppercase tracking-[0.03em] text-ink-soft">{t("tutorOnboarding.tutorApplicationPending.reason")}</Text>
               <Text className="text-[14px] text-ink">{application.rejectionReason}</Text>
             </View>

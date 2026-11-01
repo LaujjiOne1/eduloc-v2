@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo noupdate="1">
+    <!-- Motifs de clôture (cahier §4.4 : « la clôture doit être accompagnée d'un motif »). -->
+    <record id="lost_unreachable" model="crm.lost.reason">
+        <field name="name">Demandeur injoignable</field>
+    </record>
+    <record id="lost_solved_elsewhere" model="crm.lost.reason">
+        <field name="name">Besoin résolu en dehors d'EduLoc</field>
+    </record>
+    <record id="lost_no_tutor" model="crm.lost.reason">
+        <field name="name">Aucun tuteur disponible</field>
+    </record>
+    <record id="lost_budget" model="crm.lost.reason">
+        <field name="name">Budget ou tarif non adapté</field>
+    </record>
+    <record id="lost_out_of_scope" model="crm.lost.reason">
+        <field name="name">Hors périmètre (ex. candidature tuteur, partenariat)</field>
+    </record>
+    <record id="lost_duplicate" model="crm.lost.reason">
+        <field name="name">Doublon d'une autre demande</field>
+    </record>
+    <record id="lost_invalid" model="crm.lost.reason">
+        <field name="name">Demande invalide ou spam</field>
+    </record>
+</odoo>

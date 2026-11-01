@@ -328,7 +328,7 @@ export function AvailabilityEditScreen() {
           {/* Title Header */}
           <FadeIn delay={20}>
             <View className="mb-5 pt-1">
-              <Text className="text-[25px] font-bold text-ink">
+              <Text className="text-[25px] font-bold font-display text-ink">
                 {isEditMode ? tr("tutorDashboard.availabilityEdit.editTheAvailability") : tr("tutorDashboard.availabilityEdit.addAvailabilities")}
               </Text>
               <Text className="mt-1 text-[13.5px] text-ink-soft">

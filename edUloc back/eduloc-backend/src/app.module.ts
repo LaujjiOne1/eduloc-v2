@@ -30,6 +30,7 @@ import { MatchingModule } from './modules/matching/matching.module';
 import { CvImportModule } from './modules/cv-import/cv-import.module';
 import { PartnersModule } from './modules/partners/partners.module';
 import { RoomsModule } from './modules/rooms/rooms.module';
+import { PaymentsModule } from './modules/payments/payments.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { RoomsModule } from './modules/rooms/rooms.module';
     CvImportModule,
     PartnersModule,
     RoomsModule,
+    PaymentsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: JwtAuthGuard }],
 })

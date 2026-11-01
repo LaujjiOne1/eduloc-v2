@@ -8,9 +8,6 @@ import { useTranslation } from "react-i18next";
 function callRoute(id: string): Href {
   return `/apprenti-dashboard/bookings/${id}/call` as Href;
 }
-function voiceRoute(id: string): Href {
-  return `/apprenti-dashboard/bookings/${id}/conversation/voice` as Href;
-}
 function documentsRoute(id: string): Href {
   return `/apprenti-dashboard/bookings/${id}/conversation/documents` as Href;
 }
@@ -33,7 +30,6 @@ export function ConversationScreen() {
       statusLabel={booking ? (confirmed ? t("common.confirmedAppointment") : t("apprentiDashboard.conversation.awaitingConfirmation")) : null}
       statusPositive={confirmed}
       callRoute={callRoute(id ?? "")}
-      voiceRoute={voiceRoute(id ?? "")}
       documentsRoute={documentsRoute(id ?? "")}
     />
   );

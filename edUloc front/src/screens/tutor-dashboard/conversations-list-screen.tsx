@@ -13,8 +13,6 @@ export function TutorConversationsListScreen() {
   const { t } = useTranslation();
   return (
     <ConversationsListView
-      tone="violet"
-      subtitle={t("tutorDashboard.conversationsList.exchangeVoiceMessagesAndDocuments")}
       emptyTitle={t("tutorDashboard.conversationsList.noConversations")}
       emptyBody={t("tutorDashboard.conversationsList.youWillBeAbleTo")}
       routeFor={conversationRoute}
