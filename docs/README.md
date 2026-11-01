@@ -16,6 +16,7 @@ module dont la dépendance n'est pas prête). Il complète la spécification V2 
 | 5b | [`tests/ROADMAP-TEST-SYSTEME.md`](tests/ROADMAP-TEST-SYSTEME.md) | QA / direction | Paliers de test de l’ensemble du système, du contrat au pilote |
 | 5c | [`architecture/DECISIONS-A-TRANCHER.md`](architecture/DECISIONS-A-TRANCHER.md) | direction | 20 décisions à prendre avant d’implémenter, avec recommandations |
 | 4b | [`taches/ORDRE-DE-DEVELOPPEMENT.md`](taches/ORDRE-DE-DEVELOPPEMENT.md) | tous | Ordre de développement après les décisions du 2026-11-01 |
+| 1b | [`architecture/CHOIX-TECHNOLOGIQUES.md`](architecture/CHOIX-TECHNOLOGIQUES.md) | dev / direction | Technologies retenues ou reportées, par étape |
 | 7 | [`video/STORYBOARD-PRESENTATION.md`](video/STORYBOARD-PRESENTATION.md) | marketing / motion | Storyboard et direction motion design |
 
 ## CI/CD
