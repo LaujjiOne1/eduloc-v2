@@ -13,6 +13,8 @@ module dont la dépendance n'est pas prête). Il complète la spécification V2 
 | 4 | [`taches/ROADMAP-TACHES.md`](taches/ROADMAP-TACHES.md) | tous | Tâches ordonnées par vague, dépendances, critères de fin |
 | 5 | [`tests/PLAN-DE-TESTS.md`](tests/PLAN-DE-TESTS.md) | dev / QA | Tests à écrire, dans l'ordre, par tâche |
 | 6 | [`securite/SECURITE-BACKEND.md`](securite/SECURITE-BACKEND.md) | dev / sécurité | Exigences, contrôles CI, checklist de revue |
+| 5b | [`tests/ROADMAP-TEST-SYSTEME.md`](tests/ROADMAP-TEST-SYSTEME.md) | QA / direction | Paliers de test de l’ensemble du système, du contrat au pilote |
+| 5c | [`architecture/DECISIONS-A-TRANCHER.md`](architecture/DECISIONS-A-TRANCHER.md) | direction | 20 décisions à prendre avant d’implémenter, avec recommandations |
 | 7 | [`video/STORYBOARD-PRESENTATION.md`](video/STORYBOARD-PRESENTATION.md) | marketing / motion | Storyboard et direction motion design |
 
 ## CI/CD
