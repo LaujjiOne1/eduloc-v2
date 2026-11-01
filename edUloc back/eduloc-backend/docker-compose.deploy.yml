@@ -1,0 +1,6 @@
+# Déploiement : utilise l'image publiée par la CD au lieu de la construire.
+#   API_IMAGE=ghcr.io/<org>/eduloc-backend@sha256:... docker compose -f docker-compose.yml -f docker-compose.deploy.yml up -d api
+services:
+  api:
+    image: ${API_IMAGE:?API_IMAGE requis}
+    build: !reset null

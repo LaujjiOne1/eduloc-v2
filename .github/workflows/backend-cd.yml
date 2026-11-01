@@ -1,0 +1,162 @@
+name: Backend CD
+
+# Image construite à chaque fusion sur main ; staging automatique ; production sur approbation manuelle
+# (environnement GitHub « production » avec relecteurs requis).
+on:
+  push:
+    branches: [main]
+    paths:
+      - "edUloc back/eduloc-backend/**"
+  workflow_dispatch:
+    inputs:
+      deploy_production:
+        description: "Déployer aussi en production (approbation requise)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: backend-cd
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: write
+  id-token: write
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE: ghcr.io/${{ github.repository_owner }}/eduloc-backend
+
+jobs:
+  build-image:
+    name: Construire et publier l'image
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
+      tag: ${{ steps.meta.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.IMAGE }}
+          tags: |
+            type=sha,format=long
+      - id: push
+        uses: docker/build-push-action@v6
+        with:
+          context: "edUloc back/eduloc-backend"
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          provenance: true
+          sbom: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  scan-published:
+    name: Scan de l'image publiée
+    runs-on: ubuntu-latest
+    needs: build-image
+    timeout-minutes: 15
+    steps:
+      - uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}@${{ needs.build-image.outputs.digest }}
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+
+  deploy-staging:
+    name: Déploiement staging
+    runs-on: ubuntu-latest
+    needs: [build-image, scan-published]
+    environment: staging
+    timeout-minutes: 20
+    steps:
+      - name: Déployer (migrations puis démarrage)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          envs: IMAGE_REF
+          script: |
+            set -euo pipefail
+            cd "${{ vars.DEPLOY_PATH }}"
+            export API_IMAGE="${IMAGE_REF}"
+            DC="docker compose -f docker-compose.yml -f docker-compose.deploy.yml"
+            $DC pull api
+            $DC run --rm api npx prisma migrate deploy
+            $DC up -d api
+        env:
+          IMAGE_REF: ${{ env.IMAGE }}@${{ needs.build-image.outputs.digest }}
+      - name: Vérification de santé
+        run: |
+          for i in $(seq 1 20); do
+            curl -fsS "${{ vars.HEALTH_URL }}" && exit 0
+            sleep 6
+          done
+          echo "Santé KO après déploiement" >&2
+          exit 1
+
+  smoke-staging:
+    name: Test de fumée staging
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    timeout-minutes: 10
+    steps:
+      - name: /health et authentification refusée sans jeton
+        run: |
+          curl -fsS "${{ vars.HEALTH_URL }}"
+          code=$(curl -s -o /dev/null -w '%{http_code}' "${{ vars.API_BASE_URL }}/api/bookings")
+          test "$code" = "401" || { echo "Attendu 401, reçu $code"; exit 1; }
+
+  deploy-production:
+    name: Déploiement production (approbation requise)
+    runs-on: ubuntu-latest
+    needs: [build-image, smoke-staging]
+    if: github.event_name == 'workflow_dispatch' && inputs.deploy_production
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - name: Déployer (migrations puis démarrage)
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true
+          envs: IMAGE_REF
+          script: |
+            set -euo pipefail
+            cd "${{ vars.DEPLOY_PATH }}"
+            export API_IMAGE="${IMAGE_REF}"
+            DC="docker compose -f docker-compose.yml -f docker-compose.deploy.yml"
+            $DC pull api
+            # Sauvegarde logique avant migration
+            ./scripts/backup-db.sh
+            $DC run --rm api npx prisma migrate deploy
+            $DC up -d api
+        env:
+          IMAGE_REF: ${{ env.IMAGE }}@${{ needs.build-image.outputs.digest }}
+      - name: Vérification de santé
+        run: |
+          for i in $(seq 1 20); do
+            curl -fsS "${{ vars.HEALTH_URL }}" && exit 0
+            sleep 6
+          done
+          exit 1

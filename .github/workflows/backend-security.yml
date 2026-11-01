@@ -1,0 +1,120 @@
+name: Backend Security
+
+on:
+  pull_request:
+    paths:
+      - "edUloc back/eduloc-backend/**"
+      - ".github/workflows/**"
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 3 * * 1" # chaque lundi, 03:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: backend-security-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  secrets:
+    name: Recherche de secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  dependencies:
+    name: Audit des dépendances
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: edUloc back/eduloc-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: edUloc back/eduloc-backend/package-lock.json
+      - run: npm ci --ignore-scripts
+      - name: Vulnérabilités de production (HIGH et plus)
+        run: npm audit --omit=dev --audit-level=high
+      - name: Vérification de l'intégrité du verrou
+        run: npm ls --omit=dev --all > /dev/null
+
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          queries: security-extended
+      - uses: github/codeql-action/analyze@v3
+
+  image-scan:
+    name: Scan de l'image et de la configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Construction locale
+        run: docker build -t eduloc-backend:scan "edUloc back/eduloc-backend"
+      - name: Trivy — image
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: eduloc-backend:scan
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: sarif
+          output: trivy-image.sarif
+      - name: Trivy — configuration (Dockerfile, compose, workflows)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: config
+          scan-ref: "edUloc back/eduloc-backend"
+          severity: HIGH,CRITICAL
+          exit-code: "1"
+      - uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-image.sarif
+
+  sbom:
+    name: SBOM (CycloneDX)
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: edUloc back/eduloc-backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - run: npm ci --ignore-scripts
+      - run: npx --yes @cyclonedx/cyclonedx-npm --omit dev --output-file sbom.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: sbom-backend
+          path: edUloc back/eduloc-backend/sbom.json
+          retention-days: 90
