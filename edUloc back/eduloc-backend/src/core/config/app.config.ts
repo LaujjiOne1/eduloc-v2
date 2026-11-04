@@ -46,6 +46,13 @@ const envSchema = z.object({
   BOOKING_MIN_NOTICE_HOURS: z.coerce.number().default(24),
   /** Pas de démarrage des créneaux proposés (minutes) et marges entre séances : valeurs à confirmer (spec 4.4). */
   BOOKING_SLOT_STEP_MINUTES: z.coerce.number().int().min(5).max(120).default(30),
+  /**
+   * Durée pendant laquelle une demande reste valable (minutes) : le Demandeur la choisit, libre mais bornée (D-03 ; valeurs
+   * à confirmer avec le responsable produit). Passé ce délai sans réponse du Tuteur, la demande expire.
+   */
+  BOOKING_REQUEST_VALIDITY_MIN_MINUTES: z.coerce.number().int().min(5).default(60),
+  BOOKING_REQUEST_VALIDITY_MAX_MINUTES: z.coerce.number().int().min(5).default(4320),
+  BOOKING_REQUEST_VALIDITY_DEFAULT_MINUTES: z.coerce.number().int().min(5).default(1440),
   BOOKING_BUFFER_MINUTES: z.coerce.number().int().min(0).max(240).default(15),
   BOOKING_TRAVEL_BUFFER_MINUTES: z.coerce.number().int().min(0).max(480).default(30),
   ROOM_TURNOVER_BUFFER_MINUTES: z.coerce.number().int().min(0).max(240).default(0),
@@ -144,6 +151,9 @@ export class AppConfig {
   readonly mailFrom: string;
   readonly bookingMinNoticeHours: number;
   readonly bookingSlotStepMinutes: number;
+  readonly bookingRequestValidityMinMinutes: number;
+  readonly bookingRequestValidityMaxMinutes: number;
+  readonly bookingRequestValidityDefaultMinutes: number;
   readonly bookingBufferMinutes: number;
   readonly bookingTravelBufferMinutes: number;
   readonly roomTurnoverBufferMinutes: number;
@@ -221,6 +231,9 @@ export class AppConfig {
     this.mailFrom = parsed.MAIL_FROM;
     this.bookingMinNoticeHours = parsed.BOOKING_MIN_NOTICE_HOURS;
     this.bookingSlotStepMinutes = parsed.BOOKING_SLOT_STEP_MINUTES;
+    this.bookingRequestValidityMinMinutes = parsed.BOOKING_REQUEST_VALIDITY_MIN_MINUTES;
+    this.bookingRequestValidityMaxMinutes = parsed.BOOKING_REQUEST_VALIDITY_MAX_MINUTES;
+    this.bookingRequestValidityDefaultMinutes = parsed.BOOKING_REQUEST_VALIDITY_DEFAULT_MINUTES;
     this.bookingBufferMinutes = parsed.BOOKING_BUFFER_MINUTES;
     this.bookingTravelBufferMinutes = parsed.BOOKING_TRAVEL_BUFFER_MINUTES;
     this.roomTurnoverBufferMinutes = parsed.ROOM_TURNOVER_BUFFER_MINUTES;

@@ -134,6 +134,9 @@ export const ERROR_MESSAGES: Record<string, string> = {
   SLOT_TOO_CLOSE: 'Ce créneau est trop proche d’une autre séance du tuteur (marge de déplacement).',
   SLOT_DATE_INVALID: 'Cette date n’est pas réservable.',
   DURATION_NOT_OFFERED: 'Cette durée n’est pas proposée par le tuteur pour cette offre.',
+  REQUEST_VALIDITY_OUT_OF_RANGE: 'Cette durée de validité de la demande n’est pas autorisée.',
+  PAYMENT_REQUIRED: 'Payez votre réservation pour recevoir le code de séance.',
+  BOOKING_REQUEST_EXPIRED: 'Cette demande a expiré : elle n’a pas reçu de réponse à temps et ne peut plus être acceptée.',
   OFFER_FORMAT_MISMATCH: 'Cette offre n’est pas proposée dans ce mode de séance.',
 
   // Lieux partenaires — réservation d'une salle

@@ -307,8 +307,10 @@ describe('lieux partenaires (base réelle)', { skip }, () => {
       const o1 = await options.options(tutor1.offerId);
       assert.ok(o1.modes.includes('PARTNER_ROOM'));
       assert.deepEqual(o1.rooms.map((r) => r.id), [roomA]);
-      assert.deepEqual(o1.durations.map((d) => d.minutes), [60, 120]);
-      assert.equal(o1.durations[1].price.amount, '20000');
+      // Plage 08:00–18:00 : de 1 h à 10 h par pas de 30 min (durées déduites de la plage, plus celles de l'offre).
+      assert.deepEqual(o1.durations.map((d) => d.minutes), Array.from({ length: 19 }, (_, i) => 60 + i * 30));
+      assert.equal(o1.durations.find((d) => d.minutes === 120)?.price.amount, '20000');
+      assert.ok(o1.durationsByMode.PARTNER_ROOM?.some((d) => d.minutes === 90));
       const o2 = await options.options(tutor2.offerId);
       assert.ok(!o2.modes.includes('PARTNER_ROOM'));
       assert.deepEqual(o2.rooms, []);
@@ -338,7 +340,7 @@ describe('lieux partenaires (base réelle)', { skip }, () => {
 
     it('refuse une salle non acceptée par le Tuteur, une durée non proposée, un effectif ou un équipement incompatibles', async () => {
       assert.equal(await code(book(requester1, tutor2, roomA, day.date, '10:00')), 'ROOM_NOT_ACCEPTED_BY_TUTOR');
-      assert.equal(await code(book(requester1, tutor1, roomA, day.date, '10:00', { durationMinutes: 90 })), 'DURATION_NOT_OFFERED');
+      assert.equal(await code(book(requester1, tutor1, roomA, day.date, '10:00', { durationMinutes: 75 })), 'DURATION_NOT_OFFERED');
       assert.equal(await code(book(requester1, tutor1, roomA, day.date, '10:00', { participantsCount: 9 })), 'ROOM_CAPACITY_EXCEEDED');
       assert.equal(await code(book(requester1, tutor1, roomA, day.date, '10:00', { requiredEquipment: ['Projecteur'] })), 'ROOM_EQUIPMENT_MISSING');
       assert.equal(await code(book(requester1, tutor1, roomB, day.date, '10:00')), 'ROOM_NOT_BOOKABLE');

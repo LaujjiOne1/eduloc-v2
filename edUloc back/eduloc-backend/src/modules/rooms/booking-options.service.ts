@@ -5,7 +5,7 @@ import { NotFoundError, UnprocessableError } from '../../common/errors/domain-er
 import { AvailabilityRule, SlotPolicy, TeachingMode } from '../bookings/domain/slot-policy';
 import { BusyInterval, MarginConfig, MarginPolicy, locationKeyOf } from '../bookings/domain/margin-policy';
 import { BUSINESS_TIMEZONE, computeDaySlots } from '../bookings/domain/day-slots';
-import { allowedDurations } from '../bookings/domain/offer-durations';
+import { bookableDurations } from '../bookings/domain/offer-durations';
 import { distanceMeters } from '../bookings/domain/travel';
 import { toPublicPlace } from '../search/domain/public-location';
 export { distanceMeters };
@@ -113,16 +113,23 @@ export class BookingOptionsService {
       toPublicRoom(room, await this.rooms.photosOf(room), distance)));
     if (near) publicRooms.sort((a, b) => (a.distanceMeters ?? Infinity) - (b.distanceMeters ?? Infinity));
 
+    // Prix proportionnel à la durée par défaut de l'offre.
+    const priced = (minutes: number[]) => minutes.map((m) => ({
+      minutes: m,
+      price: { amount: offer.price.mul(m).div(offer.durationMinutes).toDecimalPlaces(2).toString(), currency: offer.currency },
+    }));
+
     return {
       offerId: offer.id,
       tutorId: tutor.id,
       format: offer.format,
       minNoticeHours: this.cfg.bookingMinNoticeHours,
-      durations: allowedDurations(offer).map((minutes) => ({
-        minutes,
-        // Prix proportionnel à la durée par défaut de l'offre.
-        price: { amount: offer.price.mul(minutes).div(offer.durationMinutes).toDecimalPlaces(2).toString(), currency: offer.currency },
-      })),
+      // Durées déduites des plages du Tuteur : de 1 h à la plus longue plage, par pas de 30 min.
+      durations: priced(bookableDurations(offer, rules)),
+      // Idem par mode : une plage de 4 h « en ligne » n'ouvre pas 4 h en salle partenaire. Le demandeur choisit le mode d'abord.
+      durationsByMode: Object.fromEntries(
+        BOOKING_MODES.filter((m) => available[m]).map((m) => [m, priced(bookableDurations(offer, rules, m))]),
+      ),
       modes: BOOKING_MODES.filter((m) => available[m]),
       rooms: available.PARTNER_ROOM ? publicRooms : [],
       // Lieux à choisir pour « chez le tuteur » / « lieu public » (position privée floutée, comme partout en API publique).
@@ -136,7 +143,9 @@ export class BookingOptionsService {
     const offer = await this.bookableOffer(offerId);
     const tutor = offer.tutorProfile;
     const durationMinutes = q.durationMinutes ?? offer.durationMinutes;
-    if (!allowedDurations(offer).includes(durationMinutes)) throw new UnprocessableError('DURATION_NOT_OFFERED');
+    if (!bookableDurations(offer, this.toRules(tutor.availabilities), q.mode).includes(durationMinutes)) {
+      throw new UnprocessableError('DURATION_NOT_OFFERED');
+    }
     if (q.mode === 'ONLINE' ? offer.format === 'IN_PERSON' : offer.format === 'ONLINE') {
       throw new UnprocessableError('OFFER_FORMAT_MISMATCH');
     }

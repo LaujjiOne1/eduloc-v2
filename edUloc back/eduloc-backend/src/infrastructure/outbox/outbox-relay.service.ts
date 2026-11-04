@@ -41,6 +41,7 @@ const NOTIFICATION_TYPES: Record<string, string> = {
   'booking.requested': 'BOOKING_REQUEST',
   'booking.confirmed': 'BOOKING_CONFIRMED',
   'booking.refused': 'BOOKING_REFUSED',
+  'booking.expired': 'SYSTEM',
   'booking.cancelled': 'BOOKING_CANCELLED',
   'booking.reminder': 'REMINDER',
   'session.started': 'SESSION_STARTED',

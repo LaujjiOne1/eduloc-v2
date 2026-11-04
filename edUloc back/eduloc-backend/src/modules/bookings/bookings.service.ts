@@ -15,10 +15,12 @@ import { CancelBookingDto, CreateBookingDto, RefuseBookingDto } from './dto';
 import { RoomReservationService, ROOM_INVALID_CHOICE } from './room-reservation.service';
 import { MarginConfig, MarginPolicy, locationKeyOf } from './domain/margin-policy';
 import { AcceptanceConflictError } from './domain/acceptance-conflict';
-import { allowedDurations } from './domain/offer-durations';
+import { bookableDurations } from './domain/offer-durations';
 import { PriceBreakdown, computePriceBreakdown, travelFeeForDistance } from './domain/pricing';
 import { resolveTravel } from './domain/travel';
 import { BookingHoldsService } from './booking-holds.service';
+import { BookingExpiryQueue } from './booking-expiry.queue';
+import { deadlineFrom } from './domain/deadlines';
 import { approximateDistance } from '../search/domain/public-location';
 
 /** Échecs de finalisation après lesquels le blocage temporaire est libéré (le Demandeur doit refaire un devis). */
@@ -37,6 +39,8 @@ const bookingResponseInclude = {
   beneficiary: { include: { educationLevel: true } },
   review: { select: { id: true } },
   room: { select: { id: true, name: true, zoneLabel: true, capacity: true } },
+  /** Un seul paiement réussi suffit à savoir que la réservation est payée. */
+  payments: { where: { status: 'SUCCEEDED' as const }, select: { id: true }, take: 1 },
 } satisfies Prisma.BookingInclude;
 
 /**
@@ -59,7 +63,12 @@ interface CompetingRequest {
 /** Texte du message qui transmet le code : « Code de séance : 482 913 ». */
 const sharedCodeText = (otp: string) => `Code de séance : ${otp.slice(0, 3)} ${otp.slice(3)}`;
 
-const pairKey = (b: { requesterId: string; tutorProfileId: string }) => `${b.requesterId}:${b.tutorProfileId}`;
+/** Motif posé par le système quand une demande expire (le frontend le reconnaît pour dire « expirée » plutôt que « refusée »). */
+export const REQUEST_EXPIRED_REASON = 'REQUEST_EXPIRED';
+/** Motif posé par le système quand une réservation confirmée est annulée faute de paiement à temps. */
+export const PAYMENT_EXPIRED_REASON = 'PAYMENT_EXPIRED';
+
+const pairKey =(b: { requesterId: string; tutorProfileId: string }) => `${b.requesterId}:${b.tutorProfileId}`;
 
 const whenFormat = new Intl.DateTimeFormat('fr-FR', {
   weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit',
@@ -88,6 +97,8 @@ export class BookingsService {
     private readonly cfg: AppConfig,
     private readonly rooms: RoomReservationService,
     private readonly holds: BookingHoldsService,
+    /** Planifie l'expiration des demandes ; absent dans les tests qui construisent le service à la main (le balayage rattrape). */
+    private readonly expiryQueue?: BookingExpiryQueue,
   ) {}
 
   private get margins(): MarginConfig {
@@ -118,7 +129,6 @@ export class BookingsService {
     if (isRoom && offer.format === 'ONLINE') throw new UnprocessableError('OFFER_FORMAT_MISMATCH');
 
     const durationMinutes = dto.durationMinutes ?? offer.durationMinutes;
-    if (!allowedDurations(offer).includes(durationMinutes)) throw new UnprocessableError('DURATION_NOT_OFFERED');
     // Le prix de l'offre vaut pour sa durée par défaut ; les autres durées sont proportionnelles (à confirmer).
     const price = offer.price.mul(durationMinutes).div(offer.durationMinutes).toDecimalPlaces(2);
 
@@ -145,6 +155,10 @@ export class BookingsService {
       placeId: r.placeId,
       placeType: r.place?.type ?? null,
     }));
+    // Durée déduite des plages du Tuteur (de 1 h à la plage, par pas de 30 min) : refusée côté serveur quoi qu'envoie le front.
+    if (!bookableDurations(offer, rules, dto.teachingMode as TeachingMode).includes(durationMinutes)) {
+      throw new UnprocessableError('DURATION_NOT_OFFERED');
+    }
     const rule = SlotPolicy.matchRule(rules, startAt, endAt, dto.teachingMode as TeachingMode, dto.placeId, offer.id);
     if (!rule) throw new UnprocessableError('SLOT_OUTSIDE_AVAILABILITY');
 
@@ -284,7 +298,12 @@ export class BookingsService {
   }
 
   private async createBookingOnce(requesterId: string, dto: CreateBookingDto) {
-    const bookingId = await this.prisma.$transaction(async (tx: Tx) => {
+    // Durée de validité choisie par le Demandeur, bornée côté serveur quoi qu'envoie le frontend.
+    const validityMinutes = dto.validityMinutes ?? this.cfg.bookingRequestValidityDefaultMinutes;
+    if (validityMinutes < this.cfg.bookingRequestValidityMinMinutes || validityMinutes > this.cfg.bookingRequestValidityMaxMinutes) {
+      throw new UnprocessableError('REQUEST_VALIDITY_OUT_OF_RANGE');
+    }
+    const created = await this.prisma.$transaction(async (tx: Tx) => {
       const p = await this.prepare(tx, requesterId, dto);
       const { offer, beneficiary, durationMinutes, price, startAt, endAt, rule, place, room, roomFee, travel, pricing } = p;
 
@@ -310,10 +329,14 @@ export class BookingsService {
       const matchingSearch = dto.matchingSearchId
         ? await tx.matchingSearch.findFirst({ where: { id: dto.matchingSearchId, requesterId }, select: { id: true } })
         : null;
+      // Une demande ne reste jamais valable après le début de la séance demandée.
+      const expiresAt = deadlineFrom(new Date(), validityMinutes, startAt);
       const booking = await tx.booking.create({
         data: {
           requesterId,
           matchingSearchId: matchingSearch?.id ?? null,
+          expiresAt,
+          requestValidityMinutes: validityMinutes,
           beneficiaryId: beneficiary.id,
           tutorProfileId: offer.tutorProfileId,
           offerId: offer.id,
@@ -386,13 +409,20 @@ export class BookingsService {
           : 'Un demandeur souhaite réserver un créneau.',
         cacheKeys: [`slots:${offer.tutorProfileId}:${startAt.toISOString().slice(0, 10)}:${offer.id}:${offer.durationMinutes}`],
       });
-      return booking.id;
+      return { id: booking.id, expiresAt };
     }, { timeout: 10_000 });
-    return this.getForUser(requesterId, bookingId);
+    // Après validation de la transaction : la demande existe, son job d'expiration peut être planifié. Si Redis est
+    // indisponible, la demande est tout de même créée : le balayage périodique l'expirera à l'échéance.
+    try {
+      await this.expiryQueue?.schedule(created.id, created.expiresAt);
+    } catch (err) {
+      this.logger.warn(`Expiration de la demande ${created.id} non planifiée (balayage de rattrapage) : ${(err as Error).message}`);
+    }
+    return this.getForUser(requesterId, created.id);
   }
 
   async acceptBooking(tutorUserId: string, bookingId: string) {
-    let accepted: { bookingId: string; otp: string };
+    let accepted: { bookingId: string; otp: string; paymentDueAt: Date | null };
     try {
       accepted = await this.acceptInTransaction(tutorUserId, bookingId);
     } catch (err) {
@@ -400,15 +430,17 @@ export class BookingsService {
       if (err instanceof AcceptanceConflictError) await this.recordAcceptanceConflict(bookingId, err);
       throw err;
     }
-    const booking = await this.getForUser(tutorUserId, accepted.bookingId);
-    return { ...booking, startOtp: accepted.otp };
+    await this.expiryQueue?.cancel(accepted.bookingId);
+    if (accepted.paymentDueAt) await this.schedulePaymentExpiry(accepted.bookingId, accepted.paymentDueAt);
+    // Le code de séance n'est JAMAIS renvoyé au tuteur : c'est le demandeur qui le lui donne, une fois la réservation payée.
+    return this.getForUser(tutorUserId, accepted.bookingId);
   }
 
   /**
    * Revérification complète et confirmation, en UNE transaction (spec 7.2) : séance et salle sont la même ligne, donc
    * confirmées ensemble ou pas du tout. Verrous pris toujours dans le même ordre : Tuteur, puis salle.
    */
-  private async acceptInTransaction(tutorUserId: string, bookingId: string): Promise<{ bookingId: string; otp: string }> {
+  private async acceptInTransaction(tutorUserId: string, bookingId: string): Promise<{ bookingId: string; otp: string; paymentDueAt: Date | null }> {
     return this.prisma.$transaction(async (tx: Tx) => {
       const tutor = await tx.tutorProfile.findFirst({
         where: { userId: tutorUserId, isVisible: true, suspendedAt: null },
@@ -422,6 +454,8 @@ export class BookingsService {
       });
       if (!booking) throw new NotFoundError('BOOKING_NOT_FOUND');
       BookingStateMachine.assertCanTransition(toBookingState(booking.status as string), 'CONFIRMED', 'TUTOR');
+      // Demande échue : on ne la confirme plus, même si son job d'expiration n'est pas encore passé.
+      if (booking.expiresAt && booking.expiresAt.getTime() <= Date.now()) throw new ConflictError('BOOKING_REQUEST_EXPIRED');
 
       const conflict = await this.repo.blockingOverlap(tx, tutor.id, booking.startAt, booking.endAt, booking.id);
       if (conflict) throw new AcceptanceConflictError('SLOT_NO_LONGER_AVAILABLE', 'OVERLAPPING_BOOKINGS', 'TUTOR_OVERLAP');
@@ -471,10 +505,16 @@ export class BookingsService {
       }
 
       const otp = this.crypto.generateOtp();
+      // Paiements activés : la réservation confirmée doit être payée avant l'échéance, qui reprend la durée choisie par le
+      // Demandeur pour sa demande. Sans paiement réussi à temps, elle est annulée (voir expirePaymentIfDue).
+      const paymentDueAt = this.cfg.payments.enabled
+        ? deadlineFrom(new Date(), booking.requestValidityMinutes ?? this.cfg.bookingRequestValidityDefaultMinutes, booking.startAt)
+        : null;
       const { count } = await tx.booking.updateMany({
         where: { id: booking.id, status: 'PENDING' },
         data: {
           status: 'CONFIRMED',
+          paymentDueAt,
           startOtpCipher: this.crypto.encrypt(otp),
           otpExpiresAt: booking.endAt,
           otpAttempts: 0,
@@ -500,9 +540,11 @@ export class BookingsService {
         aggregateId: booking.id,
         eventType: 'booking.confirmed',
         recipientIds: [booking.requesterId],
-        payload: { bookingId: booking.id, startAt: booking.startAt.toISOString() },
+        payload: { bookingId: booking.id, startAt: booking.startAt.toISOString(), paymentDueAt: paymentDueAt?.toISOString() ?? null },
         pushTitle: 'Réservation confirmée',
-        pushBody: 'Le tuteur a accepté votre demande.',
+        pushBody: paymentDueAt
+          ? `Le tuteur a accepté votre demande. Payez avant ${when(paymentDueAt)} pour recevoir votre code de séance.`
+          : 'Le tuteur a accepté votre demande.',
         cacheKeys: [`slots:${tutor.id}:${booking.startAt.toISOString().slice(0, 10)}:${booking.offerId}:${booking.offer.durationMinutes}`],
       }];
       for (const b of autoRefused) {
@@ -517,7 +559,7 @@ export class BookingsService {
         });
       }
       await this.outbox.writeMany(tx, inputs);
-      return { bookingId: booking.id, otp };
+      return { bookingId: booking.id, otp, paymentDueAt };
     }, { timeout: 10_000 });
   }
 
@@ -647,6 +689,7 @@ export class BookingsService {
         viewerRole: isRequester ? 'REQUESTER' as const : isTutor ? 'TUTOR' as const : 'REQUESTER' as const,
       };
     }, { timeout: 10_000 });
+    await this.expiryQueue?.cancel(cancellation.bookingId);
     if (isAdmin) {
       const booking = await this.prisma.booking.findUnique({
         where: { id: cancellation.bookingId },
@@ -664,6 +707,7 @@ export class BookingsService {
     if (booking.status !== 'CONFIRMED' || !booking.startOtpCipher) {
       throw new UnprocessableError('OTP_NOT_AVAILABLE');
     }
+    await this.assertPaid(booking.id);
     return { bookingId: booking.id, otp: this.crypto.decrypt(booking.startOtpCipher) };
   }
 
@@ -682,6 +726,7 @@ export class BookingsService {
       });
       if (!booking) throw new NotFoundError('BOOKING_NOT_FOUND');
       if (booking.status !== 'CONFIRMED' || !booking.startOtpCipher) throw new UnprocessableError('OTP_NOT_AVAILABLE');
+      await this.assertPaid(booking.id);
       if (booking.teachingMode !== 'ONLINE') throw new UnprocessableError('OTP_SHARE_ONLINE_ONLY');
 
       const conversation = await tx.conversation.findUnique({
@@ -973,7 +1018,99 @@ export class BookingsService {
       });
       return booking.id;
     });
+    await this.expiryQueue?.cancel(refusedBookingId);
     return this.getForUser(tutorUserId, refusedBookingId);
+  }
+
+  /** Planifie l'annulation d'une réservation confirmée restée impayée ; sans Redis, le balayage s'en charge à l'échéance. */
+  private async schedulePaymentExpiry(bookingId: string, dueAt: Date): Promise<void> {
+    try {
+      await this.expiryQueue?.schedulePayment(bookingId, dueAt);
+    } catch (err) {
+      this.logger.warn(`Délai de paiement de ${bookingId} non planifié (balayage de rattrapage) : ${(err as Error).message}`);
+    }
+  }
+
+  /**
+   * Annule une réservation confirmée dont le délai de paiement est écoulé sans paiement réussi : annulée par le SYSTÈME,
+   * créneau (et salle) libérés, les deux parties prévenues. Même principe que l'expiration d'une demande : l'état fait foi,
+   * l'UPDATE est conditionnel, et un paiement en cours de validation (ticket encore valable) repousse l'annulation au
+   * prochain balayage plutôt que de risquer d'encaisser une réservation annulée.
+   */
+  async expirePaymentIfDue(bookingId: string, now = new Date()): Promise<boolean> {
+    if (!this.cfg.payments.enabled) return false;
+    return this.prisma.$transaction(async (tx: Tx) => {
+      const booking = await tx.booking.findUnique({
+        where: { id: bookingId },
+        include: { tutorProfile: { select: { userId: true } }, offer: { select: { durationMinutes: true } } },
+      });
+      if (!booking || booking.status !== 'CONFIRMED' || !booking.paymentDueAt || booking.paymentDueAt > now) return false;
+      const paid = await tx.payment.count({ where: { bookingId, status: 'SUCCEEDED' } });
+      if (paid > 0) return false;
+      const inFlight = await tx.payment.count({ where: { bookingId, status: 'PENDING', ticketExpiresAt: { gt: now } } });
+      if (inFlight > 0) return false;
+      BookingStateMachine.assertCanTransition('CONFIRMED', 'CANCELLED', 'SYSTEM');
+      const { count } = await tx.booking.updateMany({
+        where: { id: booking.id, status: 'CONFIRMED', paymentDueAt: { lte: now } },
+        data: { status: 'CANCELLED', cancelledBy: 'SYSTEM' as never, cancellationReason: PAYMENT_EXPIRED_REASON },
+      });
+      if (count !== 1) return false;
+      if (booking.startOtpCipher) await this.scrubSharedCode(tx, booking, this.crypto.decrypt(booking.startOtpCipher));
+      await tx.bookingEvent.create({
+        data: { bookingId: booking.id, fromStatus: 'CONFIRMED' as never, toStatus: 'CANCELLED' as never, actor: 'SYSTEM' as never, reason: PAYMENT_EXPIRED_REASON },
+      });
+      await this.journal(tx, booking, `Séance du ${when(booking.startAt)} annulée : le paiement n'a pas été reçu à temps.`);
+      await this.outbox.write(tx, {
+        aggregateType: 'booking',
+        aggregateId: booking.id,
+        eventType: 'booking.cancelled',
+        recipientIds: [booking.requesterId, booking.tutorProfile.userId],
+        payload: { bookingId: booking.id, by: 'SYSTEM', reason: PAYMENT_EXPIRED_REASON },
+        pushTitle: 'Réservation annulée',
+        pushBody: `La réservation pour ${booking.offerTitle} a été annulée : le paiement n'a pas été reçu à temps.`,
+        cacheKeys: [`slots:${booking.tutorProfileId}:${booking.startAt.toISOString().slice(0, 10)}:${booking.offerId}:${booking.offer.durationMinutes}`],
+      });
+      return true;
+    });
+  }
+
+  /** Le code de séance n'est donné qu'une fois la réservation payée (quand les paiements sont activés). */
+  private async assertPaid(bookingId: string): Promise<void> {
+    if (!this.cfg.payments.enabled) return;
+    const paid = await this.prisma.payment.count({ where: { bookingId, status: 'SUCCEEDED' } });
+    if (paid === 0) throw new UnprocessableError('PAYMENT_REQUIRED');
+  }
+
+  /**
+   * Expire une demande restée sans réponse : refusée par le SYSTÈME, tuteur et demandeur prévenus. L'état fait foi : appelée
+   * par le job BullMQ comme par le balayage, elle ne fait rien si la demande n'est plus en attente ou pas encore échue
+   * (UPDATE conditionnel : sûr avec plusieurs instances, et si le tuteur répond au même instant, c'est lui qui l'emporte).
+   */
+  async expireIfDue(bookingId: string, now = new Date()): Promise<boolean> {
+    return this.prisma.$transaction(async (tx: Tx) => {
+      const booking = await tx.booking.findUnique({ where: { id: bookingId }, include: { tutorProfile: { select: { userId: true } } } });
+      if (!booking || booking.status !== 'PENDING' || !booking.expiresAt || booking.expiresAt > now) return false;
+      BookingStateMachine.assertCanTransition('PENDING', 'REFUSED', 'SYSTEM');
+      const { count } = await tx.booking.updateMany({
+        where: { id: booking.id, status: 'PENDING', expiresAt: { lte: now } },
+        data: { status: 'REFUSED', refusalReason: REQUEST_EXPIRED_REASON },
+      });
+      if (count !== 1) return false;
+      await tx.bookingEvent.create({
+        data: { bookingId: booking.id, fromStatus: 'PENDING' as never, toStatus: 'REFUSED' as never, actor: 'SYSTEM' as never, reason: REQUEST_EXPIRED_REASON },
+      });
+      await this.journal(tx, booking, `Demande expirée sans réponse : séance du ${when(booking.startAt)}.`);
+      await this.outbox.write(tx, {
+        aggregateType: 'booking',
+        aggregateId: booking.id,
+        eventType: 'booking.expired',
+        recipientIds: [booking.requesterId, booking.tutorProfile.userId],
+        payload: { bookingId: booking.id, reason: REQUEST_EXPIRED_REASON, by: 'SYSTEM' },
+        pushTitle: 'Demande expirée',
+        pushBody: `La demande pour ${booking.offerTitle} est restée sans réponse et a expiré.`,
+      });
+      return true;
+    });
   }
 
   private toResponse(
@@ -994,6 +1131,14 @@ export class BookingsService {
       viewerRole,
       startAt: b.startAt,
       endAt: b.endAt,
+      /** Échéance d'une demande en attente (null : demande antérieure, ou plus en attente). */
+      expiresAt: b.status === 'PENDING' ? b.expiresAt : null,
+      /**
+       * Paiement : exigé (paiements activés) pour une réservation confirmée tant qu'aucun paiement n'a réussi ; `paymentDueAt`
+       * est son échéance (la durée choisie par le Demandeur). Le code de séance n'est donné qu'une fois payée.
+       */
+      paymentRequired: this.cfg.payments.enabled && ['CONFIRMED', 'IN_PROGRESS', 'COMPLETED'].includes(b.status) && b.payments.length === 0,
+      paymentDueAt: b.status === 'CONFIRMED' && b.payments.length === 0 ? b.paymentDueAt : null,
       teachingMode: b.teachingMode,
       offer: {
         id: b.offer.id,

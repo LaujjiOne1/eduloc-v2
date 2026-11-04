@@ -1156,6 +1156,15 @@ model Booking {
   endAt   DateTime
   status  BookingStatus @default(PENDING)
 
+  /// Échéance d'une demande PENDING, choisie par le Demandeur : passé ce délai sans réponse du Tuteur, la demande est
+  /// refusée par le système (job BullMQ différé + balayage). La base fait foi ; null pour les demandes antérieures.
+  expiresAt DateTime?
+  /// Durée de validité choisie par le Demandeur (minutes) : après confirmation par le Tuteur, elle sert aussi de délai pour payer.
+  requestValidityMinutes Int?
+  /// Échéance de paiement d'une réservation CONFIRMED (si les paiements sont activés) : passé ce délai sans paiement réussi,
+  /// la réservation est annulée par le système (job BullMQ différé + balayage). Le code de séance n'est donné qu'une fois payée.
+  paymentDueAt DateTime?
+
   teachingMode TeachingMode
 
   // --- Snapshot au moment de la réservation ---
@@ -1229,6 +1238,8 @@ model Booking {
   @@index([status, startAt])
   @@index([matchingSearchId])
   @@index([roomId, status, startAt])
+  @@index([status, expiresAt])
+  @@index([status, paymentDueAt])
   @@map("bookings")
 }
 

@@ -60,6 +60,11 @@ const toMin = (hhmm: string): number => {
 };
 
 export class SlotPolicy {
+  /** La plage vaut-elle pour ce mode (plage sans lieu = tous les modes) ? */
+  static coversMode(rule: AvailabilityRule, mode: TeachingMode): boolean {
+    return !rule.placeType || rule.placeType === MODE_TO_PLACE[mode];
+  }
+
   /** Le Tuteur déclare-t-il au moins une plage active compatible avec ce mode (plage sans lieu = tous les modes) ? */
   static supportsMode(rules: AvailabilityRule[], mode: TeachingMode, offerId: string): boolean {
     return rules.some((r) =>

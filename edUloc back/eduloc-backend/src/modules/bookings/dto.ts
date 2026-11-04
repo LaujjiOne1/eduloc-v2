@@ -32,6 +32,11 @@ export class CreateBookingDto {
   /** Blocage obtenu par POST /bookings/quote : la création le consomme (et vérifie que le total annoncé n'a pas changé). */
   @IsOptional() @IsUUID() holdId?: string;
   @IsOptional() @IsString() @MaxLength(1000) requesterNote?: string;
+  /**
+   * Durée de validité de la demande (minutes), choisie par le Demandeur : sans réponse du Tuteur passé ce délai, la demande
+   * expire. Absente = valeur par défaut ; les bornes sont celles de la configuration, vérifiées côté serveur.
+   */
+  @IsOptional() @IsInt() @Min(1) @Max(43_200) validityMinutes?: number;
   /** Recherche (POST /matching/search) d'où vient la réservation : mesure de conversion du matching. */
   @IsOptional() @IsUUID() matchingSearchId?: string;
 }

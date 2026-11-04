@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException, UnprocessableEntityException } from '@nestjs/common';
 import type { Prisma } from '../../generated/prisma/client';
 import { PrismaService } from '../../core/prisma/prisma.service';
-import { allowedDurations } from '../bookings/domain/offer-durations';
+import { allowedDurations, bookableDurations } from '../bookings/domain/offer-durations';
+import type { AvailabilityRule } from '../bookings/domain/slot-policy';
 import { assertOfferTrack } from '../catalog/domain/offer-track';
 import { bookableRoomWhere } from '../partners/domain/room-bookability';
 import { enqueueTutorReindex } from '../matching/indexing/reindex-events';
@@ -202,7 +203,21 @@ export class OffersService {
       where: { tutorProfileId: p.id },
       include: offerResponseInclude,
     });
-    return offers.map((offer) => this.toResponse(offer));
+    const rules = await this.rulesOf(p.id);
+    return offers.map((offer) => ({ ...this.toResponse(offer), bookableDurations: bookableDurations(offer, rules) }));
+  }
+
+  /** Plages actives du Tuteur : les durées réservables d'une offre en sont déduites (de 1 h à la plus longue plage). */
+  private async rulesOf(tutorProfileId: string): Promise<AvailabilityRule[]> {
+    const rows = await this.prisma.availability.findMany({
+      where: { tutorProfileId, isActive: true },
+      include: { place: { select: { type: true } } },
+    });
+    return rows.map((r) => ({
+      id: r.id, dayOfWeek: r.dayOfWeek, startTime: r.startTime, endTime: r.endTime, timezone: r.timezone,
+      validFrom: r.validFrom, validUntil: r.validUntil, isActive: r.isActive, offerId: r.offerId, placeId: r.placeId,
+      placeType: r.place?.type ?? null,
+    }));
   }
 
   /** UC-E04 : cohérence offre / matières déclarées. */
@@ -279,7 +294,7 @@ export class OffersService {
       include: offerResponseInclude,
     });
     if (!offer) throw new NotFoundException('OFFER_NOT_FOUND');
-    return this.toResponse(offer);
+    return { ...this.toResponse(offer), bookableDurations: bookableDurations(offer, await this.rulesOf(offer.tutorProfileId)) };
   }
 
   private toResponse(offer: OfferResponseRecord) {
