@@ -33,6 +33,8 @@ interface BookingWizardStore {
   note: string;
   /** Id of the Booking BookingSummary just created — lets BookingPending's "Voir la demande" open the real 23_BookingDetailPending. */
   createdBookingId: string | null;
+  /** Échéance (ISO) de la demande qui vient d'être envoyée : affichée sur l'écran « Demande envoyée ». */
+  createdBookingExpiresAt: string | null;
   /** Même clé pour toutes les tentatives d'envoi d'une demande (Idempotency-Key) ; renouvelée si l'offre/le créneau change. */
   idempotencyKey: string;
   /** Offre choisie sur sa fiche : le créneau se choisit ensuite, sur le calendrier (BookDate). */
@@ -43,7 +45,7 @@ interface BookingWizardStore {
   setDifficulty: (difficulty: string) => void;
   setObjective: (objective: string) => void;
   setNote: (note: string) => void;
-  setCreatedBookingId: (id: string) => void;
+  setCreatedBookingId: (id: string, expiresAt?: string | null) => void;
   reset: () => void;
 }
 
@@ -57,6 +59,7 @@ const INITIAL_STATE = {
   objective: "",
   note: "",
   createdBookingId: null,
+  createdBookingExpiresAt: null,
   idempotencyKey: "",
 };
 
@@ -87,7 +90,7 @@ export const useBookingWizardStore = create<BookingWizardStore>((set) => ({
 
   setNote: (note) => set({ note }),
 
-  setCreatedBookingId: (createdBookingId) => set({ createdBookingId }),
+  setCreatedBookingId: (createdBookingId, expiresAt = null) => set({ createdBookingId, createdBookingExpiresAt: expiresAt }),
 
   reset: () => set({ ...INITIAL_STATE }),
 }));

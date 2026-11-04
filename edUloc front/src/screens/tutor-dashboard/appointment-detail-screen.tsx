@@ -9,6 +9,7 @@ import { FadeIn } from "@/components/motion/fade-in";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { Button } from "@/components/ui/button";
+import { PaymentDueBanner } from "@/components/booking/request-expiry";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useTutorBooking } from "@/hooks/use-tutor-booking";
 import type { Booking } from "@/types/booking";
@@ -96,7 +97,7 @@ function AppointmentDetailContent({
     <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View className="mb-[6px] flex-row items-start justify-between">
         <Text className="text-[24px] font-bold font-display text-ink">{booking.offer.subjectLabel}</Text>
-        <StatusBadge status={booking.status} />
+        <StatusBadge status={booking.status} unpaid={booking.paymentRequired} />
       </View>
       <Text className="mb-5 text-[14px] text-ink-soft">{t("tutorDashboard.appointmentDetail.with", { firstName: booking.beneficiary.firstName })}</Text>
 
@@ -121,6 +122,8 @@ function AppointmentDetailContent({
 
       <RoomLocationBlock booking={booking} />
 
+      {/* Confirmée mais pas encore payée : le demandeur n'a pas son code de séance, la séance ne peut pas démarrer */}
+      {booking.status === "confirmed" && booking.paymentRequired ? <PaymentDueBanner booking={booking} /> : null}
       {booking.status === "confirmed" ? <ConfirmedSection onOpenConversation={onOpenConversation} onOpenCall={onOpenCall} /> : null}
       {booking.status === "in_progress" ? <InProgressSection onJoinSession={onJoinSession} /> : null}
       {booking.status === "completed" ? (

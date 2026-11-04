@@ -81,7 +81,16 @@
     "choosingARoomDoesNot": " Choisir une salle ne la réserve pas : elle n’est prise que lorsque le tuteur accepte la demande.",
     "bookThisSlot": "Réserver ce créneau",
     "slotTaken": "{{range}}, créneau pris",
-    "noSlotsTitle": "Aucun créneau ce jour-là"
+    "noSlotsTitle": "Aucun créneau ce jour-là",
+    "modeLabel": "Mode de cours",
+    "dateLabel": "Date et créneau",
+    "durationLabel": "Durée",
+    "addMode": "Choisir le mode",
+    "addDate": "Ajouter une date",
+    "addDuration": "Choisir la durée",
+    "whenTitle": "Quand souhaitez-vous le cours ?",
+    "howLongTitle": "Combien de temps ?",
+    "durationHint": "Les créneaux proposés ensuite tiennent entièrement dans les disponibilités du tuteur."
   },
   "bookingPending": {
     "requestSent": "Demande envoyée",
@@ -112,7 +121,9 @@
     "recalculateThePrice": "Recalculer le prix",
     "enterTheAddressToCalculate": "Indiquez l'adresse pour calculer le prix.",
     "thePriceWillBeShown": "Le prix s'affichera ici.",
-    "atYourHome": "À votre domicile"
+    "atYourHome": "À votre domicile",
+    "validityTitle": "Durée de validité de la demande",
+    "validityHint": "Sans réponse du tuteur d'ici là, la demande expire automatiquement et le créneau est libéré. Elle expire au plus tard au début du cours."
   },
   "verify": {
     "verifyYourAccount": "Vérifiez votre compte",
@@ -121,5 +132,30 @@
     "confirm": "Confirmer",
     "verifying": "Vérification...",
     "codeSentTo": "Nous avons envoyé un code à 6 chiffres à"
+  },
+  "requestExpiry": {
+    "expiresIn": "Expire dans {{time}}",
+    "expired": "Demande expirée",
+    "expiredBadge": "Expirée",
+    "expiredHint": "Le tuteur n'a pas répondu à temps. Cette demande ne peut plus être acceptée.",
+    "offer": "Offre : {{title}}",
+    "requesterHint": "Sans réponse du tuteur d'ici là, votre demande expire automatiquement et le créneau est libéré.",
+    "requesterExpiredHint": "Le tuteur n'a pas répondu à temps. Vous pouvez envoyer une nouvelle demande.",
+    "closedExpired": "Cette demande a expiré : le tuteur n'a pas répondu à temps."
+  },
+  "paymentDue": {
+    "heading": "Paiement requis",
+    "requesterDetail": "Payez pour recevoir votre code de séance. Sans paiement dans ce délai, la réservation est annulée et le créneau est libéré.",
+    "tutorHeading": "En attente du paiement",
+    "tutorDetail": "Le demandeur doit payer pour recevoir le code de séance. Sans paiement dans ce délai, la réservation est annulée.",
+    "expiredTitle": "Délai de paiement dépassé",
+    "expiredDetail": "La réservation va être annulée si le paiement n'est pas reçu.",
+    "inline": "À payer · expire dans {{time}}",
+    "badge": "À payer",
+    "codeLockedTitle": "Code de séance",
+    "codeLockedText": "Disponible après le paiement",
+    "codeLockedScreen": "Payez votre réservation pour recevoir votre code de séance.",
+    "goToPayment": "Aller au paiement",
+    "closedExpired": "Cette réservation a été annulée : le paiement n'a pas été reçu à temps."
   }
 }

@@ -11,7 +11,11 @@
     "confirmTimeRange": "Hamafiso ny ora",
     "inPersonOnline": "An-toerana sy an-tserasera",
     "inPersonOnly": "An-toerana ihany",
-    "onlineOnly": "An-tserasera ihany"
+    "onlineOnly": "An-tserasera ihany",
+    "slotLength": "Faharetan'ity fotoana ity: {{duration}}",
+    "bookableRange": "Afaka mamandrika manomboka amin'ny 1h hatramin'ny {{max}} ny mpangataka, isaky ny 30 min.",
+    "bookableOneHour": "Afaka mamandrika 1h ny mpangataka.",
+    "tooShortToBook": "Latsaky ny 1h: tsy azo vatsiana ity fotoana ity."
   },
   "slotPill": {
     "deleteThisSlot": "Fafao ity fotoana ity",

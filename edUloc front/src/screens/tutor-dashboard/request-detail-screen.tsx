@@ -1,5 +1,6 @@
 import { type Href, useLocalSearchParams, useRouter } from "expo-router";
 import { RoomLocationBlock } from "@/components/booking/room-location-block";
+import type { ReactNode } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -8,8 +9,11 @@ import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
+import { RequestExpiryBanner, useRequestExpiry } from "@/components/booking/request-expiry";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { durationShortLabel } from "@/api/format/datetime";
 import { DIFFICULTY_LABELS, OBJECTIVE_LABELS } from "@/api/mappers";
+import { TEACHING_MODE_LABELS } from "@/lib/teaching-mode";
 import { useBookingRequestAction } from "@/hooks/use-booking-request-action";
 import { useTutorBooking } from "@/hooks/use-tutor-booking";
 import { isTutorSuspended } from "@/lib/auth-routing";
@@ -69,6 +73,7 @@ export function RequestDetailScreen() {
       )}
 
       {state.status === "success" && state.booking.status === "pending" ? (
+        <HideWhenExpired booking={state.booking}>
         <View className="bg-surface px-5 pt-4 " style={{ paddingBottom: Math.max(insets.bottom, 22) }}>
           <View className="flex-row gap-[10px] border-t border-line-soft px-15 pt-[14px] items-center justify-center">
             <Button
@@ -89,13 +94,21 @@ export function RequestDetailScreen() {
             />
           </View>
         </View>
+        </HideWhenExpired>
       ) : null}
     </View>
   );
 }
 
+/** Une demande échue ne s'accepte ni ne se refuse plus : le serveur l'expire (job + balayage), on retire donc les boutons. */
+function HideWhenExpired({ booking, children }: { booking: Booking; children: ReactNode }) {
+  const { expired } = useRequestExpiry(booking);
+  return expired ? null : <>{children}</>;
+}
+
 function RequestDetailContent({ booking, formError }: { booking: Booking; formError: string | null }) {
   const { t } = useTranslation();
+  const durationMinutes = Math.round((Date.parse(booking.slot.endAt) - Date.parse(booking.slot.startAt)) / 60_000);
   return (
     <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View className="mb-[18px] flex-row items-center justify-between">
@@ -104,9 +117,12 @@ function RequestDetailContent({ booking, formError }: { booking: Booking; formEr
 
       {booking.status !== "pending" ? (
         <View className="mb-[14px]">
-          <StatusBadge status={booking.status} />
+          <StatusBadge status={booking.status} expired={booking.expired} />
         </View>
       ) : null}
+
+      {/* Demande en attente : compte à rebours avec l'offre ; demande expirée : explication */}
+      {booking.status === "pending" || booking.expired ? <RequestExpiryBanner booking={booking} /> : null}
 
       {formError ? <FormError message={formError} /> : null}
 
@@ -127,7 +143,31 @@ function RequestDetailContent({ booking, formError }: { booking: Booking; formEr
         <Divider />
         <Row label={t("common.schedule")} value={`${booking.slot.startTime} → ${booking.slot.endTime}`} />
         <Divider />
+        <Row label={t("common.duration3")} value={durationShortLabel(durationMinutes)} />
+        <Divider />
         <Row label={t("common.place")} value={booking.offer.location} />
+      </View>
+
+      {/* Ce que le tuteur gagnera et pour quelle offre : durée réellement demandée, pas celle par défaut de l'offre */}
+      <View className="mt-[14px] rounded-lg border border-line bg-surface shadow-card p-4">
+        <Text className="mb-1 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("tutorDashboard.requestDetail.requestedOffer")}</Text>
+        <Row label={t("tutorDashboard.manageOffer.title")} value={booking.offer.title} />
+        <Divider />
+        <Row label={t("common.subject")} value={booking.offer.subjectLabel} />
+        <Divider />
+        <Row label={t("common.level")} value={booking.offer.levelLabel} />
+        <Divider />
+        <Row label={t("tutorDashboard.requestDetail.teachingMode")} value={TEACHING_MODE_LABELS[booking.teachingMode]} />
+        <Divider />
+        <Row label={t("common.duration3")} value={durationShortLabel(durationMinutes)} />
+        <Divider />
+        <View className="flex-row items-center justify-between py-[9px]">
+          <Text className="text-[13.5px] text-ink-soft">{t("tutorDashboard.requestDetail.sessionAmount")}</Text>
+          <Text className="text-[17px] font-bold text-primary">{booking.offer.priceLabel}</Text>
+        </View>
+        <Text className="text-[12px] leading-[17px] text-ink-faint">
+          {t("tutorDashboard.requestDetail.yourRateForThisDuration", { duration: durationShortLabel(durationMinutes) })}
+        </Text>
       </View>
 
       <View className="mt-[14px]">

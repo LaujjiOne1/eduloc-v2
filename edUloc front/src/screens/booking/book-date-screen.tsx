@@ -14,15 +14,17 @@ import { useOfferSlots } from "@/hooks/use-offer-slots";
 import { useBookingOptions } from "@/hooks/use-booking-options";
 import { useDevicePosition } from "@/hooks/use-device-position";
 import { useRoomDaySlots } from "@/hooks/use-room-day-slots";
+import { BookingStepCard } from "@/components/booking/booking-step-card";
 import { DurationPicker } from "@/components/booking/duration-picker";
 import { RoomPicker } from "@/components/booking/room-picker";
 import { Chip } from "@/components/ui/chip";
 import { TeachingModePicker } from "@/components/booking/teaching-mode-picker";
-import { offerTeachingModes, slotTeachingMode } from "@/lib/teaching-mode";
+import { TEACHING_MODE_LABELS, offerTeachingModes, slotTeachingMode } from "@/lib/teaching-mode";
 import { toIsoDate } from "@/lib/week";
 import { useAuthStore } from "@/store/auth.store";
 import { useBookingWizardStore } from "@/store/booking-wizard.store";
 import type { TeachingModeId } from "@/types/booking";
+import type { BookingDuration } from "@/types/room";
 import type { OfferSlot } from "@/types/offer";
 import { formatDayLabel } from "@/utils/calendar";
 import { useTranslation } from "react-i18next";
@@ -32,10 +34,15 @@ import { useTranslation } from "react-i18next";
 const LOGIN_ROUTE = "/login" as Href;
 const BENEFICIARY_ROUTE = "/beneficiary" as Href;
 
+/** 1 = mode de cours, 2 = durée, 3 = date et créneau. */
+type BookingStep = 1 | 2 | 3;
+
 /**
- * Choix du rendez-vous : le calendrier (semaine glissante, extensible en mois) montre les jours avec des
- * créneaux ; on choisit une date, on voit ses créneaux, puis on en choisit un. C'est le SEUL écran de choix de
- * créneau du parcours de réservation (la fiche de l'offre n'en propose plus).
+ * Choix du rendez-vous, en trois cartes dépliées une à une (comme la recherche Airbnb) : 1) le mode de cours
+ * (en ligne, ou présentiel : chez moi / chez le tuteur / salle partenaire), 2) la durée, 3) la date puis le
+ * créneau (le calendrier montre les jours avec des créneaux). La durée précède les horaires (RM-DUR-006) : le
+ * serveur ne calcule les créneaux que pour une durée donnée. C'est le SEUL écran de choix de créneau du parcours
+ * de réservation (la fiche de l'offre n'en propose plus).
  */
 export function BookDateScreen() {
   const { t } = useTranslation();
@@ -50,16 +57,28 @@ export function BookDateScreen() {
   const near = position.state.status === "ready" ? position.state : null;
   const { state: optionsState, retry: retryOptions } = useBookingOptions(offer?.id ?? null, near);
   const options = optionsState.status === "ready" ? optionsState.options : null;
-  const durations = options?.durations ?? [];
   const minNoticeHours = options?.minNoticeHours ?? 12;
+  const places = useMemo(() => offer?.places ?? [], [offer]);
 
-  // Durée choisie parmi celles configurées par le tuteur ; null = durée par défaut de l'offre.
+  // Où se déroule le cours : le choix filtre les créneaux. Jamais retenu d'office : le demandeur le choisit toujours
+  // en premier (seul un créneau déjà retenu, au retour sur l'écran, le préremplit).
+  const [mode, setMode] = useState<TeachingModeId | null>(
+    preselectedSlot ? slotTeachingMode(preselectedSlot, places) : null,
+  );
+
+  // Durées proposées pour ce mode, déduites des plages du tuteur (de 1 h à la plage, par pas de 30 min) par le backend.
+  const durationsFor = (m: TeachingModeId | null): BookingDuration[] =>
+    (m && options?.durationsByMode[m]) || options?.durations || [];
+  const durations = durationsFor(mode);
+  // Durée choisie par le demandeur ; null tant qu'il n'a rien choisi.
   const [durationMinutes, setDurationMinutes] = useState<number | null>(preselectedChoice.durationMinutes);
-  const effectiveDuration = durationMinutes ?? offer?.durationMinutes ?? null;
+  // Une seule durée possible : elle s'applique d'office (c'est la longueur de la plage). Sinon, durée de l'offre en attendant.
+  const effectiveDuration = durationMinutes ?? (durations.length === 1 ? durations[0].minutes : null) ?? offer?.durationMinutes ?? null;
+  const hasDurationStep = durations.length > 1;
+  const durationDone = !hasDurationStep || durationMinutes !== null;
   const { slots, loading, error, ensureRange, retry } = useOfferSlots(offer, effectiveDuration);
   const todayIso = useMemo(() => toIsoDate(new Date()), []);
 
-  const places = useMemo(() => offer?.places ?? [], [offer]);
   // « Salle partenaire » vient du serveur (salles ACCEPTÉES par le tuteur et réservables), pas des lieux du tuteur.
   const availableModes = useMemo(() => {
     const base = offerTeachingModes(places).filter((m) => m !== "partner_room");
@@ -69,14 +88,6 @@ export function BookDateScreen() {
   const [pickedDate, setPickedDate] = useState<string | null>(null);
   const [selectedSlotId, setSelectedSlotId] = useState<string | null>(preselectedSlot?.id ?? null);
   const [isNavigating, setIsNavigating] = useState(false);
-  // Où se déroule le cours : le choix filtre les créneaux. Un seul mode proposé par le tuteur → retenu d'office.
-  const [mode, setMode] = useState<TeachingModeId | null>(
-    preselectedSlot
-      ? slotTeachingMode(preselectedSlot, places)
-      : availableModes.length === 1
-        ? availableModes[0]
-        : null,
-  );
   const isRoomMode = mode === "partner_room";
   // Les salles se classent de la plus proche à la plus éloignée : on demande la position dès que ce mode est choisi.
   const requestPosition = position.request;
@@ -88,6 +99,8 @@ export function BookDateScreen() {
   const room = options?.rooms.find((r) => r.id === roomId) ?? null;
   const [participants, setParticipants] = useState(preselectedChoice.participantsCount);
   const [equipment, setEquipment] = useState<string[]>(preselectedChoice.requiredEquipment);
+  // Étape dépliée (1 lieu, 2 date + créneau, 3 durée) ; null = tout replié (retour depuis la suite du parcours).
+  const [step, setStep] = useState<BookingStep | null>(preselectedSlot ? null : 1);
 
   useFocusEffect(
     useCallback(() => {
@@ -100,6 +113,13 @@ export function BookDateScreen() {
     setMode(next);
     setSelectedSlotId(null);
     setPickedDate(null);
+    // Les durées dépendent du mode : une durée choisie qui n'existe pas pour le nouveau mode est abandonnée.
+    const nextDurations = durationsFor(next);
+    const keepDuration = durationMinutes !== null && nextDurations.some((d) => d.minutes === durationMinutes);
+    if (!keepDuration) setDurationMinutes(null);
+    // La salle partenaire demande encore une salle : on reste sur l'étape ; sinon on passe à la durée (ou à la date
+    // si la durée est déjà choisie / n'a pas lieu d'être).
+    if (next !== "partner_room") setStep(keepDuration || nextDurations.length <= 1 ? 3 : 2);
   };
 
   const chooseRoom = (id: string) => {
@@ -111,10 +131,11 @@ export function BookDateScreen() {
     setEquipment([]);
   };
 
+  // RM-DUR-009 : une autre durée recalcule les horaires ; un créneau déjà retenu n'est jamais conservé d'office.
   const chooseDuration = (minutes: number) => {
-    if (minutes === effectiveDuration) return;
+    if (minutes !== effectiveDuration) setSelectedSlotId(null);
     setDurationMinutes(minutes);
-    setSelectedSlotId(null);
+    setStep(3);
   };
 
   const toggleEquipment = (item: string) =>
@@ -127,7 +148,8 @@ export function BookDateScreen() {
     date: pickedDate ?? (preselectedSlot && slotTeachingMode(preselectedSlot, places) === "partner_room" ? preselectedSlot.date : null) ?? todayIso,
     mode,
     roomId,
-    durationMinutes: effectiveDuration,
+    // Les créneaux d'une salle ne se calculent qu'une fois la durée choisie.
+    durationMinutes: durationDone ? effectiveDuration : null,
   });
 
   // Jours avec au moins un créneau libre dans le mode choisi → pastille sur le calendrier.
@@ -183,6 +205,23 @@ export function BookDateScreen() {
     setSelectedSlotId(null);
   };
 
+  const modeDone = mode !== null && (!isRoomMode || !!room);
+  // Les durées arrivent avec les options : si elles apparaissent alors que la date est ouverte, on revient les choisir.
+  const openStep: BookingStep | null = step === 3 && !durationDone ? 2 : step;
+  const durationLabel = durations.find((d) => d.minutes === effectiveDuration)?.label ?? offer.durationLabel;
+
+  // Le créneau est la dernière étape : une fois choisi, tout se replie et « Réserver » prend le relais.
+  const pickSlot = (slot: OfferSlot) => {
+    setSelectedSlotId(slot.id);
+    setStep(null);
+  };
+
+  const modeSummary = mode === null ? t("booking.bookDate.addMode") : isRoomMode && room ? room.name : TEACHING_MODE_LABELS[mode];
+  const durationSummary = durationDone ? durationLabel : t("booking.bookDate.addDuration");
+  const dateSummary = selectedSlot
+    ? `${selectedSlot.dateLabel} · ${selectedSlot.timeRangeLabel}`
+    : t("booking.bookDate.addDate");
+
   const reserve = () => {
     if (!canReserve || !selectedSlot) return;
     setIsNavigating(true);
@@ -214,171 +253,195 @@ export function BookDateScreen() {
           </Text>
         </FadeIn>
 
-        <FadeIn delay={60}>
-          <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
-            {t("booking.bookDate.whereWouldYouLikeThe")}</Text>
-          {availableModes.length === 0 ? (
-            optionsState.status === "loading" ? (
-              <View className="h-[64px] rounded-lg bg-line-soft" />
-            ) : (
-              <Text className="text-[13.5px] text-ink-soft">{t("booking.bookDate.thisTutorHasNotYet")}</Text>
-            )
-          ) : (
-            <TeachingModePicker available={availableModes} value={mode} onChange={chooseMode} />
-          )}
-          {optionsState.status === "error" ? (
-            <View className="mt-2 flex-row items-center gap-3">
-              <Text className="flex-1 text-[12.5px] text-error">{t("booking.bookDate.thePartnerRoomsCouldNot")}</Text>
-              <PressableScale onPress={retryOptions} accessibilityLabel={t("common.tryAgain")}>
-                <Text className="text-[13px] font-semibold text-primary">{t("common.tryAgain")}</Text>
-              </PressableScale>
-            </View>
-          ) : null}
-        </FadeIn>
-
-        {isRoomMode && options ? (
-          <FadeIn delay={70}>
-            <View className="mt-[20px]">
-              <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
-                {t("booking.bookDate.whichRoom")}</Text>
-              {position.state.status === "loading" ? (
-                <Text className="mb-2 text-[12.5px] text-ink-soft">{t("booking.bookDate.calculatingDistances")}</Text>
-              ) : position.state.status === "unavailable" ? (
-                <View className="mb-3 flex-row items-center gap-3">
-                  <Text className="flex-1 text-[12.5px] leading-[18px] text-ink-soft">
-                    {t("booking.bookDate.distancesUnavailable", { message: position.state.message })}
-                  </Text>
-                  <PressableScale onPress={() => void position.request()} accessibilityLabel={t("booking.bookDate.retryThePosition")}>
+        <View className="gap-3">
+          <FadeIn delay={60}>
+            <BookingStepCard
+              title={t("booking.bookDate.whereWouldYouLikeThe")}
+              label={t("booking.bookDate.modeLabel")}
+              summary={modeSummary}
+              done={modeDone}
+              open={openStep === 1}
+              onOpen={() => setStep(1)}
+            >
+              {availableModes.length === 0 ? (
+                optionsState.status === "loading" ? (
+                  <View className="h-[64px] rounded-lg bg-line-soft" />
+                ) : (
+                  <Text className="text-[13.5px] text-ink-soft">{t("booking.bookDate.thisTutorHasNotYet")}</Text>
+                )
+              ) : (
+                <TeachingModePicker available={availableModes} value={mode} onChange={chooseMode} />
+              )}
+              {optionsState.status === "error" ? (
+                <View className="mt-2 flex-row items-center gap-3">
+                  <Text className="flex-1 text-[12.5px] text-error">{t("booking.bookDate.thePartnerRoomsCouldNot")}</Text>
+                  <PressableScale onPress={retryOptions} accessibilityLabel={t("common.tryAgain")}>
                     <Text className="text-[13px] font-semibold text-primary">{t("common.tryAgain")}</Text>
                   </PressableScale>
                 </View>
-              ) : near ? (
-                <Text className="mb-2 text-[12.5px] text-ink-soft">{t("booking.bookDate.sortedFromNearestToFarthest")}</Text>
               ) : null}
-              <RoomPicker rooms={options.rooms} value={roomId} onChange={chooseRoom} />
-              {room ? (
-                <View className="mt-4 gap-3">
-                  <View className="flex-row items-center justify-between rounded-lg border border-line bg-surface shadow-card p-4">
-                    <Text className="text-[14px] font-semibold text-ink">{t("common.participants")}</Text>
-                    <View className="flex-row items-center gap-4">
-                      <PressableScale
-                        onPress={() => setParticipants((n) => Math.max(1, n - 1))}
-                        disabled={participants <= 1}
-                        accessibilityLabel={t("booking.bookDate.oneParticipantLess")}
-                      >
-                        <Text className="text-[22px] font-bold font-display text-primary">−</Text>
-                      </PressableScale>
-                      <Text className="min-w-[24px] text-center text-[16px] font-bold text-ink">{participants}</Text>
-                      <PressableScale
-                        onPress={() => setParticipants((n) => Math.min(room.capacity, n + 1))}
-                        disabled={participants >= room.capacity}
-                        accessibilityLabel={t("booking.bookDate.oneParticipantMore")}
-                      >
-                        <Text className="text-[22px] font-bold font-display text-primary">+</Text>
+
+              {isRoomMode && options ? (
+                <View className="mt-[20px]">
+                  <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
+                    {t("booking.bookDate.whichRoom")}</Text>
+                  {position.state.status === "loading" ? (
+                    <Text className="mb-2 text-[12.5px] text-ink-soft">{t("booking.bookDate.calculatingDistances")}</Text>
+                  ) : position.state.status === "unavailable" ? (
+                    <View className="mb-3 flex-row items-center gap-3">
+                      <Text className="flex-1 text-[12.5px] leading-[18px] text-ink-soft">
+                        {t("booking.bookDate.distancesUnavailable", { message: position.state.message })}
+                      </Text>
+                      <PressableScale onPress={() => void position.request()} accessibilityLabel={t("booking.bookDate.retryThePosition")}>
+                        <Text className="text-[13px] font-semibold text-primary">{t("common.tryAgain")}</Text>
                       </PressableScale>
                     </View>
-                  </View>
-                  {room.equipment.length > 0 ? (
-                    <View>
-                      <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
-                        {t("booking.bookDate.requiredEquipmentOptional")}</Text>
-                      <View className="flex-row flex-wrap gap-2">
-                        {room.equipment.map((item) => (
-                          <Chip key={item} label={item} active={equipment.includes(item)} onPress={() => toggleEquipment(item)} />
-                        ))}
+                  ) : near ? (
+                    <Text className="mb-2 text-[12.5px] text-ink-soft">{t("booking.bookDate.sortedFromNearestToFarthest")}</Text>
+                  ) : null}
+                  <RoomPicker rooms={options.rooms} value={roomId} onChange={chooseRoom} />
+                  {room ? (
+                    <View className="mt-4 gap-3">
+                      <View className="flex-row items-center justify-between rounded-lg border border-line bg-surface shadow-card p-4">
+                        <Text className="text-[14px] font-semibold text-ink">{t("common.participants")}</Text>
+                        <View className="flex-row items-center gap-4">
+                          <PressableScale
+                            onPress={() => setParticipants((n) => Math.max(1, n - 1))}
+                            disabled={participants <= 1}
+                            accessibilityLabel={t("booking.bookDate.oneParticipantLess")}
+                          >
+                            <Text className="text-[22px] font-bold font-display text-primary">−</Text>
+                          </PressableScale>
+                          <Text className="min-w-[24px] text-center text-[16px] font-bold text-ink">{participants}</Text>
+                          <PressableScale
+                            onPress={() => setParticipants((n) => Math.min(room.capacity, n + 1))}
+                            disabled={participants >= room.capacity}
+                            accessibilityLabel={t("booking.bookDate.oneParticipantMore")}
+                          >
+                            <Text className="text-[22px] font-bold font-display text-primary">+</Text>
+                          </PressableScale>
+                        </View>
                       </View>
+                      {room.equipment.length > 0 ? (
+                        <View>
+                          <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
+                            {t("booking.bookDate.requiredEquipmentOptional")}</Text>
+                          <View className="flex-row flex-wrap gap-2">
+                            {room.equipment.map((item) => (
+                              <Chip key={item} label={item} active={equipment.includes(item)} onPress={() => toggleEquipment(item)} />
+                            ))}
+                          </View>
+                        </View>
+                      ) : null}
                     </View>
                   ) : null}
                 </View>
               ) : null}
-            </View>
+
+              {/* Les autres modes passent seuls à la suite ; la salle demande d'abord salle, effectif, équipements. */}
+              {isRoomMode ? (
+                <View className="mt-5">
+                  <Button label={t("common.continue")} disabled={!modeDone} onPress={() => setStep(durationDone ? 3 : 2)} />
+                </View>
+              ) : null}
+            </BookingStepCard>
           </FadeIn>
-        ) : null}
 
-        {mode !== null && durations.length > 1 ? (
-          <FadeIn delay={75}>
-            <View className="mt-[20px]">
-              <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
-                {t("common.duration3")}</Text>
-              <DurationPicker durations={durations} value={effectiveDuration} onChange={chooseDuration} />
-            </View>
+          {hasDurationStep ? (
+            <FadeIn delay={70}>
+              <BookingStepCard
+                title={t("booking.bookDate.howLongTitle")}
+                label={t("booking.bookDate.durationLabel")}
+                summary={durationSummary}
+                done={durationDone}
+                open={openStep === 2}
+                disabled={!modeDone}
+                onOpen={() => setStep(2)}
+              >
+                <DurationPicker durations={durations} value={durationMinutes} onChange={chooseDuration} />
+                <Text className="mt-3 text-[12px] text-ink-soft">{t("booking.bookDate.durationHint")}</Text>
+              </BookingStepCard>
+            </FadeIn>
+          ) : null}
+
+          <FadeIn delay={80}>
+            <BookingStepCard
+              title={t("booking.bookDate.whenTitle")}
+              label={t("booking.bookDate.dateLabel")}
+              summary={dateSummary}
+              done={!!selectedSlot}
+              open={openStep === 3}
+              disabled={!modeDone || !durationDone}
+              onOpen={() => setStep(3)}
+            >
+              <HabitCalendar
+                variant="card"
+                selectedDate={selectedDate}
+                onSelectDate={pickDate}
+                markers={markers}
+                minDate={todayIso}
+                onViewChange={ensureRange}
+              />
+              {isRoomMode ? (
+                <Text className="mt-2.5 px-1 text-[12px] text-ink-soft">
+                  {t("booking.bookDate.chooseADateTheRoom")}</Text>
+              ) : (
+                <View className="mt-2.5 flex-row items-center gap-2 px-1">
+                  <View className="h-[7px] w-[7px] rounded-full bg-accent" />
+                  <Text className="text-[12px] text-ink-soft">{t("booking.bookDate.daysWithAvailableSlots")}</Text>
+                </View>
+              )}
+
+              <View className="mt-[20px]">
+                <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
+                  {t("booking.bookDate.slots", { value: dayLabel.charAt(0).toLowerCase() + dayLabel.slice(1) })}
+                </Text>
+                {slotsError ? (
+                  <View className="flex-row items-center gap-3">
+                    <Text className="flex-1 text-[13.5px] text-error">{slotsError}</Text>
+                    <PressableScale onPress={retrySlots} accessibilityLabel={t("common.tryAgain")}>
+                      <Text className="text-[13.5px] font-semibold text-primary">{t("common.tryAgain")}</Text>
+                    </PressableScale>
+                  </View>
+                ) : slotsLoading ? (
+                  <View className="gap-[10px]">
+                    {[0, 1].map((i) => (
+                      <View key={i} className="h-[56px] rounded-lg bg-line-soft" />
+                    ))}
+                  </View>
+                ) : daySlots.length === 0 ? (
+                  <View className="rounded-2xl border border-line bg-surface shadow-card">
+                    <EmptyState
+                      compact
+                      illustration="calendar"
+                      title={t("booking.bookDate.noSlotsTitle")}
+                      message={
+                        isRoomMode
+                          ? t("booking.bookDate.noSlotsThatDayIn")
+                          : slots.length === 0 && !loading
+                            ? t("booking.bookDate.noSlotsAvailableAtThe")
+                            : undefined
+                      }
+                      actionLabel={nextDate ? t("booking.bookDate.nextAvailability", { toLowerCase: formatDayLabel(nextDate).toLowerCase() }) : undefined}
+                      onAction={nextDate ? () => pickDate(nextDate) : undefined}
+                    />
+                  </View>
+                ) : (
+                  <View className="gap-[10px]">
+                    {daySlots.map((slot) => (
+                      <TimeSlotRow
+                        key={slot.id}
+                        slot={slot}
+                        selected={slot.id === selectedSlotId}
+                        onPress={() => pickSlot(slot)}
+                      />
+                    ))}
+                  </View>
+                )}
+              </View>
+            </BookingStepCard>
           </FadeIn>
-        ) : null}
-
-        {mode === null || (isRoomMode && !room) ? null : (
-        <>
-        <FadeIn delay={80}>
-          <View className="mt-[20px]" />
-          <HabitCalendar
-            variant="card"
-            selectedDate={selectedDate}
-            onSelectDate={pickDate}
-            markers={markers}
-            minDate={todayIso}
-            onViewChange={ensureRange}
-          />
-          {isRoomMode ? (
-            <Text className="mt-2.5 px-1 text-[12px] text-ink-soft">
-              {t("booking.bookDate.chooseADateTheRoom")}</Text>
-          ) : (
-            <View className="mt-2.5 flex-row items-center gap-2 px-1">
-              <View className="h-[7px] w-[7px] rounded-full bg-accent" />
-              <Text className="text-[12px] text-ink-soft">{t("booking.bookDate.daysWithAvailableSlots")}</Text>
-            </View>
-          )}
-        </FadeIn>
-
-        <FadeIn delay={120}>
-          <View className="mt-[20px]">
-            <Text className="mb-[6px] ml-0.5 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">
-              {t("booking.bookDate.slots", { value: dayLabel.charAt(0).toLowerCase() + dayLabel.slice(1) })}
-            </Text>
-            {slotsError ? (
-              <View className="flex-row items-center gap-3">
-                <Text className="flex-1 text-[13.5px] text-error">{slotsError}</Text>
-                <PressableScale onPress={retrySlots} accessibilityLabel={t("common.tryAgain")}>
-                  <Text className="text-[13.5px] font-semibold text-primary">{t("common.tryAgain")}</Text>
-                </PressableScale>
-              </View>
-            ) : slotsLoading ? (
-              <View className="gap-[10px]">
-                {[0, 1].map((i) => (
-                  <View key={i} className="h-[56px] rounded-lg bg-line-soft" />
-                ))}
-              </View>
-            ) : daySlots.length === 0 ? (
-              <View className="rounded-2xl border border-line bg-surface shadow-card">
-                <EmptyState
-                  compact
-                  illustration="calendar"
-                  title={t("booking.bookDate.noSlotsTitle")}
-                  message={
-                    isRoomMode
-                      ? t("booking.bookDate.noSlotsThatDayIn")
-                      : slots.length === 0 && !loading
-                        ? t("booking.bookDate.noSlotsAvailableAtThe")
-                        : undefined
-                  }
-                  actionLabel={nextDate ? t("booking.bookDate.nextAvailability", { toLowerCase: formatDayLabel(nextDate).toLowerCase() }) : undefined}
-                  onAction={nextDate ? () => pickDate(nextDate) : undefined}
-                />
-              </View>
-            ) : (
-              <View className="gap-[10px]">
-                {daySlots.map((slot) => (
-                  <TimeSlotRow
-                    key={slot.id}
-                    slot={slot}
-                    selected={slot.id === selectedSlotId}
-                    onPress={() => setSelectedSlotId(slot.id)}
-                  />
-                ))}
-              </View>
-            )}
-          </View>
-        </FadeIn>
-        </>
-        )}
+        </View>
 
         <FadeIn delay={160}>
           <Text className="mt-4 text-[12px] leading-[18px] text-ink-faint">
@@ -408,12 +471,13 @@ type TimeSlotRowProps = {
 function TimeSlotRow({ slot, selected, onPress }: TimeSlotRowProps) {
   const { t } = useTranslation();
   const booked = slot.status === "unavailable";
+  const range = slot.timeRangeLabel;
 
   return (
     <PressableScale
       onPress={onPress}
       disabled={booked}
-      accessibilityLabel={booked ? t("booking.bookDate.slotTaken", { range: slot.timeRangeLabel }) : slot.timeRangeLabel}
+      accessibilityLabel={booked ? t("booking.bookDate.slotTaken", { range }) : range}
     >
       <View
         className={[
@@ -423,7 +487,7 @@ function TimeSlotRow({ slot, selected, onPress }: TimeSlotRowProps) {
       >
         <View className="flex-row items-center gap-[10px]">
           <ClockIcon size={16} color={!booked && selected ? "#332E86" : "#585B78"} />
-          <Text className="text-[14.5px] font-bold text-ink">{slot.timeRangeLabel}</Text>
+          <Text className="text-[14.5px] font-bold text-ink">{range}</Text>
         </View>
         {booked ? (
           <Text className="text-[12px] font-semibold text-ink-faint">{t("booking.bookDate.taken")}</Text>

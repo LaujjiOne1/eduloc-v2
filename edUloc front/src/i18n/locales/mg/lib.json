@@ -68,5 +68,10 @@
     "leadHour": "1 ora",
     "bodyRequester": "{{subject}} amin'ny {{time}}. Miomàna.",
     "bodyTutor": "{{student}} · {{subject}} amin'ny {{time}}."
+  },
+  "countdown": {
+    "hoursMinutes": "{{hours}} ora {{minutes}} min",
+    "minutesSeconds": "{{minutes}} min {{seconds}} s",
+    "seconds": "{{seconds}} s"
   }
 }

@@ -138,7 +138,16 @@
     "myOffers": "Ny tolotro",
     "youHaveNotCreatedAn": "Mbola tsy nanao tolotra ianao.",
     "active": "Mandeha",
-    "deactivated": "Tsy mandeha"
+    "deactivated": "Tsy mandeha",
+    "hourlyRate": "Vidin'ora iray",
+    "perHour": "{{price}} / ora",
+    "bookableDurations": "Faharetana azo vatsiana",
+    "durationRange": "{{min}} hatramin'ny {{max}}",
+    "amount": "Vidiny",
+    "amountRange": "{{min}} hatramin'ny {{max}}",
+    "amountByDuration": "Vidiny araka ny faharetana",
+    "addAvailabilityHint": "Ampio fotoana malalaka 1h farafahakeliny mba hahafahan'ny mpangataka misafidy faharetana ary mamandrika ity tolotra ity.",
+    "formatAndPlaces": "Karazana sy toerana"
   },
   "requestAccepted": {
     "requestAccepted": "Nekena ny fangatahana",
@@ -164,7 +173,11 @@
     "theOtherOne": "ilay hafa",
     "viewSRequest": "Jereo ny fangatahan'i {{beneficiaryFirstName}}",
     "notSpecifiedMasculine": "Tsy voafaritra",
-    "notSpecifiedFeminine": "Tsy voafaritra"
+    "notSpecifiedFeminine": "Tsy voafaritra",
+    "requestedOffer": "Tolotra angatahana",
+    "teachingMode": "Karazana lesona",
+    "sessionAmount": "Vidin'ny lesona",
+    "yourRateForThisDuration": "Ny vidinao ho an'ny {{duration}} (tsy ao anatin'ny saran'ny dia, efitrano ary serivisy)."
   },
   "requests": {
     "requests": "Fangatahana",

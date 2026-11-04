@@ -138,7 +138,16 @@
     "myOffers": "Mes offres",
     "youHaveNotCreatedAn": "Vous n'avez pas encore créé d'offre.",
     "active": "Active",
-    "deactivated": "Désactivée"
+    "deactivated": "Désactivée",
+    "hourlyRate": "Tarif horaire",
+    "perHour": "{{price}} / h",
+    "bookableDurations": "Durées réservables",
+    "durationRange": "{{min}} à {{max}}",
+    "amount": "Montant",
+    "amountRange": "{{min}} à {{max}}",
+    "amountByDuration": "Montant selon la durée",
+    "addAvailabilityHint": "Ajoutez une disponibilité d'au moins 1h pour que les demandeurs puissent choisir une durée et réserver cette offre.",
+    "formatAndPlaces": "Format et lieux"
   },
   "requestAccepted": {
     "requestAccepted": "Demande acceptée",
@@ -164,7 +173,11 @@
     "theOtherOne": "l'autre",
     "viewSRequest": "Voir la demande de {{beneficiaryFirstName}}",
     "notSpecifiedMasculine": "Non précisé",
-    "notSpecifiedFeminine": "Non précisée"
+    "notSpecifiedFeminine": "Non précisée",
+    "requestedOffer": "Offre demandée",
+    "teachingMode": "Mode de cours",
+    "sessionAmount": "Montant de la séance",
+    "yourRateForThisDuration": "Votre tarif pour {{duration}} (hors frais de déplacement, de salle et de service)."
   },
   "requests": {
     "requests": "Demandes",

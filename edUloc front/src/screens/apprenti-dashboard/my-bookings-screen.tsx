@@ -9,6 +9,7 @@ import { PressableScale } from "@/components/motion/pressable-scale";
 import { ApprentiBottomNav } from "@/components/ui/apprenti-bottom-nav";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { EmptyState } from "@/components/ui/empty-state";
+import { PaymentDueInline, RequestExpiryInline } from "@/components/booking/request-expiry";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useSearchWizardStore } from "@/store/search-wizard.store";
 import { useMyBookings } from "@/hooks/use-my-bookings";
@@ -123,7 +124,7 @@ function BookingCard({ booking, onPress }: { booking: Booking; onPress: () => vo
             <Text className="text-[15px] font-bold text-ink">{booking.offer.subjectLabel}</Text>
             <Text className="mt-[2px] text-[13px] text-ink-soft">{booking.offer.tutorName}</Text>
           </View>
-          <StatusBadge status={booking.status} />
+          <StatusBadge status={booking.status} expired={booking.expired} unpaid={booking.paymentRequired} />
         </View>
         <View className="my-3 h-px bg-line-soft" />
         <View className="flex-row items-center gap-[6px]">
@@ -132,6 +133,8 @@ function BookingCard({ booking, onPress }: { booking: Booking; onPress: () => vo
             {booking.slot.dateLabel} • {booking.slot.startTime}
           </Text>
         </View>
+        {booking.status === "pending" || booking.expired ? <RequestExpiryInline booking={booking} /> : null}
+        {booking.status === "confirmed" && booking.paymentRequired ? <PaymentDueInline booking={booking} /> : null}
       </View>
     </PressableScale>
   );

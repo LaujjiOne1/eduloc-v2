@@ -44,6 +44,11 @@ export interface Offer {
   durationLabel: string;
   /** Autres durées proposées (minutes), en plus de durationMinutes. */
   durationOptions: number[];
+  /**
+   * Durées réellement réservables (minutes), déduites des plages du tuteur : de 1 h à la plus longue plage, par pas de
+   * 30 min. Fourni seulement à l'espace du tuteur (GET /tutors/me/offers) ; vide ailleurs.
+   */
+  bookableDurations: number[];
   format: LocationFormatId; // [v1+] valeur unique (TeachingFormat)
   formats: FormatId[]; // dérivé de `format` (BOTH → ["in_person","online"])
   places: OfferPlace[]; // [v1+]

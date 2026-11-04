@@ -302,6 +302,8 @@ export interface OfferDto extends OfferSummaryDto {
   places: PlacePublicDto[];
   disabledByAdmin: boolean;
   createdAt: IsoDateTime;
+  /** GET /tutors/me/offers seulement : durées réservables déduites des plages du Tuteur (minutes). */
+  bookableDurations?: number[];
 }
 export interface CreateOfferRequestDto {
   subjectId: Uuid;
@@ -445,6 +447,8 @@ export interface BackendCreateBookingRequestDto {
   beneficiaryLongitude?: number;
   /** Blocage temporaire obtenu par POST /bookings/quote. */
   holdId?: Uuid;
+  /** Durée de validité de la demande (minutes), choisie par le Demandeur ; absente = valeur par défaut du serveur. */
+  validityMinutes?: number;
 }
 /** Décomposition du prix : le Demandeur paie `total` ; le tarif du Tuteur lui revient en entier. */
 export interface BookingPricingDto {
@@ -509,6 +513,12 @@ export interface BookingDto {
   refusalReason: string | null;
   conversationId: Uuid | null;
   hasReview: boolean;
+  /** Échéance d'une demande en attente ; null si elle ne l'est plus (ou demande antérieure). */
+  expiresAt?: IsoDateTime | null;
+  /** Réservation confirmée non payée (paiements activés) : le code de séance n'est donné qu'après paiement. */
+  paymentRequired?: boolean;
+  /** Échéance de paiement : la durée choisie par le Demandeur pour sa demande, à compter de la confirmation. */
+  paymentDueAt?: IsoDateTime | null;
   /** Vue tuteur d'une demande en attente : autres demandes en attente sur le même horaire. */
   competingRequests?: CompetingRequestDto[];
   createdAt: IsoDateTime;
@@ -836,7 +846,10 @@ export interface BookingOptionsDto {
   tutorId: Uuid;
   format: TeachingFormat;
   minNoticeHours: number;
+  /** Durées déduites des plages du Tuteur : de 1 h à la plus longue plage, par pas de 30 min. */
   durations: { minutes: number; price: MoneyDto }[];
+  /** Idem pour chaque mode proposé (une plage « en ligne » n'ouvre pas la salle partenaire). */
+  durationsByMode: Partial<Record<TeachingMode, { minutes: number; price: MoneyDto }[]>>;
   modes: TeachingMode[];
   rooms: PublicRoomDto[];
 }

@@ -11,7 +11,11 @@
     "confirmTimeRange": "Valider la plage horaire",
     "inPersonOnline": "Présentiel & En ligne",
     "inPersonOnly": "Présentiel uniquement",
-    "onlineOnly": "En ligne uniquement"
+    "onlineOnly": "En ligne uniquement",
+    "slotLength": "Durée de ce créneau : {{duration}}",
+    "bookableRange": "Les demandeurs pourront réserver de 1h à {{max}}, par pas de 30 min.",
+    "bookableOneHour": "Les demandeurs pourront réserver 1h.",
+    "tooShortToBook": "Moins d'1h : ce créneau ne pourra pas être réservé."
   },
   "slotPill": {
     "deleteThisSlot": "Supprimer ce créneau",

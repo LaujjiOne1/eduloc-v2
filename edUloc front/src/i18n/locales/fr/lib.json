@@ -68,5 +68,10 @@
     "leadHour": "1 h",
     "bodyRequester": "{{subject}} à {{time}}. Préparez-vous.",
     "bodyTutor": "{{student}} · {{subject}} à {{time}}."
+  },
+  "countdown": {
+    "hoursMinutes": "{{hours}} h {{minutes}} min",
+    "minutesSeconds": "{{minutes}} min {{seconds}} s",
+    "seconds": "{{seconds}} s"
   }
 }

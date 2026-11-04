@@ -10,7 +10,8 @@ import { Chip } from "@/components/ui/chip";
 import { FormError } from "@/components/ui/form-error";
 import { type SelectOption, SelectField } from "@/components/ui/select-field";
 import { TextField } from "@/components/ui/text-field";
-import { useOffer } from "@/hooks/use-offer";
+import { OfferPricingSummary } from "@/components/offers/offer-pricing-summary";
+import { useTutorOffer } from "@/hooks/use-tutor-offer";
 import { useTracks } from "@/hooks/use-tracks";
 import { trackKindOf } from "@/lib/search-funnel";
 import { type OfferSaveInput, useOfferActions, type OfferActionState } from "@/hooks/use-offer-actions";
@@ -43,7 +44,7 @@ export function ManageOfferScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();
   const isEditMode = !!id;
 
-  const { state: offerState, retry: retryOffer } = useOffer(id);
+  const { state: offerState, retry: retryOffer } = useTutorOffer(id);
   const { state: profileState } = useTutorProfile();
   const { state: actionState, save, toggleStatus } = useOfferActions();
 
@@ -199,12 +200,20 @@ function ManageOfferForm({
 
         {actionState.status === "error" ? <FormError message={actionState.message} /> : null}
 
+        {/* Ce que les demandeurs voient en heures et en argent, déduit des plages de disponibilité */}
+        {existingOffer ? (
+          <View className="mb-[18px]">
+            <OfferPricingSummary offer={existingOffer} />
+          </View>
+        ) : null}
+
         <TextField label={t("tutorDashboard.manageOffer.title")} value={title} onChangeText={setTitle} placeholder={t("tutorDashboard.manageOffer.pythonForBeginners")} />
 
         {existingOffer ? (
           <>
             <ReadOnlyField label={t("common.subject")} value={existingOffer.subjectLabel} />
             <ReadOnlyField label={t("common.level")} value={existingOffer.levelLabel} />
+            <ReadOnlyField label={t("tutorDashboard.offers.formatAndPlaces")} value={existingOffer.location} />
           </>
         ) : (
           <>

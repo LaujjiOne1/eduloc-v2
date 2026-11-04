@@ -6,6 +6,7 @@ import { XIcon } from "@/components/icons";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { Button } from "@/components/ui/button";
 import { TimeRangeWheelPicker } from "@/components/ui/time-range-wheel-picker";
+import { durationShortLabel } from "@/api/format/datetime";
 import type { LocationFormatId } from "@/types/common";
 import { useTranslation } from "react-i18next";
 import { t as tr } from "@/i18n";
@@ -17,6 +18,11 @@ function addOneHour(time: string): string {
   const [hours, minutes] = time.split(":").map(Number);
   return hours >= 23 ? "23:45" : `${String(hours + 1).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
 }
+
+const minutesOf = (time: string): number => {
+  const [hours, minutes] = time.split(":").map(Number);
+  return hours * 60 + minutes;
+};
 
 const FORMAT_OPTIONS: { id: LocationFormatId; label: string }[] = [
   { id: "both", get label() { return tr("availability.slotModal.inPersonOnline"); } },
@@ -45,6 +51,7 @@ export function SlotModal({ subtitle, showFormat = true, onClose, onSave }: Slot
   const [endTime, setEndTime] = useState("17:00");
   const [format, setFormat] = useState<LocationFormatId>("both");
   const [error, setError] = useState<string | null>(null);
+  const windowMinutes = Math.max(0, minutesOf(endTime) - minutesOf(startTime));
 
   const save = () => {
     if (endTime <= startTime) {
@@ -84,6 +91,20 @@ export function SlotModal({ subtitle, showFormat = true, onClose, onSave }: Slot
                 setError(null);
               }}
             />
+          </View>
+
+          {/* Ce que les demandeurs pourront réserver : de 1 h à la longueur de la plage, par pas de 30 min */}
+          <View className="mb-4 rounded-lg bg-primary-tint/40 px-3 py-2.5">
+            <Text className="text-[13px] font-bold text-primary">
+              {t("availability.slotModal.slotLength", { duration: durationShortLabel(windowMinutes) })}
+            </Text>
+            <Text className="mt-0.5 text-[12px] leading-[17px] text-ink-soft">
+              {windowMinutes < 60
+                ? t("availability.slotModal.tooShortToBook")
+                : windowMinutes === 60
+                  ? t("availability.slotModal.bookableOneHour")
+                  : t("availability.slotModal.bookableRange", { max: durationShortLabel(windowMinutes - (windowMinutes % 30)) })}
+            </Text>
           </View>
 
           {showFormat ? (

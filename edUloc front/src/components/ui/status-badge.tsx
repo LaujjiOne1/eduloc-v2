@@ -38,8 +38,13 @@ export function statusDotClass(status: BookingStatus): string {
 }
 
 /** Pill matching the EduLoc .badge-pending/.badge-confirmed/... styles for each BookingStatus. */
-export function StatusBadge({ status }: { status: BookingStatus }) {
-  const config = STATUS_CONFIG[status] ?? STATUS_CONFIG.pending;
+export function StatusBadge({ status, expired = false, unpaid = false }: { status: BookingStatus; expired?: boolean; unpaid?: boolean }) {
+  // Refusée par le système faute de réponse à temps : « Expirée » plutôt que « Refusée » ; confirmée mais pas payée : « À payer ».
+  const config = expired
+    ? { ...STATUS_CONFIG.refused, label: t("booking.requestExpiry.expiredBadge") }
+    : unpaid && status === "confirmed"
+      ? { ...STATUS_CONFIG.pending, label: t("booking.paymentDue.badge") }
+      : (STATUS_CONFIG[status] ?? STATUS_CONFIG.pending);
   // En attente : pastille blanche cernée d'ambre vif et point pulsé, bien plus lisible que l'ancien beige pâle.
   if (status === "pending") {
     return (

@@ -196,6 +196,7 @@ export function toOffer(o: D.OfferDto, slots: D.SlotDto[] = []): Offer {
     durationMinutes: o.durationMinutes,
     durationLabel: F.durationLongLabel(o.durationMinutes),
     durationOptions: o.durationOptions ?? [],
+    bookableDurations: o.bookableDurations ?? [],
     format: formatToVm(o.format),
     formats: formatToList(o.format),
     places: o.places.map(toOfferPlace),
@@ -415,6 +416,11 @@ export function toBooking(b: D.BookingDto): Booking {
     cancellationReason: b.cancellationReason,
     cancelledBy: b.cancelledBy ? lower(b.cancelledBy) : null,
     hasReview: b.hasReview,
+    expiresAt: b.expiresAt ?? null,
+    expired: b.status === "REFUSED" && b.refusalReason === "REQUEST_EXPIRED",
+    paymentRequired: b.paymentRequired ?? false,
+    paymentDueAt: b.paymentDueAt ?? null,
+    paymentExpired: b.status === "CANCELLED" && b.cancellationReason === "PAYMENT_EXPIRED",
     competingRequests: (b.competingRequests ?? []).map((c) => ({ id: c.id, beneficiaryFirstName: c.beneficiaryFirstName, requesterName: c.requesterName, createdAt: c.createdAt })),
     canReview: b.viewerRole === "REQUESTER" && b.status === "COMPLETED" && !b.hasReview,
     createdAt: b.createdAt,
@@ -455,10 +461,18 @@ export function toPartnerRoom(r: D.PublicRoomDto): PartnerRoom {
 }
 export const toAcceptedRoom = (r: D.AcceptedRoomDto): AcceptedRoom => ({ ...toPartnerRoom(r), bookable: r.bookable });
 export function toBookingOptions(o: D.BookingOptionsDto): BookingOptions {
+  const toDuration = (d: { minutes: number; price: D.MoneyDto }) => ({
+    minutes: d.minutes,
+    label: F.durationLongLabel(d.minutes),
+    priceLabel: F.priceLabel(d.price),
+  });
   return {
     offerId: o.offerId,
     minNoticeHours: o.minNoticeHours,
-    durations: o.durations.map((d) => ({ minutes: d.minutes, label: F.durationLongLabel(d.minutes), priceLabel: F.priceLabel(d.price) })),
+    durations: o.durations.map(toDuration),
+    durationsByMode: Object.fromEntries(
+      Object.entries(o.durationsByMode ?? {}).map(([mode, list]) => [lower(mode), (list ?? []).map(toDuration)]),
+    ),
     modes: o.modes.map((m) => lower(m) as TeachingModeId),
     rooms: o.rooms.map(toPartnerRoom),
   };

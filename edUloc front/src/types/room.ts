@@ -38,6 +38,8 @@ export interface BookingOptions {
   offerId: string;
   minNoticeHours: number;
   durations: BookingDuration[];
+  /** Durées par mode, à utiliser une fois le mode choisi (repli : `durations`). */
+  durationsByMode: Partial<Record<TeachingModeId, BookingDuration[]>>;
   modes: TeachingModeId[];
   rooms: PartnerRoom[];
 }

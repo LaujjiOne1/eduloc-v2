@@ -81,7 +81,16 @@
     "choosingARoomDoesNot": " Choosing a room does not reserve it: it is only taken when the tutor accepts the request.",
     "bookThisSlot": "Book this slot",
     "slotTaken": "{{range}}, slot taken",
-    "noSlotsTitle": "No slots this day"
+    "noSlotsTitle": "No slots this day",
+    "modeLabel": "Lesson mode",
+    "dateLabel": "Date and slot",
+    "durationLabel": "Duration",
+    "addMode": "Choose the mode",
+    "addDate": "Add a date",
+    "addDuration": "Choose the duration",
+    "whenTitle": "When would you like the lesson?",
+    "howLongTitle": "For how long?",
+    "durationHint": "The slots offered next fit entirely within the tutor's availability."
   },
   "bookingPending": {
     "requestSent": "Request sent",
@@ -112,7 +121,9 @@
     "recalculateThePrice": "Recalculate the price",
     "enterTheAddressToCalculate": "Enter the address to calculate the price.",
     "thePriceWillBeShown": "The price will be shown here.",
-    "atYourHome": "At your home"
+    "atYourHome": "At your home",
+    "validityTitle": "How long the request stays valid",
+    "validityHint": "If the tutor has not replied by then, the request expires automatically and the slot is released. It expires at the latest when the lesson starts."
   },
   "verify": {
     "verifyYourAccount": "Verify your account",
@@ -121,5 +132,30 @@
     "confirm": "Confirm",
     "verifying": "Verifying...",
     "codeSentTo": "We sent a 6-digit code to"
+  },
+  "requestExpiry": {
+    "expiresIn": "Expires in {{time}}",
+    "expired": "Request expired",
+    "expiredBadge": "Expired",
+    "expiredHint": "The tutor did not reply in time. This request can no longer be accepted.",
+    "offer": "Offer: {{title}}",
+    "requesterHint": "If the tutor has not replied by then, your request expires automatically and the slot is released.",
+    "requesterExpiredHint": "The tutor did not reply in time. You can send a new request.",
+    "closedExpired": "This request expired: the tutor did not reply in time."
+  },
+  "paymentDue": {
+    "heading": "Payment required",
+    "requesterDetail": "Pay to receive your session code. If payment is not received in time, the booking is cancelled and the slot is released.",
+    "tutorHeading": "Waiting for payment",
+    "tutorDetail": "The requester must pay to receive the session code. If payment is not received in time, the booking is cancelled.",
+    "expiredTitle": "Payment deadline passed",
+    "expiredDetail": "The booking will be cancelled if payment is not received.",
+    "inline": "To pay · expires in {{time}}",
+    "badge": "To pay",
+    "codeLockedTitle": "Session code",
+    "codeLockedText": "Available after payment",
+    "codeLockedScreen": "Pay for your booking to receive your session code.",
+    "goToPayment": "Go to payment",
+    "closedExpired": "This booking was cancelled: payment was not received in time."
   }
 }

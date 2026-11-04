@@ -1,6 +1,6 @@
 import { type Href, useRouter } from "expo-router";
 import type { ReactNode } from "react";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ScrollView, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -11,6 +11,7 @@ import { AuthHeader } from "@/components/ui/auth-header";
 import { Button } from "@/components/ui/button";
 import { FormError } from "@/components/ui/form-error";
 import { StepProgress } from "@/components/ui/step-progress";
+import { DEFAULT_REQUEST_VALIDITY, REQUEST_VALIDITY_CHOICES, ValidityPicker, pickValidity } from "@/components/booking/validity-picker";
 import * as F from "@/api/format/datetime";
 import { countdownLabel, useBookingQuote } from "@/hooks/use-booking-quote";
 import { useCreateBooking } from "@/hooks/use-create-booking";
@@ -58,6 +59,17 @@ export function BookingSummaryScreen() {
   const objective = useBookingWizardStore((s) => s.objective);
   const { state, submit } = useCreateBooking();
   const position = useDevicePosition();
+
+  // Durée de validité de la demande : propositions limitées par le délai avant le cours (le serveur borne aussi, et fait foi).
+  const [validity, setValidity] = useState(DEFAULT_REQUEST_VALIDITY);
+  const slotStartAt = slot?.startAt ?? null;
+  const [openedAt] = useState(() => Date.now());
+  const validityChoices = useMemo(() => {
+    const untilStart = slotStartAt ? Date.parse(slotStartAt) - openedAt : Infinity;
+    const fitting = REQUEST_VALIDITY_CHOICES.filter((minutes) => minutes * 60_000 <= untilStart);
+    return fitting.length > 0 ? fitting : REQUEST_VALIDITY_CHOICES.slice(0, 1);
+  }, [slotStartAt, openedAt]);
+  const effectiveValidity = pickValidity(validity, validityChoices);
 
   // Guard: a full recap needs an offer, a slot, and a chosen beneficiary —
   // i.e. BookDate + Beneficiary must both be completed already.
@@ -128,9 +140,10 @@ export function BookingSummaryScreen() {
       idempotencyKey: idempotencyKey || undefined,
       note: note.trim() || undefined,
       holdId: readyQuote.holdId,
+      validityMinutes: effectiveValidity,
     });
     if (booking) {
-      setCreatedBookingId(booking.id);
+      setCreatedBookingId(booking.id, booking.expiresAt);
       router.push(BOOKING_PENDING_ROUTE);
     } else {
       // Ressource prise ou prix modifié entre-temps : le blocage a été libéré, on recalcule pour afficher l'état réel.
@@ -239,6 +252,16 @@ export function BookingSummaryScreen() {
             onRetry={() => void refreshQuote()}
             waitingForAddress={needsAddress && beneficiaryAddress.trim().length === 0}
           />
+        </FadeIn>
+
+        <FadeIn delay={115}>
+          <View className="mt-[14px] rounded-lg border border-line bg-surface shadow-card p-4">
+            <Text className="mb-1 text-[12.5px] font-semibold uppercase tracking-[0.03em] text-ink-soft">{t("booking.bookingSummary.validityTitle")}</Text>
+            <View className="mt-2">
+              <ValidityPicker choices={validityChoices} value={effectiveValidity} onChange={setValidity} />
+            </View>
+            <Text className="mt-3 text-[12px] leading-[18px] text-ink-soft">{t("booking.bookingSummary.validityHint")}</Text>
+          </View>
         </FadeIn>
 
         <FadeIn delay={120}>

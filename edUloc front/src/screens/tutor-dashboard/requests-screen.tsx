@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { StatusBadge } from "@/components/ui/status-badge";
+import { RequestExpiryInline } from "@/components/booking/request-expiry";
 import { TutorBottomNav } from "@/components/ui/tutor-bottom-nav";
 import { useTutorBookings } from "@/hooks/use-tutor-bookings";
 import type { Booking, BookingStatus } from "@/types/booking";
@@ -106,13 +107,16 @@ function RequestCard({ booking, onPress }: { booking: Booking; onPress: () => vo
               {booking.offer.subjectLabel} — {booking.slot.dateLabel} • {booking.slot.startTime}
             </Text>
           </View>
-          <StatusBadge status={booking.status} />
+          <StatusBadge status={booking.status} expired={booking.expired} />
         </View>
         <View className="my-3 h-px bg-line-soft" />
         <View className="flex-row items-center gap-[6px]">
           <CalendarIcon size={14} color="#9799AF" />
           <Text className="text-[13px] text-ink-soft">{booking.slot.dateLabel}</Text>
         </View>
+        {/* Offre demandée et compte à rebours : « Expire dans … » */}
+        <Text className="mt-2 text-[12.5px] text-ink-faint" numberOfLines={1}>{booking.offer.title}</Text>
+        {booking.status === "pending" || booking.expired ? <RequestExpiryInline booking={booking} /> : null}
         {booking.competingRequests.length > 0 ? (
           <View className="mt-3 flex-row items-center gap-[6px] rounded-md bg-warning-tint px-3 py-2">
             <AlertTriangleIcon size={14} color="#D4890A" />

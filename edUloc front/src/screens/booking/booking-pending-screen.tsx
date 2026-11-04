@@ -7,6 +7,7 @@ import { CheckCircleIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { ScaleIn } from "@/components/motion/scale-in";
 import { Button } from "@/components/ui/button";
+import { ExpiryCountdownCard } from "@/components/booking/request-expiry";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useBookingWizardStore } from "@/store/booking-wizard.store";
 import { useTranslation } from "react-i18next";
@@ -25,6 +26,7 @@ export function BookingPendingScreen() {
   const offer = useBookingWizardStore((s) => s.offer);
   const slot = useBookingWizardStore((s) => s.slot);
   const createdBookingId = useBookingWizardStore((s) => s.createdBookingId);
+  const createdBookingExpiresAt = useBookingWizardStore((s) => s.createdBookingExpiresAt);
   const reset = useBookingWizardStore((s) => s.reset);
 
   // Guard: this confirmation only makes sense right after a booking was just
@@ -86,6 +88,18 @@ export function BookingPendingScreen() {
             </Text>
           </View>
         </FadeIn>
+
+        {createdBookingExpiresAt ? (
+          <FadeIn delay={205}>
+            <View className="w-full">
+              <ExpiryCountdownCard
+                expiresAt={createdBookingExpiresAt}
+                detail={t("booking.requestExpiry.requesterHint")}
+                expiredDetail={t("booking.requestExpiry.requesterExpiredHint")}
+              />
+            </View>
+          </FadeIn>
+        ) : null}
 
         <FadeIn delay={220}>
           <Text className="text-center text-[12.5px] leading-[19px] text-ink-faint">

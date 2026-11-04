@@ -70,6 +70,16 @@ export interface Booking {
   cancellationReason: string | null; // [v1+]
   cancelledBy: "requester" | "tutor" | "system" | "admin" | null; // [v1+]
   hasReview: boolean; // [v1+]
+  /** Échéance d'une demande en attente (ISO) ; null si elle ne l'est plus ou n'en a pas. */
+  expiresAt: string | null;
+  /** Demande refusée par le système faute de réponse du tuteur à temps (refusalReason = REQUEST_EXPIRED). */
+  expired: boolean;
+  /** Confirmée mais pas encore payée : le code de séance n'est donné qu'après paiement. */
+  paymentRequired: boolean;
+  /** Échéance de paiement (ISO) d'une réservation confirmée non payée ; null sinon. */
+  paymentDueAt: string | null;
+  /** Annulée par le système faute de paiement à temps (cancellationReason = PAYMENT_EXPIRED). */
+  paymentExpired: boolean;
   competingRequests: CompetingRequest[]; // [v1+] vue tuteur, demandes en attente seulement
   canReview: boolean; // [v1+] dérivé
   createdAt: string;
@@ -102,6 +112,8 @@ export interface BookingRequest {
   beneficiaryCoordinates?: { latitude: number; longitude: number };
   /** Blocage du créneau obtenu au devis : la création le consomme. */
   holdId?: string;
+  /** Durée de validité de la demande en minutes, choisie par le demandeur (le serveur borne et fait foi). */
+  validityMinutes?: number;
 }
 
 /** Une ligne du détail du prix, déjà formatée (« 25 000 Ar »). */

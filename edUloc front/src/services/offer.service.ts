@@ -80,6 +80,13 @@ export const OfferService = {
     return (await api.get<OfferDto[]>("/tutors/me/offers")).map((o) => toOffer(o));
   },
 
+  /** Une offre du tuteur connecté, avec ses durées réservables (la liste « mes offres » les porte déjà). */
+  async getTutorOfferById(id: string): Promise<Offer> {
+    const offer = (await OfferService.getTutorOffers()).find((o) => o.id === id);
+    if (!offer) throw new Error(t("hooks.useOffer.thisOfferCouldNotBe"));
+    return offer;
+  },
+
   async updateOffer(id: string, data: UpdateOfferInput): Promise<Offer> {
     return toOffer(await api.patch<OfferDto>(`/tutors/me/offers/${id}`, toUpdateDto(data)));
   },

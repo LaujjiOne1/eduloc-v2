@@ -25,7 +25,8 @@ export function SessionOtpScreen() {
   const insets = useSafeAreaInsets();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { state: bookingState } = useMyBooking(id);
-  const { state: codeState } = useSessionCode(bookingState.status === "success" ? bookingState.booking.id : undefined);
+  // Pas de code avant le paiement : on ne le demande même pas au serveur.
+  const { state: codeState } = useSessionCode(bookingState.status === "success" && !bookingState.booking.paymentRequired ? bookingState.booking.id : undefined);
   const { state: shareState, share } = useShareSessionCode(bookingState.status === "success" ? bookingState.booking.id : undefined);
 
   // Une séance déjà en cours n'a plus besoin de cet écran. Le tuteur démarre la séance depuis SON appli avec ce code :
@@ -58,6 +59,18 @@ export function SessionOtpScreen() {
   }
 
   const { booking } = bookingState;
+
+  if (booking.paymentRequired) {
+    return (
+      <View className="flex-1 items-center justify-center gap-5 bg-paper px-8" style={{ paddingTop: insets.top }}>
+        <View className="h-16 w-16 items-center justify-center rounded-full bg-paper-alt">
+          <LockIcon size={28} color="#585B78" />
+        </View>
+        <Text className="text-center text-[14.5px] leading-[21px] text-ink-soft">{t("booking.paymentDue.codeLockedScreen")}</Text>
+        <Button label={t("booking.paymentDue.goToPayment")} onPress={() => router.replace(bookingRoute(booking.id))} />
+      </View>
+    );
+  }
 
   return (
     <View className="flex-1 bg-paper" style={{ paddingTop: insets.top }}>

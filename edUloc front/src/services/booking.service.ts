@@ -49,6 +49,7 @@ function bookingBody(request: BookingRequest): BackendCreateBookingRequestDto {
       ? { beneficiaryLatitude: request.beneficiaryCoordinates.latitude, beneficiaryLongitude: request.beneficiaryCoordinates.longitude }
       : {}),
     ...(request.holdId ? { holdId: request.holdId } : {}),
+    ...(request.validityMinutes ? { validityMinutes: request.validityMinutes } : {}),
   };
 }
 

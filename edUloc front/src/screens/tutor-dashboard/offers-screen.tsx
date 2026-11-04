@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PlusIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
+import { OfferPricingSummary } from "@/components/offers/offer-pricing-summary";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
 import { Button } from "@/components/ui/button";
@@ -74,6 +75,13 @@ function OfferCard({ offer, onEdit }: { offer: Offer; onEdit: () => void }) {
           <Text className="mt-[2px] text-[13px] text-ink-soft">{offer.levelLabel}</Text>
         </View>
         <OfferStatusBadge isActive={offer.isActive} />
+      </View>
+      {offer.description ? (
+        <Text className="mt-2 text-[13px] leading-[19px] text-ink-soft" numberOfLines={2}>{offer.description}</Text>
+      ) : null}
+      <Text className="mt-2 text-[12.5px] text-ink-faint">{`${offer.subjectLabel} · ${offer.location}`}</Text>
+      <View className="mt-3">
+        <OfferPricingSummary offer={offer} compact />
       </View>
       <PressableScale onPress={onEdit} accessibilityLabel={t("common.edit2", { title: offer.title })}>
         <Text className="mt-3 text-[13px] font-bold text-primary">{t("common.edit")}</Text>

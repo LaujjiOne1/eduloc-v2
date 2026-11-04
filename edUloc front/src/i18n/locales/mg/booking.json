@@ -81,7 +81,16 @@
     "choosingARoomDoesNot": " Tsy voatokana ny efitrano rehefa mifidy azy; voaray ihany rehefa manaiky ny fangatahana ny mpampianatra.",
     "bookThisSlot": "Mandrisika ity fotoana ity",
     "slotTaken": "{{range}}, voaray ny fotoana",
-    "noSlotsTitle": "Tsy misy fotoana amin'io andro io"
+    "noSlotsTitle": "Tsy misy fotoana amin'io andro io",
+    "modeLabel": "Karazana lesona",
+    "dateLabel": "Daty sy fotoana",
+    "durationLabel": "Faharetana",
+    "addMode": "Mifidiana ny karazana",
+    "addDate": "Manampy daty",
+    "addDuration": "Mifidiana ny faharetana",
+    "whenTitle": "Rahoviana no tianao ny lesona?",
+    "howLongTitle": "Mandritra ny ohatrinona?",
+    "durationHint": "Ny fotoana atolotra manaraka dia tafiditra tanteraka ao anatin'ny fotoana malalaky ny mpampianatra."
   },
   "bookingPending": {
     "requestSent": "Nalefa ny fangatahana",
@@ -112,7 +121,9 @@
     "recalculateThePrice": "Kajio indray ny vidiny",
     "enterTheAddressToCalculate": "Ampidiro ny adiresy hikajiana ny vidiny.",
     "thePriceWillBeShown": "Eto no hiseho ny vidiny.",
-    "atYourHome": "Any aminao"
+    "atYourHome": "Any aminao",
+    "validityTitle": "Faharetan'ny fangatahana",
+    "validityHint": "Raha tsy mbola nisy valin'ny mpampianatra amin'izay, dia lany daty ho azy ny fangatahana ary malalaka indray ny fotoana. Lany daty rehefa manomboka ny lesona."
   },
   "verify": {
     "verifyYourAccount": "Hamafiso ny kaontinao",
@@ -121,5 +132,30 @@
     "confirm": "Hamafiso",
     "verifying": "Manamarina…",
     "codeSentTo": "Nandefa kaody 6 isa izahay tany amin'ny"
+  },
+  "requestExpiry": {
+    "expiresIn": "Ho lany ao anatin'ny {{time}}",
+    "expired": "Lany daty ny fangatahana",
+    "expiredBadge": "Lany daty",
+    "expiredHint": "Tsy namaly tamin'ny fotoana ny mpampianatra. Tsy azo ekena intsony ity fangatahana ity.",
+    "offer": "Tolotra: {{title}}",
+    "requesterHint": "Raha tsy mbola nisy valin'ny mpampianatra amin'izay, dia lany daty ho azy ny fangatahanao ary malalaka indray ny fotoana.",
+    "requesterExpiredHint": "Tsy namaly tamin'ny fotoana ny mpampianatra. Afaka mandefa fangatahana vaovao ianao.",
+    "closedExpired": "Lany daty ity fangatahana ity: tsy namaly tamin'ny fotoana ny mpampianatra."
+  },
+  "paymentDue": {
+    "heading": "Takiana ny fandoavana",
+    "requesterDetail": "Mandoa vola mba hahazoana ny kaody ny lesona. Raha tsy voaray ny fandoavana tao anatin'ity fe-potoana ity, dia foanana ny famandrihana ary malalaka indray ny fotoana.",
+    "tutorHeading": "Miandry ny fandoavana",
+    "tutorDetail": "Tsy maintsy mandoa ny mpangataka vao hahazo ny kaody ny lesona. Raha tsy voaray ny fandoavana, dia foanana ny famandrihana.",
+    "expiredTitle": "Lany ny fe-potoana hanaovana ny fandoavana",
+    "expiredDetail": "Hofoanana ny famandrihana raha tsy voaray ny fandoavana.",
+    "inline": "Andoavina · lany ao anatin'ny {{time}}",
+    "badge": "Andoavina",
+    "codeLockedTitle": "Kaody ny lesona",
+    "codeLockedText": "Azo jerena aorian'ny fandoavana",
+    "codeLockedScreen": "Mandoa ny famandrihanao mba hahazoana ny kaody ny lesona.",
+    "goToPayment": "Mankany amin'ny fandoavana",
+    "closedExpired": "Nofoanana ity famandrihana ity: tsy voaray tamin'ny fotoana ny fandoavana."
   }
 }

@@ -3,7 +3,7 @@ import { useCallback, useRef, useState } from "react";
 import { localDate } from "@/api/format/datetime";
 import { OfferService } from "@/services/offer.service";
 import type { Offer, OfferSlot } from "@/types/offer";
-import { t } from "@/i18n";
+import { t } from "@/i18n";
 import { useLoadEffect } from "@/hooks/use-load-effect";
 
 /** Le serveur calcule les créneaux par fenêtre de 31 jours maximum. */
@@ -58,12 +58,16 @@ export function useOfferSlots(offer: Offer | null, durationMinutes: number | nul
 
   // Une autre durée change les créneaux possibles : on repart de zéro. Puis la première fenêtre est toujours chargée
   // (date initiale, « prochaine disponibilité »).
+  // La durée se choisit après le créneau : les fenêtres déjà consultées sont rechargées avec la nouvelle durée, pour
+  // qu'un créneau retenu plus loin dans le calendrier ne disparaisse pas faute d'avoir été rechargé.
   const restart = useCallback(() => {
+    const consulted = [...requested.current];
     generation.current += 1;
     requested.current.clear();
     setChunks({});
     setError(null);
     load(0);
+    consulted.forEach(load);
   }, [load]);
   useLoadEffect(restart);
 

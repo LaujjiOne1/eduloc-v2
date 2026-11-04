@@ -11,7 +11,11 @@
     "confirmTimeRange": "Confirm time range",
     "inPersonOnline": "In person & Online",
     "inPersonOnly": "In person only",
-    "onlineOnly": "Online only"
+    "onlineOnly": "Online only",
+    "slotLength": "Length of this slot: {{duration}}",
+    "bookableRange": "Requesters will be able to book from 1h to {{max}}, in 30-minute steps.",
+    "bookableOneHour": "Requesters will be able to book 1h.",
+    "tooShortToBook": "Under 1h: this slot cannot be booked."
   },
   "slotPill": {
     "deleteThisSlot": "Delete this slot",

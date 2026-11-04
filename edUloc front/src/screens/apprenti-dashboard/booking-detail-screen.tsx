@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ActivityIndicator, ScrollView, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { CalendarIcon, ClockIcon, LocationIcon, MicIcon, PhoneIcon } from "@/components/icons";
+import { CalendarIcon, ClockIcon, LocationIcon, LockIcon, MicIcon, PhoneIcon } from "@/components/icons";
 import { FadeIn } from "@/components/motion/fade-in";
 import { PressableScale } from "@/components/motion/pressable-scale";
 import { AuthHeader } from "@/components/ui/auth-header";
@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { PaymentCard } from "@/components/payment/payment-card";
 import { CancelBookingModal } from "@/components/ui/cancel-booking-modal";
 import { FormError } from "@/components/ui/form-error";
+import { PaymentDueBanner, RequestExpiryBanner } from "@/components/booking/request-expiry";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useBookingCancelAction } from "@/hooks/use-booking-cancel-action";
 import { useMyBooking } from "@/hooks/use-my-booking";
@@ -139,7 +140,7 @@ function BookingDetailContent({
     <ScrollView className="flex-1" contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
       <View className="mb-[6px] flex-row items-start justify-between">
         <Text className="text-[24px] font-bold font-display text-ink">{booking.offer.subjectLabel}</Text>
-        <StatusBadge status={booking.status} />
+        <StatusBadge status={booking.status} expired={booking.expired} unpaid={booking.paymentRequired} />
       </View>
       <Text className="mb-5 text-[14px] text-ink-soft">{t("common.with", { tutorName: booking.offer.tutorName })}</Text>
 
@@ -166,19 +167,23 @@ function BookingDetailContent({
 
       <RoomLocationBlock booking={booking} />
 
+      {/* Confirmée mais pas payée : il faut payer avant l'échéance pour recevoir le code de séance */}
+      {booking.status === "confirmed" && booking.paymentRequired ? <PaymentDueBanner booking={booking} /> : null}
+
       {booking.status === "confirmed" || booking.status === "in_progress" || booking.status === "completed" ? (
         <PaymentCard bookingId={booking.id} totalLabel={booking.pricing?.totalLabel ?? null} />
       ) : null}
 
+      {booking.status === "pending" || booking.expired ? <RequestExpiryBanner booking={booking} /> : null}
       {booking.status === "pending" ? <PendingSection tutorName={booking.offer.tutorName} onOpenConversation={onOpenConversation} /> : null}
       {booking.status === "confirmed" ? (
-        <ConfirmedSection bookingId={booking.id} onOpenConversation={onOpenConversation} onOpenCall={onOpenCall} onOpenOtp={onOpenOtp} />
+        <ConfirmedSection bookingId={booking.id} locked={booking.paymentRequired} onOpenConversation={onOpenConversation} onOpenCall={onOpenCall} onOpenOtp={onOpenOtp} />
       ) : null}
       {booking.status === "in_progress" ? <InProgressSection onJoinSession={onJoinSession} /> : null}
       {booking.status === "completed" ? (
         <CompletedSection durationLabel={booking.sessionDurationLabel} onOpenConversation={onOpenConversation} onReview={onReview} />
       ) : null}
-      {booking.status === "cancelled" || booking.status === "refused" ? <ClosedSection status={booking.status} /> : null}
+      {booking.status === "cancelled" || booking.status === "refused" ? <ClosedSection status={booking.status} expired={booking.expired} paymentExpired={booking.paymentExpired} /> : null}
     </ScrollView>
   );
 }
@@ -206,34 +211,24 @@ function PendingSection({ tutorName, onOpenConversation }: { tutorName: string; 
 
 function ConfirmedSection({
   bookingId,
+  locked,
   onOpenConversation,
   onOpenCall,
   onOpenOtp,
 }: {
   bookingId: string;
+  /** Pas encore payée : le code de séance n'est pas donné (et n'est même pas demandé au serveur). */
+  locked: boolean;
   onOpenConversation: () => void;
   onOpenCall: () => void;
   onOpenOtp: () => void;
 }) {
   const { t } = useTranslation();
-  const { state } = useSessionCode(bookingId);
 
   return (
     <>
       <FadeIn delay={30}>
-        <PressableScale onPress={onOpenOtp} accessibilityLabel={t("apprentiDashboard.bookingDetail.viewTheSessionCode")}>
-          <View className="mb-4 items-center rounded-lg border border-primary-tint bg-primary-tint p-[22px]">
-            <Text className="mb-2 text-[12px] font-bold uppercase tracking-[0.04em] text-primary">{t("common.sessionCode")}</Text>
-            {state.status === "loading" ? (
-              <View className="h-9 w-[140px] rounded bg-white/60" />
-            ) : state.status === "error" ? (
-              <Text className="text-[13px] text-error">{state.message}</Text>
-            ) : (
-              <Text className="text-[30px] font-bold font-display tracking-[0.1em] text-primary-dark">{state.code}</Text>
-            )}
-            <Text className="mt-2 text-[12px] text-ink-soft">{t("apprentiDashboard.bookingDetail.toBeGivenToThe")}</Text>
-          </View>
-        </PressableScale>
+        {locked ? <LockedSessionCode /> : <SessionCodeCard bookingId={bookingId} onOpenOtp={onOpenOtp} />}
       </FadeIn>
 
       <FadeIn delay={70}>
@@ -243,6 +238,40 @@ function ConfirmedSection({
         </View>
       </FadeIn>
     </>
+  );
+}
+
+function LockedSessionCode() {
+  const { t } = useTranslation();
+  return (
+    <View className="mb-4 items-center rounded-lg border border-line bg-paper-alt p-[22px]" accessibilityLabel={t("booking.paymentDue.codeLockedScreen")}>
+      <View className="mb-2 flex-row items-center gap-[6px]">
+        <LockIcon size={14} color="#585B78" />
+        <Text className="text-[12px] font-bold uppercase tracking-[0.04em] text-ink-soft">{t("booking.paymentDue.codeLockedTitle")}</Text>
+      </View>
+      <Text className="text-[22px] font-bold font-display tracking-[0.2em] text-ink-faint">••• •••</Text>
+      <Text className="mt-2 text-center text-[12.5px] text-ink-soft">{t("booking.paymentDue.codeLockedText")}</Text>
+    </View>
+  );
+}
+
+function SessionCodeCard({ bookingId, onOpenOtp }: { bookingId: string; onOpenOtp: () => void }) {
+  const { t } = useTranslation();
+  const { state } = useSessionCode(bookingId);
+  return (
+    <PressableScale onPress={onOpenOtp} accessibilityLabel={t("apprentiDashboard.bookingDetail.viewTheSessionCode")}>
+      <View className="mb-4 items-center rounded-lg border border-primary-tint bg-primary-tint p-[22px]">
+        <Text className="mb-2 text-[12px] font-bold uppercase tracking-[0.04em] text-primary">{t("common.sessionCode")}</Text>
+        {state.status === "loading" ? (
+          <View className="h-9 w-[140px] rounded bg-white/60" />
+        ) : state.status === "error" ? (
+          <Text className="text-[13px] text-error">{state.message}</Text>
+        ) : (
+          <Text className="text-[30px] font-bold font-display tracking-[0.1em] text-primary-dark">{state.code}</Text>
+        )}
+        <Text className="mt-2 text-[12px] text-ink-soft">{t("apprentiDashboard.bookingDetail.toBeGivenToThe")}</Text>
+      </View>
+    </PressableScale>
   );
 }
 
@@ -281,13 +310,19 @@ function CompletedSection({
   );
 }
 
-function ClosedSection({ status }: { status: "cancelled" | "refused" }) {
+function ClosedSection({ status, expired, paymentExpired }: { status: "cancelled" | "refused"; expired: boolean; paymentExpired: boolean }) {
   const { t } = useTranslation();
   return (
     <FadeIn delay={30}>
       <View className="items-center rounded-lg border border-line bg-surface shadow-card py-8">
         <Text className="text-center text-[13.5px] text-ink-soft">
-          {status === "cancelled" ? t("common.thisAppointmentWasCancelled") : t("apprentiDashboard.bookingDetail.thisRequestWasDeclinedBy")}
+          {status === "cancelled"
+            ? paymentExpired
+              ? t("booking.paymentDue.closedExpired")
+              : t("common.thisAppointmentWasCancelled")
+            : expired
+              ? t("booking.requestExpiry.closedExpired")
+              : t("apprentiDashboard.bookingDetail.thisRequestWasDeclinedBy")}
         </Text>
       </View>
     </FadeIn>

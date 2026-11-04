@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { CheckCircleIcon } from "@/components/icons";
 import { ScaleIn } from "@/components/motion/scale-in";
 import { Button } from "@/components/ui/button";
+import { PaymentDueBanner } from "@/components/booking/request-expiry";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { useTutorBooking } from "@/hooks/use-tutor-booking";
 import { useTranslation } from "react-i18next";
@@ -50,8 +51,13 @@ export function RequestAcceptedScreen() {
           <Text className="mb-[22px] text-center text-[14.5px] leading-[21px] text-ink-soft">
             {t("tutorDashboard.requestAccepted.theAppointmentWithIsNow", { firstName: state.booking.beneficiary.firstName })}</Text>
           <View className="mb-6">
-            <StatusBadge status="confirmed" />
+            <StatusBadge status="confirmed" unpaid={state.booking.paymentRequired} />
           </View>
+          {state.booking.paymentRequired ? (
+            <View className="w-full">
+              <PaymentDueBanner booking={state.booking} />
+            </View>
+          ) : null}
         </ScrollView>
       )}
 
